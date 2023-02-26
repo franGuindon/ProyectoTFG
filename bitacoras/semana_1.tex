@@ -1,0 +1,58 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+
+\addbibresource{../tesis/literatura.bib}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \textbf{Bitácora - Semana 1}
+  \par\vspace{10mm}
+
+  \begin{table} [!h]
+    \centering
+    \begin{tabular}{p{1.5 cm} p{1.7 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      8/2/23 & 1 h & Reunión de avance 1 & Definir metas de semana 1 \\
+      9/2/23 & 4 h & Reunión con Prof. Miguel Hernandez & Discutir generalidades del TFG \\
+      9/2/23 & 3 h & Anteproyecto & Implementar correcciones a proyecto \\
+      10/2/23 & 5 h & Investigación Artefactos & Investigar características principales de los artefactos de video \cite{Greengrass2009,Glavota2016} \\
+      13/2/23 & 4 h & Investigación en Bosques de Búsqueda Aleatoria & Estudiar matemática y algoritmos involucrados en los RDF. Estudiar marcos de trabajo de RDF. \\
+      14/2/23 & 4 h & Definición de características a utilizar & Definir características de entrenamiento a utilizar según las propiedades estadísticas de los artefactos de video. \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
