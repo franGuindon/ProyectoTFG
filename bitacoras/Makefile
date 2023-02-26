@@ -6,7 +6,10 @@
 # creation ...: 14.08.2018
 #----------------------------------------------------------------
 
-MAINFILE=not_for_human_use
+#MAINFILE=semana_3
+MAINFILES := $(wildcard semana_*.tex)
+MAINPDFS := $(patsubst %.tex,%.pdf,$(MAINFILES))
+MAINPS := $(patsubst %.tex,%.ps,$(MAINFILES))
 
 LATEX=/usr/bin/latex -interaction=batchmode -file-line-error-style
 PDFLATEX=pdflatex -interaction=batchmode
@@ -211,48 +214,48 @@ fig/%.pdf : fig/%.eps
 # Targets
 # -----------------------------------------------------------------------------
 
-pdf:     $(MAINFILE).pdf
+pdf:     $(MAINPDFS)
 
 # Sobre makeindex y xindy: makeindex se usó para hacer el índice, pero no
 # maneja bien las tildes en español, así que se sustituyó por xindy.  Sin
 # embargo la nomenclatura sigue usando makeindex, porque nomencl no funciona
 # con xindy.  Eventualmente se puede sustituir por glossaries...  
 
-$(MAINFILE).pdf: $(TEXFILES) $(PDFFILES)  $(BIBFILES)
+%.pdf: $(TEXFILES) $(PDFFILES)  $(BIBFILES)
 	@echo "Generating PDF file..."; \
 	echo "------------------------------------------" ;\
 	echo "Removing index temporary files..." ;\
-	rm -f $(MAINFILE).nl? $(MAINFILE).i* *.aux ;\
+	rm -f $*.nl? $*.i* *.aux ;\
 	echo "Running latex once..." ;\
-	$(PDFLATEX) $(MAINFILE) > pdf.log 2>&1 ;\
-	if ( $(BIB) $(MAINFILE) >> pdf.log 2>&1 ) ; then \
+	$(PDFLATEX) $* > pdf.log 2>&1 ;\
+	if ( $(BIB) $* >> pdf.log 2>&1 ) ; then \
 	  echo " Bibliography ok" ;\
 	else \
 	  echo " Bibliography failed" ;\
 	fi ;\
-	if ( makeindex $(MAINFILE).idx >> pdf.log 2>&1 ) ; then \
+	if ( makeindex $*.idx >> pdf.log 2>&1 ) ; then \
 	  echo " Index ok" ;\
 	else \
 	  echo " Index failed" ;\
 	fi ;\
-	if ( makeindex $(MAINFILE).nlo -s nomencl.ist -o $(MAINFILE).nls >> pdf.log 2>&1 ) ; then \
+	if ( makeindex $*.nlo -s nomencl.ist -o $*.nls >> pdf.log 2>&1 ) ; then \
 	  echo " List of symbols ok" ;\
 	else \
 	  echo " List of symbols failed" ;\
 	fi ;\
 	echo "Running latex twice..." ;\
-	$(PDFLATEX) $(MAINFILE) >> pdf.log 2>&1 ;\
+	$(PDFLATEX) $* >> pdf.log 2>&1 ;\
 	latex_count=5 ; \
-	while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(MAINFILE).log && [ $$latex_count -gt 0 ] ;\
+	while egrep -s 'Rerun (LaTeX|to get cross-references right)' $*.log && [ $$latex_count -gt 0 ] ;\
 	    do \
 	      echo "Rerunning latex...." ;\
-	      $(PDFLATEX) $(MAINFILE).tex >> pdf.log 2>&1 ;\
+	      $(PDFLATEX) $*.tex >> pdf.log 2>&1 ;\
 	      latex_count=`expr $$latex_count - 1` ;\
 	    done ;\
 	echo "Ready."
 
 force-pdf: 
-	touch $(MAINFILE).tex ;\
+	touch $(MAINFILES) ;\
 	make pdf
 
 figs:	$(EPSFILES)
@@ -307,10 +310,10 @@ clean-all: clean
 
 help:
 	@echo "This Makefile provides following targets: " ;\
-	echo " ps:	  generate $(MAINFILE).ps" ;\
-	echo " force-ps:  force generation of $(MAINFILE).ps" ;\
-	echo " pdf:       generate $(MAINFILE).pdf" ;\
-	echo " force-pdf: force generation of $(MAINFILE).pdf" ;\
+	echo " ps:	  generate $(MAINPS)" ;\
+	echo " force-ps:  force generation of $(MAINPS)" ;\
+	echo " pdf:       generate $(MAINPDFS)" ;\
+	echo " force-pdf: force generation of $(MAINPDFS)" ;\
 	echo " figs:      create eps image files from jpg,png,fig,etc." ;\
 	echo " pdfigs:    create pdf image files from jpg,png,fig,etc." ;\
 	echo " clean:     remove temporary files but keep final ps and pdf" ;\
