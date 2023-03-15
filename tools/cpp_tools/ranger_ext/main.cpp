@@ -32,7 +32,48 @@
 using namespace ranger;
 typedef ForestClassification ForestRangerx;
 
-void run_ranger(const ArgumentHandler& arg_handler, std::ostream& verbose_out) {
+struct Args {
+  bool verbose = true;
+  std::string outprefix = "ranger_out";
+  std::string depvarname = "";
+  MemoryMode memmode = MEM_DOUBLE;
+  std::string file = "";
+  uint mtry = 0;
+  uint ntree = DEFAULT_NUM_TREE;
+  uint seed = 0;
+};
+
+void run_ranger(const Args& arg_handler, std::ostream& verbose_out);
+
+int main(int argc, char **argv) {
+
+  try {
+    // Handle command line arguments
+    // ArgumentHandler arg_handler(argc, argv);
+    // if (arg_handler.processArguments() != 0) {
+    //   return 0;
+    // }
+    // arg_handler.checkArguments();
+    Args arg_handler{};
+
+    if (arg_handler.verbose) {
+      run_ranger(arg_handler, std::cout);
+    } else {
+      std::ofstream logfile { arg_handler.outprefix + ".log" };
+      if (!logfile.good()) {
+        throw std::runtime_error("Could not write to logfile.");
+      }
+      run_ranger(arg_handler, logfile);
+    }
+  } catch (std::exception& e) {
+    std::cerr << "Error: " << e.what() << " Ranger will EXIT now." << std::endl;
+    return -1;
+  }
+
+  return 0;
+}
+
+void run_ranger(const Args& arg_handler, std::ostream& verbose_out) {
   verbose_out << "Starting Ranger." << std::endl;
 
   // Create forest object
@@ -85,31 +126,4 @@ void run_ranger(const ArgumentHandler& arg_handler, std::ostream& verbose_out) {
   }
   forest->writeOutput();
   verbose_out << "Finished Ranger." << std::endl;
-}
-
-int main(int argc, char **argv) {
-
-  try {
-    // Handle command line arguments
-    ArgumentHandler arg_handler(argc, argv);
-    if (arg_handler.processArguments() != 0) {
-      return 0;
-    }
-    arg_handler.checkArguments();
-
-    if (arg_handler.verbose) {
-      run_ranger(arg_handler, std::cout);
-    } else {
-      std::ofstream logfile { arg_handler.outprefix + ".log" };
-      if (!logfile.good()) {
-        throw std::runtime_error("Could not write to logfile.");
-      }
-      run_ranger(arg_handler, logfile);
-    }
-  } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << " Ranger will EXIT now." << std::endl;
-    return -1;
-  }
-
-  return 0;
 }
