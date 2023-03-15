@@ -430,6 +430,9 @@ int ArgumentHandler::processArguments() {
 void ArgumentHandler::checkArguments() {
 
   // required arguments
+  if (file.empty()) {
+    throw std::runtime_error("Please specify an input filename with '--file'. See '--help' for details.");
+  }
   if (predict.empty() && depvarname.empty()) {
     throw std::runtime_error("Please specify a dependent variable name with '--depvarname'. See '--help' for details.");
   }
