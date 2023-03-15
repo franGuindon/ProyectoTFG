@@ -30,6 +30,7 @@
 #include "utility.h"
 
 using namespace ranger;
+typedef ForestClassification ForestRangerx;
 
 void run_ranger(const ArgumentHandler& arg_handler, std::ostream& verbose_out) {
   verbose_out << "Starting Ranger." << std::endl;
@@ -37,27 +38,39 @@ void run_ranger(const ArgumentHandler& arg_handler, std::ostream& verbose_out) {
   // Create forest object
   std::unique_ptr<Forest> forest { };
 
-  /* FIXME #1: Disable arg switch */
-  switch (arg_handler.treetype) {
-  case TREE_CLASSIFICATION:
-    if (arg_handler.probability) {
-      forest = make_unique<ForestProbability>();
-    } else {
-      forest = make_unique<ForestClassification>();
-    }
-    break;
-  case TREE_REGRESSION:
-    forest = make_unique<ForestRegression>();
-    break;
-  case TREE_SURVIVAL:
-    forest = make_unique<ForestSurvival>();
-    break;
-  case TREE_PROBABILITY:
-    forest = make_unique<ForestProbability>();
-    break;
-  }
+  /* Goal: Disable arg switch */
+  // switch (arg_handler.treetype) {
+  // case TREE_CLASSIFICATION:
+  //   if (arg_handler.probability) {
+  //     forest = make_unique<ForestProbability>();
+  //   } else {
+  //     forest = make_unique<ForestClassification>();
+  //   }
+  //   break;
+  // case TREE_REGRESSION:
+  //   forest = make_unique<ForestRegression>();
+  //   break;
+  // case TREE_SURVIVAL:
+  //   forest = make_unique<ForestSurvival>();
+  //   break;
+  // case TREE_PROBABILITY:
+  //   forest = make_unique<ForestProbability>();
+  //   break;
+  // }
+
+  /* Goal: Construct subclass */
+  forest = make_unique<ForestRangerx>();
 
   // Call Ranger
+  /* Goal: Disable old initCpp */
+  // forest->initCpp(arg_handler.depvarname, arg_handler.memmode, arg_handler.file, arg_handler.mtry,
+  //     arg_handler.outprefix, arg_handler.ntree, &verbose_out, arg_handler.seed, arg_handler.nthreads,
+  //     arg_handler.predict, arg_handler.impmeasure, arg_handler.targetpartitionsize, arg_handler.splitweights,
+  //     arg_handler.alwayssplitvars, arg_handler.statusvarname, arg_handler.replace, arg_handler.catvars,
+  //     arg_handler.savemem, arg_handler.splitrule, arg_handler.caseweights, arg_handler.predall, arg_handler.fraction,
+  //     arg_handler.alpha, arg_handler.minprop, arg_handler.holdout, arg_handler.predictiontype,
+  //     arg_handler.randomsplits, arg_handler.maxdepth, arg_handler.regcoef, arg_handler.usedepth);
+  /* Goal: Use custom method */
   forest->initCpp(arg_handler.depvarname, arg_handler.memmode, arg_handler.file, arg_handler.mtry,
       arg_handler.outprefix, arg_handler.ntree, &verbose_out, arg_handler.seed, arg_handler.nthreads,
       arg_handler.predict, arg_handler.impmeasure, arg_handler.targetpartitionsize, arg_handler.splitweights,
