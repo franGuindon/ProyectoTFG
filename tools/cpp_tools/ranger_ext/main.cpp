@@ -34,10 +34,10 @@ typedef ForestClassification ForestRangerx;
 
 struct Args {
   bool verbose = true;
-  std::string outprefix = "ranger_out";
+  std::string outprefix = "";
   std::string depvarname = "";
   MemoryMode memmode = MEM_DOUBLE;
-  std::string file = "";
+  std::string file = "test_data.dat";
   uint mtry = 0;
   uint ntree = DEFAULT_NUM_TREE;
   uint seed = 0;
@@ -79,6 +79,11 @@ int main(int argc, char **argv) {
     // }
     // arg_handler.checkArguments();
     Args arg_handler{};
+    arg_handler.verbose = true;
+    arg_handler.file = "test_data.dat";
+    arg_handler.depvarname = "y";
+    arg_handler.ntree = 1000;
+    arg_handler.nthreads = 12;
 
     if (arg_handler.verbose) {
       run_ranger(arg_handler, std::cout);
