@@ -1,0 +1,248 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 3}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      22/2/23 & 1 h & Reunión de avance 3 & Metas: Terminar de coleccionar videos para dataset, Preguntar a Greivin sobre generación de ground truths (cómo usaba el histograma), Ajustar Ranger para pasarle datos por API (NO DEDICAR DEMASIADO TIEMPO A CAMBIAR EL API), Tener ejemplo con features generados \\
+      23/2/23 & 4 h & Coleccionar videos & Conseguí un video de youtube sobre un walking tour de valencia. El video tiene gran variedad de escenas. Empecé a escribir un script de python para cortarlo en pedazos según los requisitos del anteproyecto. Además genera los ground truths tanto como videos cortos y como un archivo binario que se puede leer con c++. \\
+      25/2/23 & 4 h & & Continué trabajando en la generación de ground truths \\
+      26/2/23 & 4 h & & Terminé el script y terminé de generar todos los ground truths. Me tomó más tiempo de lo que esperaba. \\
+      27/2/23 & 4 h & Generación de features & \\
+      28/2/23 & 4 h & & \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section{Notas}
+  \setlength\parindent{0pt}
+
+  Notes from the meeting:
+  C++ allows use of partial\_sort to sort data.
+
+  I have 5 goals for this week:
+  \begin{enumerate}
+    \item Complete dataset
+    \item Investigate ground truth generation (ask Greivin)
+    \item Adjust Ranger to recieve data from API
+    \item Complete feature generation
+    \item Train example
+  \end{enumerate}
+
+  To complete my first goal:
+  \begin{enumerate}
+    \item Review anteproyecto goals
+    \item Determine what kind of videos I want
+    \item Find videos on the internet
+    \item Download videos
+    \item Verify that they work with the data generation pipeline
+  \end{enumerate}
+
+  According to the anteproyecto, videos must contain:
+  \begin{enumerate}
+    \item 6 different activities
+    \item 3 different light conditions
+    \item at least 600 frames long each
+    \item at least 1280x720 resolution each
+  \end{enumerate}
+
+  What do I already have?
+  \begin{enumerate}
+    \item \lstinline| SOS_20220204_122232.MOV |
+    \item \lstinline| VID_20220220_152529.MOV |
+    
+    These 2 videos are Marco's daytime dashcam recordings.
+
+    \item \lstinline| MOVI6859.mp4 |
+    
+    ...
+
+    \item \lstinline| MOVI6871.mp4 |
+    
+    These 13 videos are Marco's nighttime dashcam recordings.
+  \end{enumerate}
+
+  This means I have:
+  \begin{itemize}
+    \item 1 activity category (Driving)
+    \item 2 lighting conditions (Daytime and Nightime)
+    \item Much more than 600 frames each (20 seconds at 30 fps)
+    \item 720p videos
+  \end{itemize}
+  
+  According to my rules, I need videos in 1 more lighting condition, and 5 more activities.
+
+  These are the 6 activities I have in mind:
+  \begin{itemize}
+    \item Urban scenery while driving (the one I already have)
+    \item Nature scenery while walking
+    \item Sidewalk scenery while walking
+    \item People in Sports
+    \item People Dancing
+    \item People Video conferencing
+  \end{itemize}
+
+  I found the BOSS dataset \cite{Velastin2017}. Turns out, the resolution is not
+  right. This dataset explored certain activities in trains, like burglary. It might have been an interesting direction for the proyecto if it happens to have high metrics in certain datasets.
+
+  I found \url{https://research.google.com/youtube8m/explore.html}.
+  It helps explore youtube videos in a certain category.
+  I used it once, and found the recomendations had low quality.
+  I decided to directly search into youtube: `hd video walking'
+  The first option at the time (03:36 P.M. 23/2/23): ``4K VIDEO ULTRA HD - VALENCIA, SPAIN | 4K Walking Tour - Relax Video''
+  I watched it a while.
+  The camareographer came out of an elevator to a white wall.
+  He turn to a door.
+  He goes out on a street with lots of people.
+  The camareographer experiences a variety of scenes and people engaging in different activities.
+  The video is 1.75 H long.
+  I could't have asked for a better dataset (¿Or so I think ... ?)
+  Well, It will work great for now.
+  I google searched `download youtube video'.
+  I clicked on \url{https://ssyoutube.com/en37/youtube-video-downloader}.
+  I inputed the video link: \url{https://www.youtube.com/watch?v=EpCvEgh3I7o}.
+  I downloaded the one titled 720.mp4:
+    720: Minimum resolution in Anteproyecto
+    mp4: is mpeg-4, which uses h264x video encoding (Just what I need :).
+  Using vlc, it's the real deal, it doesn't seem to be compressed beyond h264x.
+  I want to chop it up into samples between specific ranges.
+  First, I'll rename the videos to simplify their identification.
+  I'll use a readme to keep track of the original name (in case I need it) and a
+  description of the video contents.
+  The youtube video got changed to ``walking\_tour\_720p.mp4''
+  Ok, so I ran this:
+
+  \begin{lstlisting}
+    GST_DEBUG=WARNING gst-launch-1.0 -ve filesrc location= walking_tour_720p.mp4 ! qtdemux ! video/x-h264, format=I420 ! identity drop-probability=0.1 ! h264parse ! qtmux ! filesink location= lossy_walking_tour_720p.mov \end{lstlisting}
+
+  It only took about a minute or two and it produced a new file containing simulated loss.
+
+  I wrote a small script to generate ground truths. Currently in the ``dataset/base\_videos/Youtube'' directory.
+  I'll move it to a tools directory eventually. 
+
+  This script took longer to write than I was expecting. However, I am happy with the results.
+
+  My goal now is to create a simple c++ tool that can read the lossy video frame by frame and produce a dummy .dat file. I understand that the intention is to train Ranger directly on memory, but given time constraints, I want be already training trees. Soon enough I want to work Ranger directly into the tool.
+
+  The old gstreamer pipeline is not reading the generated packet loss video.
+  I tested the pipeline on the terminal directly, with the following result:
+  \begin{lstlisting}
+    francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/tools/feature_generator (main=)$ GST_DEBUG=WARNING gst-launch-1.0 -ve filesrc location= ../../dataset/base_videos/Youtube/0/pl.mp4 ! qtdemux name=mux ! video/x-h264, format=I420 ! h264parse ! avdec_h264 ! queue ! xvimagesink
+    Setting pipeline to PAUSED ...
+    0:00:00.078809332 235818 0x562e0bc28590 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+    Pipeline is PREROLLING ...
+    0:00:00.078956304 235818 0x562e0bb3a800 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<mux> failed to find fragment defaults for stream 1
+    /GstPipeline:pipeline0/GstCapsFilter:capsfilter1: caps = video/x-h264, format=(string)I420
+    0:00:00.079155078 235818 0x562e0bb3a800 WARN                 default grammar.y:506:gst_parse_no_more_pads:<mux> warning: Delayed linking failed.
+    0:00:00.079163073 235818 0x562e0bb3a800 WARN                 default grammar.y:506:gst_parse_no_more_pads:<mux> warning: failed delayed linking some pad of GstQTDemux named mux to some pad of GstH264Parse named h264parse0
+    WARNING: from element /GstPipeline:pipeline0/GstQTDemux:mux: Delayed linking failed.
+    Additional debug info:
+    ./grammar.y(506): gst_parse_no_more_pads (): /GstPipeline:pipeline0/GstQTDemux:mux:
+    failed delayed linking some pad of GstQTDemux named mux to some pad of GstH264Parse named h264parse0
+    0:00:00.079203982 235818 0x562e0bb3a800 WARN                 qtdemux qtdemux.c:6619:gst_qtdemux_loop:<mux> error: Internal data stream error.
+    0:00:00.079208982 235818 0x562e0bb3a800 WARN                 qtdemux qtdemux.c:6619:gst_qtdemux_loop:<mux> error: streaming stopped, reason not-linked (-1)
+    ERROR: from element /GstPipeline:pipeline0/GstQTDemux:mux: Internal data stream error.
+    Additional debug info:
+    qtdemux.c(6619): gst_qtdemux_loop (): /GstPipeline:pipeline0/GstQTDemux:mux:
+    streaming stopped, reason not-linked (-1)
+    ERROR: pipeline doesn't want to preroll.
+    Setting pipeline to NULL ...
+    Freeing pipeline ...\end{lstlisting}
+  
+  I ran the mediainfo command, it shows this:
+  \begin{lstlisting}
+    francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/tools/feature_generator (main=)$ mediainfo ../../dataset/base_videos/Youtube/0/pl.mp4 
+    General
+    Complete name                            : ../../dataset/base_videos/Youtube/0/pl.mp4
+    Format                                   : MPEG-4
+    Format profile                           : Base Media
+    Codec ID                                 : isom (isom/iso2/mp41)
+    File size                                : 3.31 MiB
+    Duration                                 : 6 s 667 ms
+    Overall bit rate mode                    : Variable
+    Overall bit rate                         : 4 159 kb/s
+    Writing application                      : Lavf58.76.100
+    
+    Video
+    ID                                       : 1
+    Format                                   : MPEG-4 Visual
+    Format profile                           : Simple@L1
+    Format settings, BVOP                    : No
+    Format settings, QPel                    : No
+    Format settings, GMC                     : No warppoints
+    Format settings, Matrix                  : Default (H.263)
+    Codec ID                                 : mp4v-20
+    Duration                                 : 6 s 667 ms
+    Bit rate mode                            : Variable
+    Bit rate                                 : 4 157 kb/s
+    Maximum bit rate                         : 55.3 Mb/s / 55.3 Mb/s
+    Width                                    : 1 280 pixels
+    Height                                   : 720 pixels
+    Display aspect ratio                     : 16:9
+    Frame rate mode                          : Constant
+    Frame rate                               : 30.000 FPS
+    Color space                              : YUV
+    Chroma subsampling                       : 4:2:0
+    Bit depth                                : 8 bits
+    Scan type                                : Progressive
+    Compression mode                         : Lossy
+    Bits/(Pixel*Frame)                       : 0.150
+    Stream size                              : 3.30 MiB (100%)
+    Writing library                          : Lavc58.134.100\end{lstlisting}
+
+  The file does not have qt codec, instead it has isom codec. Also, the video seems to not be encoded with h264, which is not problematic since the original video is. Perhaps there is a different gstreamer demux I can use.
+  This video was generated by python3 and opencv, perhaps it is easier to change how the video is written.
+  I found this link \url{https://stackoverflow.com/questions/30103077/what-is-the-codec-for-mp4-videos-in-python-opencv} where someone suggests using h264 as the fourcc in the opencv videowriter. However, I have to install some packages:
+  \begin{lstlisting}
+francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/dataset/base_videos/Youtube (main=)$ sudo apt-get install ffmpeg x264 libx264-dev
+  \end{lstlisting}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

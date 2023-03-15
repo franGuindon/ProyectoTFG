@@ -1,0 +1,239 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 4}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      1/3/23 & 1 h & 4th Status Meeting & Goals: Work on ranger function, Finish feature generator, Train some models \\
+      2/3/23 & 4 h & Feature script & Add dataset loading \\
+      3/3/23 & 4 h & & Add filtering and border feature generation \\
+      4/3/23 & 4 h & Ranger function & Adding function to ranger \\
+      6/3/23 & 4 h & Feature script & Finish feature generation and start working on generating feature file \\
+      7/3/23 & 4 h & Model training & Finish feature file generation and start training models \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section{Notas}
+  \setlength\parindent{0pt}
+
+  \subsection{Notes from meeting}
+
+  Sugerencias del profe:
+  \begin{enumerate}
+    \item Investigar paper que Greivin usó (seguro está en la tesis) sobre porcentajes aceptables de pérdida (posiblemente alrededor de 5\%, yo usé 10\%).
+    \item 
+  \end{enumerate}
+
+  Metas de la semana:
+  \begin{enumerate}
+    \item Tener código concreto de features para hacer entrenamiento (".dat") (40\%)
+    \item Entrenamiento con algunos features (filtrado, mean, variance near border (TBD))
+    \item Agregarle a Ranger un loadFromMatrix que carque de un array guardado en RAM
+    \item Ground truths ver si brillo en región original de imagen afecta imagen umbralisada, ver si umbral usado se debe ajustar con brillo del macrobloque (por ejemplo usando un percentil de lista ordenada de diferencias).
+  \end{enumerate}
+
+  I used OBS to record clips of myself.
+  I managed to record them using my media info criteria:
+  - h264 encoded
+  - 720p resolution
+  - at least 30 fps (60, in this case)
+  I found a pipeline that works to decode this video:
+  \begin{lstlisting}
+francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2022_S2/dsp/dspIIS2022-G02/tools (main=)$ GST_DEBUG=WARNING gst-launch-1.0 -ve filesrc location=2023-03-05\ 21-15-49.mkv ! matroskademux ! h264parse ! avdec_h264 ! xvimagesink sync=false
+Setting pipeline to PAUSED ...
+0:00:00.090352230 34527 0x558f4d4dbe30 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+Pipeline is PREROLLING ...
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:src: caps = video/x-h264, level=(string)3.2, profile=(string)high, codec_data=(buffer)01640020ffe1001c67640020acd9405005bb016a02020280000003008000003c478c18cb01000568ef85f2c0, stream-format=(string)avc, alignment=(string)au, width=(int)1280, height=(int)720, framerate=(fraction)60/1, colorimetry=(string)bt709, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+Redistribute latency...
+0:00:00.092056792 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:sink: caps = video/x-h264, level=(string)3.2, profile=(string)high, codec_data=(buffer)01640020ffe1001c67640020acd9405005bb016a02020280000003008000003c478c18cb01000568ef85f2c0, stream-format=(string)avc, alignment=(string)au, width=(int)1280, height=(int)720, framerate=(fraction)60/1, colorimetry=(string)bt709, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+0:00:00.092072437 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092083468 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092090440 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092097165 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:sink: caps = video/x-h264, level=(string)3.2, profile=(string)high, codec_data=(buffer)01640020ffe1001c67640020acd9405005bb016a02020280000003008000003c478c18cb01000568ef85f2c0, stream-format=(string)avc, alignment=(string)au, width=(int)1280, height=(int)720, framerate=(fraction)60/1, colorimetry=(string)bt709
+0:00:00.092104334 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092111501 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092118612 34527 0x558f4d46d5e0 WARN      matroskareadcommon matroska-read-common.c:757:gst_matroska_read_common_parse_skip:<matroskademux0:sink> Unknown CueTrackPositions subelement 0xf0 - ignoring
+0:00:00.092223538 34527 0x558f4d46d5e0 WARN           matroskademux matroska-demux.c:2304:gst_matroska_demux_peek_cluster_info:<matroskademux0> Unknown ebml id 0x000000bf (possibly garbage), bailing out
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)60/1
+/GstPipeline:pipeline0/GstXvImageSink:xvimagesink0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)60/1
+Redistribute latency...
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+0:00:06.530116387 34527 0x558f4d46d400 WARN             xvimagesink xvimagesink.c:554:gst_xv_image_sink_handle_xevents:<xvimagesink0> error: Output window was closed
+ERROR: from element /GstPipeline:pipeline0/GstXvImageSink:xvimagesink0: Output window was closed
+Additional debug info:
+xvimagesink.c(554): gst_xv_image_sink_handle_xevents (): /GstPipeline:pipeline0/GstXvImageSink:xvimagesink0
+EOS on shutdown enabled -- waiting for EOS after Error
+Waiting for EOS...
+0:00:06.549353469 34527 0x558f4d46d5e0 WARN             xvimagesink xvimagesink.c:1016:gst_xv_image_sink_show_frame:<xvimagesink0> could not output image - no window
+0:00:06.549502291 34527 0x558f4d46d5e0 WARN           matroskademux matroska-demux.c:5732:gst_matroska_demux_loop:<matroskademux0> error: Internal data stream error.
+0:00:06.549535872 34527 0x558f4d46d5e0 WARN           matroskademux matroska-demux.c:5732:gst_matroska_demux_loop:<matroskademux0> error: streaming stopped, reason error (-5)
+ERROR: from element /GstPipeline:pipeline0/GstMatroskaDemux:matroskademux0: Internal data stream error.
+Additional debug info:
+matroska-demux.c(5732): gst_matroska_demux_loop (): /GstPipeline:pipeline0/GstMatroskaDemux:matroskademux0:
+streaming stopped, reason error (-5)
+0:00:06.567865543 34527 0x558f4d46d5e0 WARN             xvimagesink xvimagesink.c:1016:gst_xv_image_sink_show_frame:<xvimagesink0> could not output image - no window
+Got EOS from element "pipeline0".
+EOS received - stopping pipeline...
+Execution ended after 0:00:06.543266083
+Setting pipeline to NULL ...
+Freeing pipeline ...
+\end{lstlisting}
+
+  \subsubsection*{Reminder de metas de la semana:}
+  \begin{enumerate}
+    \item Tener código concreto de features para hacer entrenamiento (".dat") (40\%)
+    \item Entrenamiento con algunos features (filtrado, mean, variance near border (TBD))
+    \item Agregarle a Ranger un loadFromMatrix que carque de un array guardado en RAM
+    \item Ground truths ver si brillo en región original de imagen afecta imagen umbralisada, ver si umbral usado se debe ajustar con brillo del macrobloque (por ejemplo usando un percentil de lista ordenada de diferencias).
+  \end{enumerate}
+
+  \subsubsection*{Tener código concreto de features para hacer entrenamiento (".dat") (40\%):}
+  \begin{enumerate}
+    \item Load dataset
+    \begin{enumerate}
+      \item Input: Dataset files
+      \item Output: Dataset struct
+    \end{enumerate}
+    \item Process dataset into features
+    \begin{enumerate}
+      \item Input: Dataset struct
+      \item Output: Feature struct
+    \end{enumerate}
+    \item Save features
+    \begin{enumerate}
+      \item Input: Feature struct
+      \item Output: Feature file (.dat)
+    \end{enumerate}
+  \end{enumerate}
+
+  \subsubsection*{Load dataset:}
+  \begin{enumerate}
+    \item Input: Dataset files
+    \begin{enumerate}
+      \item Directory structure: \$TFG\_DIR/dataset/\$VID\_NAME/\$SNIP\_ID/\$FILES
+      \item Example: \$TFG\_DIR/dataset/walking\_tour/00/block.mp4
+    \end{enumerate}
+    \item Output: Dataset struct
+    \begin{enumerate}
+      \item Data Structure: Class with frame getter and can be iterated
+      \item Similar structure to directory
+      \item Look at hand written notes
+    \end{enumerate}
+    \item Tool creation steps:
+    \begin{enumerate}
+      \item Load and display any single frame of a file ... done
+      \item Be able to load a single frame given vid id, snip id and frame id ... done 4:26
+      \item Load data per snippet into a structure ... done
+      \item Load labels into array ... done
+    \end{enumerate}
+  \end{enumerate}
+
+  \subsubsection*{Process dataset into features:}
+  \begin{enumerate}
+    \item Input: Dataset struct (basically just a list of frames)
+    \item Output: Feature struct (list of features)
+    \item Tool creation steps:
+    \begin{enumerate}
+      \item Filter image ... done
+      \item Create function that can get average and standard deviation of rectange ... done
+      \item Create function to get all border rectange stats for different range sizes ... done
+      \item Create function to save to dat file ... done
+    \end{enumerate}
+  \end{enumerate}
+
+
+
+  Should all data should be loaded simultaneously?
+  I tested loading one snippet, which was not a problem.
+  The whole dataset fills up the ram too fast.
+
+  \subsubsection*{Entrenamiento con algunos features (filtrado, mean, variance near border (TBD)):}
+  \begin{lstlisting}
+    francis@francis-laptop:~/Documents/2023_S1/Proyecto/tools/python_tools$ ../../subprojects/ranger/cpp_version/build/ranger --verbose --file dataset.dat --depvarname bm --treetype 1 --ntree 1000 --nthreads 12
+    Starting Ranger.
+    Loading input file: dataset.dat.
+    Growing trees ..
+    Computing prediction error ..
+    
+    Tree type:                         Classification
+    Dependent variable name:           bm
+    Number of trees:                   1000
+    Sample size:                       1200
+    Number of independent variables:   64
+    Mtry:                              8
+    Target node size:                  1
+    Variable importance mode:          0
+    Memory mode:                       0
+    Seed:                              0
+    Number of threads:                 12
+    
+    Overall OOB prediction error:      0.176667
+    
+    Saved confusion matrix to file ranger_out.confusion.
+    Finished Ranger.
+    francis@francis-laptop:~/Documents/2023_S1/Proyecto/tools/python_tools$ cat ranger_out.confusion 
+    Overall OOB prediction error (Fraction missclassified): 0.176667
+    
+    Class specific prediction errors:
+                    0     1
+    predicted 0     883   174   
+    predicted 1     38    105
+  \end{lstlisting}
+
+  \subsubsection*{Agregarle a Ranger un loadFromMatrix que carque de un array guardado en RAM}
+
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
