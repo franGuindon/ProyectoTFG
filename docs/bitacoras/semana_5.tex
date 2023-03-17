@@ -29,7 +29,7 @@
   \par\vspace{1mm}
   2018259419
   \par\vspace{10mm}
-  \large\textbf{Bitácora - Semana 4}
+  \large\textbf{Bitácora - Semana 5}
   \par\vspace{10mm}
   \small
 
@@ -40,7 +40,12 @@
       \hline
       Fecha & Duración & Actividad & Descripción \\
       \hline
-      8/3/23 & 1 h & Reunión de avance 5 & \\
+      8/3/23 & 1 h & Reunión de avance 5 & Metas son agregar y entrenar nuevas características, terminar función de ranger, e investigar porcentaje de pérdida \\
+      8/3/23 & 4 h & Agregar nuevas características & Se empezó a agregar nuevas caraterísticas a script de python, pero no se llegó a entrenar \\
+      9/3/23 & 4 h & Agregar función de ranger & Se hizo el setup de meson para unificar construcción de herramientas del proyecto \\
+      12/3/23 & 4 h & & Se dió soporte al subprojecto de ranger por aparte de los archivos a extender, para desacoplar ranger de los cambios propios \\
+      13/3/23 & 4 h & & Se empezó a agregar el método de ranger con problemas de memoria \\
+      14/3/23 & 4 h & & Se trabajó en solucionar pulgas de método de ranger \\
       \hline
       \textbf{Total} & 21 h \\
       \hline
@@ -79,63 +84,7 @@
     \item Investigar porcentaje comun de perdida en h264 streaming
   \end{enumerate}
 
-  
-  \begin{lstlisting}
-francis@francis-laptop:~$ python3
-Python 3.8.10 (default, Nov 14 2022, 12:59:47) 
-[GCC 9.4.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> VCC = 3.3
->>> VLED = 2
->>> I=0.02
->>> VR = VCC-VLED
->>> VR
-1.2999999999999998
->>> R = VR/I
->>> R
-64.99999999999999
->>> resistor_colors = ['black', 'brown','red','orange','yellow', 'green','blue','violet','gray','white']
->>> R
-64.99999999999999
->>> lambda n: rint(n+0.5)
-<function <lambda> at 0x7fca35a40280>
->>> rint = lambda n: int(n+0.5)
->>> rint(R)
-65
->>> R = rint(R)
->>> units = lambda n: n%10
->>> tens = lambda n: (n//10)%10
->>> units(R)
-5
->>> tens(R)
-6
->>> rcolor_units = lambda r: resustor_colors[units(r)]
->>> rcolor_units = lambda r: resistor_colors[units(r)]
->>> rcolor_units(R)
-'green'
->>> rcolor_tens = lambda r: resistor_colors[tens(r)]
->>> rcolor_tens(R)
-'blue'
->>> rcolor_mantissa = lambda r: rcolor_tens, rcolor_units
->>> rcolor_mantissa(R)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-TypeError: 'tuple' object is not callable
->>> rcolor_mantissa = lambda r: (rcolor_tens, rcolor_units)
->>> rcolor_mantissa(R)
-(<function <lambda> at 0x7fca35a40430>, <function <lambda> at 0x7fca35a404c0>)
->>> rcolor_mantissa = lambda r: (rcolor_tens(r), rcolor_units(r))
->>> rcolor_mantissa(R)
-('blue', 'green')
->>> import math
->>> help(math.log)
-
->>> rcolor_mantissa(R)
-('blue', 'green')
->>> 
-  \end{lstlisting}
-
-  \subsubsection*{1:34 P.M. 12/3/23 Ranger Function}
+  \subsubsection*{Ranger Function}% \subsubsection*{1:34 P.M. 12/3/23 Ranger Function}
   \begin{enumerate}
     \item Setup Ranger as Meson Library Estimate: 2H Real: 
     \begin{enumerate}
@@ -151,8 +100,8 @@ TypeError: 'tuple' object is not callable
   Goal: fix linking with utility  ... done \\
   Goal: fix \url{../utility/Data.cpp:152:6: error} ... \\
   Error: I changed Data.h file without noticing \\
-  How I found solution: I looked at the git and noticed the file had changed
-  Which git?
+  How I found solution: I looked at the git and noticed the file had changed \\
+  (Which git?) \\
   I have deactivated ranger git over my own \\
   Goal: fix linking with Forest ... done \\
   Goal: fix linking with Tree ... done \\
@@ -173,15 +122,11 @@ TypeError: 'tuple' object is not callable
 
   % how (in_progress start_time) = (... 07:29 P.M. 14/3/23) looks like
   % how (done 07:29 P.M. 14/3/23) looks like
-  Goal: add custom logging in the loader location 
-  Goal: add custom loader code and watch it fail (... 07:29 P.M. 14/3/23) (done 08:06 P.M. 14/3/23) \\
-  Goal: fix compilation issues (... 08:06 P.M. 14/3/23) (done 11:00 P.M. 14/3/23) \\
-  Goal: adjust inputs so it actually trains (... 06:33 15/3/23) (done --:-- 15/3/23) \\
-  Goal: - (... --:-- 15/3/23) (done --:-- 15/3/23) \\
-  ...
-
-  Goal: start changing the code ... \\
-
+  Goal: add custom logging in the loader location ... done \\
+  Goal: add custom loader code and watch it fail ... done \\ %(... 07:29 P.M. 14/3/23) (done 08:06 P.M. 14/3/23) \\
+  Goal: fix compilation issues ... done \\ %(... 08:06 P.M. 14/3/23) (done 11:00 P.M. 14/3/23) \\
+  Goal: adjust inputs so it actually trains ... done \\ %(... 06:33 15/3/23) (done --:-- 15/3/23) \\
+  % Goal: - (... --:-- 15/3/23) (done --:-- 15/3/23) \\
 
   \begin{lstlisting}
     francis@francis-laptop:~/Documents/2023_S1/Proyecto/subprojects/ranger/cpp_version/src/build (main=)$ ./ranger -h
