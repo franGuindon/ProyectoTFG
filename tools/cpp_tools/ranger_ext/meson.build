@@ -6,10 +6,12 @@ ranger_ext_deps = []
 ranger_ext_deps += ext_deps
 
 ranger_ext_headers = [
+  'Forest.h',
   'ForestClassification.h',
   'ArgumentHandler.h']
 
 ranger_ext_sources = [
+  'Forest.cpp',
   'ForestClassification.cpp',
   'ArgumentHandler.cpp']
 ranger_ext_sources += ext_sources
