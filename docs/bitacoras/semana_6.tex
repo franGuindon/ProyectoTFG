@@ -1,0 +1,98 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 4}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      16/3/23 & 1 h & Reunión de avance 5 & Metas es: Terminar de montar función de Ranger para estar entrenando \\
+      16/3/23 & 4 h & Presentación anteproyecto & Se alistó una pressentación para el anteproyecto \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Notes from meeting}
+
+  Sugerencias del profe:
+  \begin{enumerate}
+    \item presentación 10 min 6 folios
+    \item contexto disptec - cola, brete de Greivin, problema tiene que quedar claro
+    \item objetivos y indicadores y entregable
+    \item cronograma
+    \item Recordar sobre tesis en ingles
+  \end{enumerate}
+
+  Metas de la semana:
+  \begin{enumerate}
+    \item Agregar y entrenar con nuevos features
+    \item Terminar funcion de Ranger
+    \item Investigar porcentaje comun de perdida en h264 streaming
+  \end{enumerate}
+
+  Observaciones de la reunión:
+  \begin{enumerate}
+    \item Comparar con resultados disptec ¿Métricas de detección-tiempo?
+    \item Justificar 70\% en base a lo que se ha logrado
+    \item Justificar 30 fps en base de lo que se ha logrado ... ?
+    \item Agregar más sobre generación de conjunto de entrenamiento
+    \item ¿Cómo se genera y porqué?
+    \item ir escribiendo tesis
+    \item tener intro lista
+    \item diagrama de bloques
+    \item Figuras y tablas son subjetos (voz activa)
+    \item formalizmos de tec español, maybe portada, 
+  \end{enumerate}
+
+  Goal: connect to custom init fnc ... 
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
