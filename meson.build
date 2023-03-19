@@ -6,7 +6,7 @@
 # The TFG project can be seen as a collection of tools that can be used to
 # accomplish the objectives laid out in my Project Proposal.
 ################################################################################
-project('TFG','cpp', default_options : ['c_std=c11', 'cpp_std=c++11'])
+project('TFG','cpp', default_options : ['c_std=c14', 'cpp_std=c++14'])
 
 ################################################################################
 # Tools
