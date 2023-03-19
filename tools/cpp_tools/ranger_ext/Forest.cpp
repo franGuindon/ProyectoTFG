@@ -176,8 +176,8 @@ void Forest::initCppFromArrs(std::string dependent_variable_name, MemoryMode mem
   }
 
   // Call other init function
-  std::unique_ptr<Data> &input_data = std::make_unique(loadDataFromFile(input_file).get());
-  init(input_data, mtry, output_prefix, num_trees, seed, num_threads, importance_mode,
+  std::unique_ptr<Data> input_data = loadDataFromFile(input_file);
+  init(std::move(input_data), mtry, output_prefix, num_trees, seed, num_threads, importance_mode,
       min_node_size, prediction_mode, sample_with_replacement, unordered_variable_names, memory_saving_splitting,
       splitrule, predict_all, sample_fraction_vector, alpha, minprop, holdout, prediction_type, num_random_splits,
       false, max_depth, regularization_factor, regularization_usedepth);
