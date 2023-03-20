@@ -45,7 +45,7 @@ executable('ranger',
 # These variables are extracted in TFG root and used to build extended ranger
 ################################################################################
 
-ext_incdirs = ranger_incdir
+ext_incdirs = include_directories('extension')
 ext_deps = ranger_deps
 
 ext_sources = []
