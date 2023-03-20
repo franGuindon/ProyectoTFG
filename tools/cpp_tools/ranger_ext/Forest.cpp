@@ -176,7 +176,7 @@ void Forest::initCppFromArrs(std::string dependent_variable_name, MemoryMode mem
   }
 
   // Call other init function
-  std::unique_ptr<Data> input_data = loadDataFromFile(input_file);
+  std::unique_ptr<Data> input_data = loadDataFromMem(nullptr, 0);
   init(std::move(input_data), mtry, output_prefix, num_trees, seed, num_threads, importance_mode,
       min_node_size, prediction_mode, sample_with_replacement, unordered_variable_names, memory_saving_splitting,
       splitrule, predict_all, sample_fraction_vector, alpha, minprop, holdout, prediction_type, num_random_splits,
@@ -1041,6 +1041,20 @@ std::unique_ptr<Data> Forest::loadDataFromFile(const std::string& data_path) {
   return result;
 }
 // #nocov end
+
+std::unique_ptr<Data> Forest::loadDataFromMem(float* mem, size_t size) {
+  std::unique_ptr<Data> result { };
+
+  result = make_unique<DataFloat>();
+
+  if (verbose_out) {
+    *verbose_out << "Loading from memory: " << mem << std::endl;
+  }
+  result->loadFromMem(mem, size);
+  // result->loadFromFile("test_data.dat", dependent_variable_names);
+
+  return result;
+}
 
 void Forest::setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights) {
 
