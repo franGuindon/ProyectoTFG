@@ -182,6 +182,11 @@ protected:
 
   // Load data from file
   std::unique_ptr<Data> loadDataFromFile(const std::string& data_path);
+  /** Added by Francis
+   *
+   * Currently only supports float memory.
+   */
+  std::unique_ptr<Data> loadDataFromMem(float* mem, size_t size);
 
   // Set split select weights and variables to be always considered for splitting
   void setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights);
