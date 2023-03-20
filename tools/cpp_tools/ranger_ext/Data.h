@@ -47,7 +47,7 @@ public:
   /** Added by Francis Guindon
    * 
    */
-  bool loadFromMem(float *mem, size_t size);
+  bool loadFromMem(float *mem, int num_rows, int num_cols);
 
   bool loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
       std::vector<std::string>& dependent_variable_names);

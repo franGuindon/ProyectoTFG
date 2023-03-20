@@ -134,7 +134,7 @@ void Forest::initCpp(std::string dependent_variable_name, MemoryMode memory_mode
 }
 // #nocov end
 
-void Forest::initCppFromArrs(std::string dependent_variable_name, MemoryMode memory_mode, std::string input_file, uint mtry,
+void Forest::initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *mem, int num_rows, int num_cols, uint mtry,
     std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
     std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
     std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
@@ -143,6 +143,11 @@ void Forest::initCppFromArrs(std::string dependent_variable_name, MemoryMode mem
     std::string case_weights_file, bool predict_all, double sample_fraction, double alpha, double minprop, bool holdout,
     PredictionType prediction_type, uint num_random_splits, uint max_depth,
     const std::vector<double>& regularization_factor, bool regularization_usedepth) {
+  
+  if (!mem) {
+    *verbose_out << "Memory pointer is null" << std::endl;
+    return;
+  }
 
   this->memory_mode = memory_mode;
   this->verbose_out = verbose_out;
@@ -176,7 +181,7 @@ void Forest::initCppFromArrs(std::string dependent_variable_name, MemoryMode mem
   }
 
   // Call other init function
-  std::unique_ptr<Data> input_data = loadDataFromMem(nullptr, 0);
+  std::unique_ptr<Data> input_data = loadDataFromMem(mem, num_rows, num_cols);
   init(std::move(input_data), mtry, output_prefix, num_trees, seed, num_threads, importance_mode,
       min_node_size, prediction_mode, sample_with_replacement, unordered_variable_names, memory_saving_splitting,
       splitrule, predict_all, sample_fraction_vector, alpha, minprop, holdout, prediction_type, num_random_splits,
@@ -1042,7 +1047,9 @@ std::unique_ptr<Data> Forest::loadDataFromFile(const std::string& data_path) {
 }
 // #nocov end
 
-std::unique_ptr<Data> Forest::loadDataFromMem(float* mem, size_t size) {
+std::unique_ptr<Data> Forest::loadDataFromMem(float* mem, int num_rows, int num_cols) {
+  if (!mem) { return nullptr; }
+
   std::unique_ptr<Data> result { };
 
   result = make_unique<DataFloat>();
@@ -1050,7 +1057,7 @@ std::unique_ptr<Data> Forest::loadDataFromMem(float* mem, size_t size) {
   if (verbose_out) {
     *verbose_out << "Loading from memory: " << mem << std::endl;
   }
-  result->loadFromMem(mem, size);
+  result->loadFromMem(mem, num_rows, num_cols);
   // result->loadFromFile("test_data.dat", dependent_variable_names);
 
   return result;

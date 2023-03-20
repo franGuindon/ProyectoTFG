@@ -66,7 +66,7 @@ public:
       bool order_snps, uint max_depth, const std::vector<double>& regularization_factor, bool regularization_usedepth);
   
   /* Custom added by Francis */
-  void initCppFromArrs(std::string dependent_variable_name, MemoryMode memory_mode, std::string input_file, uint mtry,
+  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *mem, int num_rows, int num_cols, uint mtry,
       std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
       std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
       std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
@@ -186,7 +186,7 @@ protected:
    *
    * Currently only supports float memory.
    */
-  std::unique_ptr<Data> loadDataFromMem(float* mem, size_t size);
+  std::unique_ptr<Data> loadDataFromMem(float* mem, int num_cols, int num_rows);
 
   // Set split select weights and variables to be always considered for splitting
   void setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights);

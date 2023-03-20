@@ -81,6 +81,18 @@ bool Data::loadFromFile(std::string filename, std::vector<std::string>& dependen
   return result;
 }
 
+/** Added by Francis Guindon
+ * 
+ */
+bool Data::loadFromMem(float *mem, int num_rows, int num_cols) {
+  if (!mem) { return false; }
+  num_rows = 0;
+
+
+  return false;
+}
+
+
 bool Data::loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
     std::vector<std::string>& dependent_variable_names) {
 
