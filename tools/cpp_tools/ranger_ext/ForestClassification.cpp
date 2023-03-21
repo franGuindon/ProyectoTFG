@@ -22,6 +22,8 @@
 #include "TreeClassification.h"
 #include "Data.h"
 
+#include <stdio.h>
+
 namespace ranger {
 
 void ForestClassification::loadForest(size_t num_trees,
