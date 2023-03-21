@@ -18,6 +18,8 @@
 #include "Data.h"
 #include "utility.h"
 
+#include <stdio.h>
+
 namespace ranger {
 
 Data::Data() :
@@ -85,7 +87,7 @@ bool Data::loadFromFile(std::string filename, std::vector<std::string>& dependen
  * 
  * Here is a list of class members that may or may be not
  * addressed:
-  - variable_names (std::vector<std::string>)             | missing
+  - variable_names (std::vector<std::string>)             | addressed
   - num_rows = num_rows (size_t)                          | addressed
   - num_rows_rounded (size_t)                             | 
   - num_cols = num_cols (size_t)                          | addressed
@@ -111,8 +113,11 @@ bool Data::loadFromMem(float *x_mem, float *y_mem, size_t num_rows, size_t num_c
   this->num_cols = num_cols;
   this->num_cols_no_snp = num_cols;
   this->externalData = false;
-  
-  return false;
+
+  this->set_x_array(x_mem);
+  this->set_y_array(y_mem);
+
+  return true;
 }
 
 bool Data::loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
