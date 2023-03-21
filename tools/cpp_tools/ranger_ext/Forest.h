@@ -64,9 +64,21 @@ public:
       bool memory_saving_splitting, SplitRule splitrule, bool predict_all, std::vector<double>& sample_fraction,
       double alpha, double minprop, bool holdout, PredictionType prediction_type, uint num_random_splits,
       bool order_snps, uint max_depth, const std::vector<double>& regularization_factor, bool regularization_usedepth);
-  
-  /* Custom added by Francis */
-  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *mem, int num_rows, int num_cols, uint mtry,
+
+/** Added by Francis
+ * @brief Initialize Forest from data arrays stored in RAM and not from files
+ * 
+ * @param dependent_variable_name :
+ * @param memory_mode             :
+ * @param x_mem                   : Array of feature vectors
+ * @param y_mem                   : Array of labels
+ * @param num_rows                : Number of rows in x_mem, corresponds to
+ *                                  the number of feature vectors in array
+ * @param num_cols                : Number of cols in x_mem, corresponds to
+ *                                  the number of features in feature vector
+ * FIXME: Add missing parameters
+ */
+  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *x_mem, float *y_mem, int num_rows, int num_cols, uint mtry,
       std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
       std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
       std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
@@ -186,7 +198,7 @@ protected:
    *
    * Currently only supports float memory.
    */
-  std::unique_ptr<Data> loadDataFromMem(float* mem, int num_cols, int num_rows);
+  std::unique_ptr<Data> loadDataFromMem(float* x_mem, float* y_mem, int num_cols, int num_rows);
 
   // Set split select weights and variables to be always considered for splitting
   void setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights);
