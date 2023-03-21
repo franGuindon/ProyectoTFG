@@ -100,7 +100,7 @@ bool Data::loadFromFile(std::string filename, std::vector<std::string>& dependen
   - snp_order (std::vector<std::vector<size_t>>)          |
   - order_snps (bool)                                     |
  */
-bool Data::loadFromMem(float *x_mem, float *y_mem, int num_rows, int num_cols) {
+bool Data::loadFromMem(float *x_mem, float *y_mem, size_t num_rows, size_t num_cols) {
   if (!x_mem) { return false; }
   if (!y_mem) { return false; }
 

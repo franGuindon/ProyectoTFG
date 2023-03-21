@@ -78,7 +78,7 @@ public:
  *                                  the number of features in feature vector
  * FIXME: Add missing parameters
  */
-  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *x_mem, float *y_mem, int num_rows, int num_cols, uint mtry,
+  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *x_mem, float *y_mem, size_t num_rows, size_t num_cols, uint mtry,
       std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
       std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
       std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
@@ -198,7 +198,7 @@ protected:
    *
    * Currently only supports float memory.
    */
-  std::unique_ptr<Data> loadDataFromMem(float* x_mem, float* y_mem, int num_cols, int num_rows);
+  std::unique_ptr<Data> loadDataFromMem(float* x_mem, float* y_mem, size_t num_cols, size_t num_rows);
 
   // Set split select weights and variables to be always considered for splitting
   void setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights);

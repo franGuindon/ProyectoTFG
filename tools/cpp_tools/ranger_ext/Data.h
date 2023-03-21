@@ -58,7 +58,7 @@ public:
    * @param num_cols : Number of cols in y_mem, corresponds to the number of
    *                   individual features in feature vector.
    */
-  bool loadFromMem(float *x_mem, float *y_mem, int num_rows, int num_cols);
+  bool loadFromMem(float *x_mem, float *y_mem, size_t num_rows, size_t num_cols);
   /** Added by Francis Guindon
    * @brief Set subclass x vector's underlying array to x_mem
    * 
@@ -67,7 +67,7 @@ public:
    * 
    * @param x_mem : Array with corresponding data
    */
-  virtual void set_x_array(float *x_mem) = 0;
+  void set_x_array(float *x_mem) {};
   /** Added by Francis Guindon
    * @brief Set subclass x vector's underlying array to y_mem
    * 
@@ -75,7 +75,7 @@ public:
    * 
    * @param y_mem : Array with corresponding data
    */
-  virtual void set_y_array(float *y_mem) = 0;
+  void set_y_array(float *y_mem) {};
 
   bool loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
       std::vector<std::string>& dependent_variable_names);
