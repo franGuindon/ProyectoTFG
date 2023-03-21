@@ -108,11 +108,13 @@ void run_ranger(const Args& arg_handler, std::ostream& verbose_out) {
   forest = make_unique<ForestRangerx>();
 
   // Call Ranger
-  float *mem = nullptr;
-  int num_rows = 0;
-  int num_cols = 0;
+  int num_rows = 10;
+  int num_cols = 11;
+  size_t mem_size = num_rows * num_cols;
+  auto x_mem = std::unique_ptr<float>(new float[mem_size]);
+  auto y_mem = std::unique_ptr<float>(new float[num_rows]);
 
-  forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode, mem, num_rows, num_cols, arg_handler.mtry,
+  forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode, x_mem.get(), y_mem.get(), num_rows, num_cols, arg_handler.mtry,
       arg_handler.outprefix, arg_handler.ntree, &verbose_out, arg_handler.seed, arg_handler.nthreads,
       arg_handler.predict, arg_handler.impmeasure, arg_handler.targetpartitionsize, arg_handler.splitweights,
       arg_handler.alwayssplitvars, arg_handler.statusvarname, arg_handler.replace, arg_handler.catvars,
