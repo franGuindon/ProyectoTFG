@@ -67,7 +67,7 @@ public:
    * 
    * @param x_mem : Array with corresponding data
    */
-  void set_x_array(float *x_mem) {};
+  virtual void set_x_array(float *x_mem) {};
   /** Added by Francis Guindon
    * @brief Set subclass x vector's underlying array to y_mem
    * 
@@ -75,7 +75,7 @@ public:
    * 
    * @param y_mem : Array with corresponding data
    */
-  void set_y_array(float *y_mem) {};
+  virtual void set_y_array(float *y_mem) {};
 
   bool loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
       std::vector<std::string>& dependent_variable_names);
