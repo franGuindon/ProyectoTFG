@@ -45,9 +45,37 @@ public:
 
   bool loadFromFile(std::string filename, std::vector<std::string>& dependent_variable_names);
   /** Added by Francis Guindon
+   * @brief Load Data from an array allocated in memory (instead of a file).
    * 
+   * Notes:
+   * Currently only supports float arrays.
+   * 
+   * @param x_mem : Array containing feature vectors (must be column major)
+   * @param y_mem : Array containing labels (only supports 1D labels)
+   * @param num_rows : Number of rows in x_mem, corresponds to the number of
+   *                   feature vectors in the array (each row is a single
+   *                   feature vector)
+   * @param num_cols : Number of cols in y_mem, corresponds to the number of
+   *                   individual features in feature vector.
    */
-  bool loadFromMem(float *mem, int num_rows, int num_cols);
+  bool loadFromMem(float *x_mem, float *y_mem, int num_rows, int num_cols);
+  /** Added by Francis Guindon
+   * @brief Set subclass x vector's underlying array to x_mem
+   * 
+   * Note: The array dimensions must already be set in the num_rows and
+   * num_cols members.
+   * 
+   * @param x_mem : Array with corresponding data
+   */
+  virtual void set_x_array(float *x_mem) = 0;
+  /** Added by Francis Guindon
+   * @brief Set subclass x vector's underlying array to y_mem
+   * 
+   * Note: The array dimension must already be set in the num_rows member.
+   * 
+   * @param y_mem : Array with corresponding data
+   */
+  virtual void set_y_array(float *y_mem) = 0;
 
   bool loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
       std::vector<std::string>& dependent_variable_names);
