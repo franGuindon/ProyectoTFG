@@ -83,15 +83,37 @@ bool Data::loadFromFile(std::string filename, std::vector<std::string>& dependen
 
 /** Added by Francis Guindon
  * 
+ * Here is a list of class members that may or may be not
+ * addressed:
+  - variable_names (std::vector<std::string>)             | missing
+  - num_rows = num_rows (size_t)                          | addressed
+  - num_rows_rounded (size_t)                             | 
+  - num_cols = num_cols (size_t)                          | addressed
+  - snp_data (unsigned char* snp_data)                    |
+  - num_cols_no_snp = num_cols (size_t)                   | addressed
+  - externalData (bool)                                   | addressed
+  - index_data (std::vector<size_t>)                      |
+  - unique_data_values (std::vector<std::vector<double>>) |
+  - max_num_unique_values (size_t)                        |
+  - is_ordered_variable (std::vector<bool>)               |
+  - permuted_sampleIDs (std::vector<size_t>)              |
+  - snp_order (std::vector<std::vector<size_t>>)          |
+  - order_snps (bool)                                     |
  */
-bool Data::loadFromMem(float *mem, int num_rows, int num_cols) {
-  if (!mem) { return false; }
-  num_rows = 0;
+bool Data::loadFromMem(float *x_mem, float *y_mem, int num_rows, int num_cols) {
+  if (!x_mem) { return false; }
+  if (!y_mem) { return false; }
 
-
+  for (size_t i = 0; i < num_cols; ++i) {
+    this->variable_names.push_back("x" + std::to_string(i));
+  }
+  this->num_rows = num_rows;
+  this->num_cols = num_cols;
+  this->num_cols_no_snp = num_cols;
+  this->externalData = false;
+  
   return false;
 }
-
 
 bool Data::loadFromFileWhitespace(std::ifstream& input_file, std::string header_line,
     std::vector<std::string>& dependent_variable_names) {
