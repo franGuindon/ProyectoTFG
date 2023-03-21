@@ -21,6 +21,8 @@
 #include "utility.h"
 #include "Data.h"
 
+#include <stdio.h>
+
 namespace ranger {
 
 class DataFloat: public Data {
@@ -54,6 +56,15 @@ public:
   void reserveMemory(size_t y_cols) override {
     x.resize(num_cols * num_rows);
     y.resize(y_cols * num_rows);
+  }
+
+  void set_x_array(float *x_mem) override {
+    size_t x_mem_size = this->num_rows * this->num_cols;
+    this->x = std::vector<float>(x_mem, x_mem + x_mem_size);
+  }
+
+  void set_y_array(float *y_mem) override {
+    this->y = std::vector<float>(y_mem, y_mem + this->num_rows);
   }
 
   void set_x(size_t col, size_t row, double value, bool& error) override {
