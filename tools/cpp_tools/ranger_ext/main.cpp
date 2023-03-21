@@ -29,6 +29,9 @@
 #include "ForestProbability.h"
 #include "utility.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 using namespace ranger;
 typedef ForestClassification ForestRangerx;
 
@@ -74,10 +77,11 @@ int main(int argc, char **argv) {
   try {
     // Handle command line arguments
     Args arg_handler{};
+    arg_handler.outprefix = "rangerx";
     arg_handler.verbose = true;
     arg_handler.file = "test_data.dat";
     arg_handler.depvarname = "y";
-    arg_handler.ntree = 1000;
+    arg_handler.ntree = 10;
     arg_handler.nthreads = 12;
     arg_handler.write = true;
 
@@ -108,11 +112,26 @@ void run_ranger(const Args& arg_handler, std::ostream& verbose_out) {
   forest = make_unique<ForestRangerx>();
 
   // Call Ranger
-  int num_rows = 10;
-  int num_cols = 11;
+  uint32_t seed = 48;
+  srand(seed);
+
+  size_t num_rows = 1000000;
+  size_t num_cols = 2;
   size_t mem_size = num_rows * num_cols;
   auto x_mem = std::unique_ptr<float>(new float[mem_size]);
   auto y_mem = std::unique_ptr<float>(new float[num_rows]);
+
+  for (size_t i = 0; i < mem_size; ++i) {
+    x_mem.get()[i] = rand() % 100;
+  }
+
+  for (size_t i = 0; i < num_rows; ++i) {
+    float x0 = x_mem.get()[i];
+    float x1 = x_mem.get()[num_rows + i];
+    bool in_roi = (x0 > 10) && (x0 < 90) && (x1 > 10) && (x1 < 90);
+    float value = in_roi ? 1 : 0;
+    y_mem.get()[i] = value;
+  }
 
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode, x_mem.get(), y_mem.get(), num_rows, num_cols, arg_handler.mtry,
       arg_handler.outprefix, arg_handler.ntree, &verbose_out, arg_handler.seed, arg_handler.nthreads,
