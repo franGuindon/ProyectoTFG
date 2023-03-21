@@ -134,7 +134,7 @@ void Forest::initCpp(std::string dependent_variable_name, MemoryMode memory_mode
 }
 // #nocov end
 
-void Forest::initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *mem, int num_rows, int num_cols, uint mtry,
+void Forest::initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *x_mem, float *y_mem, int num_rows, int num_cols, uint mtry,
     std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
     std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
     std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
@@ -144,7 +144,7 @@ void Forest::initCppFromMem(std::string dependent_variable_name, MemoryMode memo
     PredictionType prediction_type, uint num_random_splits, uint max_depth,
     const std::vector<double>& regularization_factor, bool regularization_usedepth) {
   
-  if (!mem) {
+  if (!x_mem || !y_mem) {
     *verbose_out << "Memory pointer is null" << std::endl;
     return;
   }
@@ -181,7 +181,7 @@ void Forest::initCppFromMem(std::string dependent_variable_name, MemoryMode memo
   }
 
   // Call other init function
-  std::unique_ptr<Data> input_data = loadDataFromMem(mem, num_rows, num_cols);
+  std::unique_ptr<Data> input_data = loadDataFromMem(x_mem, y_mem, num_rows, num_cols);
   init(std::move(input_data), mtry, output_prefix, num_trees, seed, num_threads, importance_mode,
       min_node_size, prediction_mode, sample_with_replacement, unordered_variable_names, memory_saving_splitting,
       splitrule, predict_all, sample_fraction_vector, alpha, minprop, holdout, prediction_type, num_random_splits,
@@ -1047,17 +1047,20 @@ std::unique_ptr<Data> Forest::loadDataFromFile(const std::string& data_path) {
 }
 // #nocov end
 
-std::unique_ptr<Data> Forest::loadDataFromMem(float* mem, int num_rows, int num_cols) {
-  if (!mem) { return nullptr; }
+std::unique_ptr<Data> Forest::loadDataFromMem(float* x_mem, float* y_mem, int num_rows, int num_cols) {
+  if (!x_mem || !y_mem) {
+    *this->verbose_out << __FILE__ << ":" << __LINE__ << "Error: null mem ptrs" << std::endl;
+    return nullptr;
+  }
 
   std::unique_ptr<Data> result { };
 
   result = make_unique<DataFloat>();
 
   if (verbose_out) {
-    *verbose_out << "Loading from memory: " << mem << std::endl;
+    *verbose_out << "Loading from memory: " << x_mem << " " << y_mem << std::endl;
   }
-  result->loadFromMem(mem, num_rows, num_cols);
+  result->loadFromMem(x_mem, y_mem, num_rows, num_cols);
   // result->loadFromFile("test_data.dat", dependent_variable_names);
 
   return result;
