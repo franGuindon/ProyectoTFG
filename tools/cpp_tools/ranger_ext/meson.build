@@ -7,6 +7,7 @@ ranger_ext_deps += ext_deps
 
 ranger_ext_headers = [
   'Data.h',
+  'DataFloat.h',
   'Forest.h',
   'ForestClassification.h',
   'ArgumentHandler.h']
