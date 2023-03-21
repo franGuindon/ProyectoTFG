@@ -26,6 +26,8 @@
 #include "DataDouble.h"
 #include "DataFloat.h"
 
+#include <stdio.h>
+
 namespace ranger {
 
 Forest::Forest() :
