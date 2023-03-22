@@ -40,11 +40,14 @@
       \hline
       Fecha & Duración & Actividad & Descripción \\
       \hline
-      16/3/23 & 1 h & Reunión de avance 5 & Metas es: Terminar de montar función de Ranger para estar entrenando \\
-      16/3/23 & 1 h & Función Ranger & Se logró desacoplar la creación del objeto datos de la función de Ranger \\
-      16/3/23 & 3 h & Presentación anteproyecto & Se alistó una presentación para el anteproyecto \\
-      17/3/23 & 1 h & Presentación anteproyecto & Se presentó el anteproyecto ante el tribunal \\
-      17/3/23 & 3 h & Función Ranger &  \\
+      15/3/23 & 1 h & Reunión de avance 5 & Metas es: Terminar de montar función de Ranger para estar entrenando \\
+      15/3/23 & 1 h & Función Ranger & Se logró desacoplar la creación del objeto de datos de la función de Ranger \\ 
+      15/3/23 & 3 h & Presentación anteproyecto & Se alistó una presentación para el anteproyecto \\
+      16/3/23 & 1 h & & Se presentó el anteproyecto ante el tribunal \\
+      16/3/23 & 3 h & Función Ranger & Se logró completar implementación con algunos errores sencillos \\
+      19/3/23 & 4 h & & Se terminó de arreglar errores y se generó código para probar la función \\
+      20/3/23 & 4 h & Generación de features en C++ & Se logró arreglar código viejo para cargar imágenes con Gstreamer y procesarlas cuadro por cuadro \\
+      21/3/23 & 4 h & & Se logró reciclar código para filtrar imágenes y se inició con códigos para tomar estadísticas sobre filtros \\
       \hline
       \textbf{Total} & 21 h \\
       \hline
@@ -100,7 +103,7 @@
   Status:
     The creation of data objects during Forest loader has been decoupled
     This allows the replacement of the data loading function
-  8:39 19/3/23
+  8:39
   Goal: Add custom data obj loader (to forest)
   8:48
   Breakfast break
@@ -130,7 +133,7 @@
   Goal: Adding ptr guards ... done
   20:29
   Goal: Load basic data ... 
-  21/3/23 04:26
+  04:26
   Status:
     I have a general understanding of what I have to do.
     The data superclass does not hold the actual data.
@@ -184,8 +187,11 @@ bool generate_dataset("path/to/lossy/video",
                       feature_vector_obj,
                       label_vector_obj)
 
-  22/3/23 4:30
-  Goal: Review python feature code
+  4:30
+  Goal: Review python feature code ... done
+  Status:
+    Old filtering code was reused (using pointer arithmetic).
+    Still working on adding statistics.
 \end{lstlisting}
 
   \printbibliography[title={Bibliografía},heading=bibintoc]
