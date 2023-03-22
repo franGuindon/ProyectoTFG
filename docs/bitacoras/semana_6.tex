@@ -159,6 +159,33 @@
     This procedure takes a few seconds
   8:24
   Work time
+  14:57
+  Status:
+    There is another cpp tool I started work on to do feature construction
+    The basic set of steps now is:
+    Link with Forest and see if I can create a minimal example where I create
+    a forest and train it.
+    Start work on function to parse file into features.
+  15:12
+  Goal: Get feature tool status
+  Status:
+    After a quick fix, it compiles.
+    Now I am trying to decide how to modify it appropiately
+    Here is an idea for a design:
+
+// pseudo C++
+std::pair<std::shared_ptr<float>, std::shared_ptr<float>> dataset = 
+    generate_dataset("path/to/feature/file", "path/to/label/file");
+- The problem here is that I don't know how much data I will use beforehand
+- I will use vectors to store the data
+
+bool generate_dataset("path/to/lossy/video",
+                      "path/to/labels",
+                      feature_vector_obj,
+                      label_vector_obj)
+
+  22/3/23 4:30
+  Goal: Review python feature code
 \end{lstlisting}
 
   \printbibliography[title={Bibliografía},heading=bibintoc]
