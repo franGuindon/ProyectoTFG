@@ -44,6 +44,16 @@ activate_ranger = true
 activate_ranger_ext = true
 
 ################################################################################
+# Feature Generator
+#
+# This tool is capable of parsing and loading the datset files
+# into an array of features
+################################################################################
+
+# Switches
+activate_feature_generator = true
+
+################################################################################
 # Switch Cases
 #
 # Some of the switches defined in this file are used here
