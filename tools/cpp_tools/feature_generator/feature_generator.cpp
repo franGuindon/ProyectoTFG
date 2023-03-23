@@ -78,12 +78,9 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
  * @param size           : Feature vector size
  * @returns bool         : Operation status
  */
-/* FIXME: Remove gstreamer from function */
 /* FIXME: Abstract whole procedure to class perhaps*/
-bool generate_frame_features(const GstMapInfo map, const size_t width,
+bool generate_frame_features(uint8_t *data, const size_t width,
                       const size_t height, std::vector<float> features) {
-  uint8_t* data = static_cast<uint8_t*>(map.data);
-
   /* Allocate vertical filter and horizontal filter */
   auto vertical_filtered = std::unique_ptr<int32_t>(new int[width*height]);
   auto horizontal_filtered = std::unique_ptr<int32_t>(new int[width*height]);
@@ -95,7 +92,7 @@ bool generate_frame_features(const GstMapInfo map, const size_t width,
 
   uint8_t* in_elem_ptr = nullptr;
   int32_t* ver_elem_ptr = nullptr;
-  int32_t* hor_elem_ptr = nullptr;
+  int32_t* hor_elem_ptnr = nullptr;
 
   
   const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
@@ -226,15 +223,16 @@ bool generate_dataset(std::string video_path, std::string labels_path,
 
     input_buffer = InputPipeline.pull_buffer(width, height);
 
-    printf("Unmapping buffer\n");
-
     /* Use InputPipeline.map to process frame info */
     printf("Generating feature\n");
-    if (!generate_frame_features(InputPipeline.map, width, height, features)) {
+    uint8_t* data = static_cast<uint8_t*>(InputPipeline.map.data);
+    if (!generate_frame_features(data, width, height, features)) {
       /** FIXME: Perhaps ensure no memory leaks before throwing error */
       throw std::runtime_error("Feature generation failed");
     }
+    data = nullptr;
 
+    printf("Unmapping buffer\n");
     gst_buffer_unmap(input_buffer, &InputPipeline.map);
 
     printf("Incrementing processed frame count\n");
