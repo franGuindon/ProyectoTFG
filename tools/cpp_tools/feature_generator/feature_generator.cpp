@@ -78,6 +78,9 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
  * @param size           : Feature vector size
  * @returns bool         : Operation status
  */
+/* FIXME: Change name to generate_frame_features */
+/* FIXME: Remove gstreamer from function */
+/* FIXME: Abstract whole procedure to class perhaps*/
 bool generate_feature(const GstMapInfo map, const size_t width,
                       const size_t height, std::vector<float> features) {
   uint8_t* data = static_cast<uint8_t*>(map.data);
@@ -129,9 +132,9 @@ bool generate_feature(const GstMapInfo map, const size_t width,
   /* FIXME: refactor test into unit */
   // uint8_t* test_in_ptr = data + 100*width + 100;
   // int32_t* test_out_ptr = horizontal_filtered.get() + 100*width + 100;
-  // printf("-%d+%d=%d\n", *test_in_ptr, *(test_in_ptr+1), *test_out_ptr);
+  // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+1), *test_out_ptr);
   // test_out_ptr = vertical_filtered.get() + 100*width + 100;
-  // printf("-%d+%d=%d\n", *test_in_ptr, *(test_in_ptr+width), *test_out_ptr);
+  // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+width), *test_out_ptr);
 
   /* Log */
   /* FIXME: refactor log into unit*/
@@ -149,16 +152,24 @@ bool generate_feature(const GstMapInfo map, const size_t width,
   /* pixel(i,j) = j*height + i goes pixel by pixel col major ... */
   /* macroblock_topleftcorner(bi,bj) = 
             bi*block_width*num_blocks_in_row + bj*block_height */
-  constexpr size_t kRowsPerBlocklength = 16;
-  constexpr size_t kPixelsPerBlocklength = 16;
-  const size_t kPixelsPerRow = width;
-  const size_t kPixelsPerCol = height;
+  // constexpr size_t kRowsPerBlocklength = 16;
+  // constexpr size_t kPixelsPerBlocklength = 16;
+  // const size_t kPixelsPerRow = width;
+  // const size_t kPixelsPerCol = height;
   
-  size_t block_i = 1; /* Measured in blocklengths */
-  size_t block_j = 1; /* Measured in blocklengths */
-  size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow + block_j*kPixelsPerBlocklength;
+  // size_t block_i = 1; /* Measured in blocklengths */
+  // size_t block_j = 1; /* Measured in blocklengths */
+  // size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
+  //                       block_j*kPixelsPerBlocklength;
+  // size_t sum = 0;
+  // size_t sum_sq = 0;
+
+  // /* Calculate sum for block row of block_offset */
+  // for (size_t i = 0; i < kPixelsPerBlocklength; ++i) {
+  //   sum += vertical_filtered.get()[i];
+  // }
   
-  features.push_back();
+  // features.push_back();
 
   return true;
 }
