@@ -78,10 +78,9 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
  * @param size           : Feature vector size
  * @returns bool         : Operation status
  */
-/* FIXME: Change name to generate_frame_features */
 /* FIXME: Remove gstreamer from function */
 /* FIXME: Abstract whole procedure to class perhaps*/
-bool generate_feature(const GstMapInfo map, const size_t width,
+bool generate_frame_features(const GstMapInfo map, const size_t width,
                       const size_t height, std::vector<float> features) {
   uint8_t* data = static_cast<uint8_t*>(map.data);
 
@@ -231,7 +230,7 @@ bool generate_dataset(std::string video_path, std::string labels_path,
 
     /* Use InputPipeline.map to process frame info */
     printf("Generating feature\n");
-    if (!generate_feature(InputPipeline.map, width, height, features)) {
+    if (!generate_frame_features(InputPipeline.map, width, height, features)) {
       /** FIXME: Perhaps ensure no memory leaks before throwing error */
       throw std::runtime_error("Feature generation failed");
     }
