@@ -14,6 +14,7 @@
 #include <fstream>
 #include <memory>
 #include <string>
+//#include
 
 /**
  * @brief Returns formated string with  input arguments
@@ -68,6 +69,18 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
   return in1 > in2 ? in1 - in2 : in2 - in1;
 }
 
+#define ABS_DIFF(in1, in2) in1 > in2 ? in1 - in2 : in2 - in1
+
+#define SUM_2_BLOCK_ROWS(dst, src, step, n0, n1) \
+        ((dst) += *(src + n0*step) + *(src + n1*step))
+
+#define SUM_4_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) \
+    ((dst) += *(src + n0*step) + *(src + n1*step)) + *(src + n2*step) + *(src + n3*step))
+
+#define SUM_8_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) \
+    ((dst) += *(src + n0*step) + *(src + n1*step)) + *(src + n2*step) + *(src + n3*step)) + \
+              *(src + n4*step) + *(src + n5*step)) + *(src + n6*step) + *(src + n7*step))
+
 /**
  * @brief Generate feature for single frame
  * 
@@ -92,7 +105,7 @@ bool generate_frame_features(uint8_t *data, const size_t width,
 
   uint8_t* in_elem_ptr = nullptr;
   int32_t* ver_elem_ptr = nullptr;
-  int32_t* hor_elem_ptnr = nullptr;
+  int32_t* hor_elem_ptr = nullptr;
 
   
   const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
@@ -109,19 +122,19 @@ bool generate_frame_features(uint8_t *data, const size_t width,
     
     /* Loop excludes last element in row by subtracting 1 from end */
     for (; in_elem_ptr != in_elem_ptr_end - 1; ++in_elem_ptr) {
-      *ver_elem_ptr++ = absolute_difference(*in_elem_ptr, *(in_elem_ptr + width));
-      *hor_elem_ptr++ = absolute_difference(*in_elem_ptr, *(in_elem_ptr + 1));
+      *ver_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + width));
+      *hor_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
     }
 
     /* Last element of row (not considered in loop) */
-    *ver_elem_ptr = absolute_difference(*in_elem_ptr, *(in_elem_ptr + width));
+    *ver_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + width));
     *hor_elem_ptr = 0;
   }
 
   /* Last row in image (not considered in loop) */
   for (; in_elem_ptr != in_row_ptr_end - 1; ++in_elem_ptr) {
     *ver_elem_ptr = 0;
-    *hor_elem_ptr = absolute_difference(*in_elem_ptr, *(in_elem_ptr + 1));
+    *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
   }
 
   /* Filter test */
@@ -148,24 +161,87 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   /* pixel(i,j) = j*height + i goes pixel by pixel col major ... */
   /* macroblock_topleftcorner(bi,bj) = 
             bi*block_width*num_blocks_in_row + bj*block_height */
-  // constexpr size_t kRowsPerBlocklength = 16;
-  // constexpr size_t kPixelsPerBlocklength = 16;
-  // const size_t kPixelsPerRow = width;
+  constexpr size_t kRowsPerBlocklength = 16;
+  constexpr size_t kPixelsPerBlocklength = 16;
+  const size_t kPixelsPerRow = width;
   // const size_t kPixelsPerCol = height;
   
-  // size_t block_i = 1; /* Measured in blocklengths */
-  // size_t block_j = 1; /* Measured in blocklengths */
-  // size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
-  //                       block_j*kPixelsPerBlocklength;
-  // size_t sum = 0;
-  // size_t sum_sq = 0;
+  size_t block_i = 1; /* Measured in blocklengths */
+  size_t block_j = 1; /* Measured in blocklengths */
+  size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
+                        block_j*kPixelsPerBlocklength;
 
-  // /* Calculate sum for block row of block_offset */
-  // for (size_t i = 0; i < kPixelsPerBlocklength; ++i) {
-  //   sum += vertical_filtered.get()[i];
-  // }
-  
+  constexpr size_t kSumArrSize = 4;
+  size_t* sums = new size_t[kSumArrSize];
+  size_t* sq_sums = new size_t[kSumArrSize];
+
+  memset(sums, 0, sizeof(size_t)*kSumArrSize);
+  memset(sq_sums, 0, sizeof(size_t)*kSumArrSize);
+
+  int32_t *ptr = vertical_filtered.get() + block_offset;
+  const int32_t *ptr_end = ptr + kPixelsPerBlocklength;
+
+  /* Calculate sums for block row of block_offset */
+  for (; ptr != ptr_end; ++ptr) {
+#define NEW_IDEA 1
+#ifdef NEW_IDEA
+
+    SUM_2_BLOCK_ROWS(sums[0], ptr, width, 0, -1);
+    SUM_2_BLOCK_ROWS(sums[1], ptr, width, 1, -2);
+    SUM_4_BLOCK_ROWS(sums[3], ptr, width, 2, 3, -3, -4);
+    SUM_8_BLOCK_ROWS(sums[3], ptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+
+    printf("Sums[0] = %ld =  %d + %d\n", sums[0], *ptr, *(ptr + -1*width));
+
+#else
+    sums[0] += *ptr           + *(ptr-  width);
+    sums[1] += *ptr           + *(ptr-  width) + *(ptr+  width) + *(ptr-2*width);
+    sums[2] += *ptr           + *(ptr-  width) + *(ptr+  width) + *(ptr-2*width)
+               *(ptr+2*width) + *(ptr+3*width) + *(ptr-3*width) + *(ptr-4*width);
+    sums[3] += *ptr           + *(ptr-  width) + *(ptr+  width) + *(ptr-2*width)
+               *(ptr+2*width) + *(ptr+3*width) + *(ptr-3*width) + *(ptr-4*width)
+               *(ptr+4*width) + *(ptr+5*width) + *(ptr+6*width) + *(ptr+7*width)
+               *(ptr-5*width) + *(ptr-6*width) + *(ptr-7*width) + *(ptr-8*width);
+    
+    sq_sums[0] += (*ptr)*(*ptr) + (*(ptr-  width))*(*(ptr-  width));
+    sq_sums[1] += (*ptr)*(*ptr) + (*(ptr-  width))*(*(ptr-  width))
+                                + (*(ptr+  width))*(*(ptr+  width))
+                                + (*(ptr-2*width))*(*(ptr-2*width));
+    sq_sums[2] += (*ptr)*(*ptr) + (*(ptr-  width))*(*(ptr-  width))
+                                + (*(ptr+  width))*(*(ptr+  width))
+                                + (*(ptr-2*width))*(*(ptr-2*width))
+                                + (*(ptr+2*width))*(*(ptr+2*width))
+                                + (*(ptr+3*width))*(*(ptr+3*width))
+                                + (*(ptr-3*width))*(*(ptr-3*width))
+                                + (*(ptr-4*width))*(*(ptr-4*width));
+    sq_sums[3] += (*ptr)*(*ptr) + (*(ptr-  width))*(*(ptr-  width))
+                                + (*(ptr+  width))*(*(ptr+  width))
+                                + (*(ptr-2*width))*(*(ptr-2*width))
+                                + (*(ptr+2*width))*(*(ptr+2*width))
+                                + (*(ptr+3*width))*(*(ptr+3*width))
+                                + (*(ptr-3*width))*(*(ptr-3*width))
+                                + (*(ptr-4*width))*(*(ptr-4*width))
+                                + (*(ptr+4*width))*(*(ptr+4*width))
+                                + (*(ptr+5*width))*(*(ptr+5*width))
+                                + (*(ptr+6*width))*(*(ptr+6*width))
+                                + (*(ptr+7*width))*(*(ptr+7*width))
+                                + (*(ptr-5*width))*(*(ptr-5*width))
+                                + (*(ptr-6*width))*(*(ptr-6*width))
+                                + (*(ptr-7*width))*(*(ptr-7*width))
+                                + (*(ptr-8*width))*(*(ptr-8*width));
+#endif
+  }
+
+  /* Calculate metrics for block row of block_offset */
+#ifndef NEW_IDEA
+  float mean = sum / kPixelsPerBlocklength;
+  float var = sum_sq / kPixelsPerBlocklength - mean*mean;
+#endif
+
   // features.push_back();
+
+  delete[] sums;
+  delete[] sq_sums;
 
   return true;
 }
