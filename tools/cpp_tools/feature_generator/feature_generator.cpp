@@ -184,48 +184,73 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
                         block_j*kPixelsPerBlocklength;
 
-  constexpr size_t kMetricsPerBorder = 4;
+  constexpr size_t kMetricsPerBorder = 8;
   size_t* sums = new size_t[kMetricsPerBorder];
   size_t* sq_sums = new size_t[kMetricsPerBorder];
 
   memset(sums, 0, sizeof(size_t)*kMetricsPerBorder);
   memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBorder);
 
-  int32_t *ptr = vertical_filtered.get() + block_offset;
-  const int32_t *ptr_end = ptr + kPixelsPerBlocklength;
+  int32_t *vptr = vertical_filtered.get() + block_offset;
+  int32_t *hptr = horizontal_filtered.get() + block_offset;
+  const int32_t *vptr_end = vptr + kPixelsPerBlocklength;
 
   /* Calculate sums for top border of block at block_offset */
-  for (; ptr != ptr_end; ++ptr) {
-    SUM_2_BLOCK_ROWS(sums[0], ptr, width, 0, -1);
-    SUM_2_BLOCK_ROWS(sums[1], ptr, width, 1, -2);
-    SUM_4_BLOCK_ROWS(sums[3], ptr, width, 2, 3, -3, -4);
-    SUM_8_BLOCK_ROWS(sums[3], ptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+  for (; vptr != vptr_end; ++vptr, ++hptr) {
+    SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
+    SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
+    SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
+    SUM_8_BLOCK_ROWS(sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SUM_2_BLOCK_ROWS(sums[4], hptr, width, 0, -1);
+    SUM_2_BLOCK_ROWS(sums[5], hptr, width, 1, -2);
+    SUM_4_BLOCK_ROWS(sums[6], hptr, width, 2, 3, -3, -4);
+    SUM_8_BLOCK_ROWS(sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
 
-    SQ_SUM_2_BLOCK_ROWS(sums[0], ptr, width, 0, -1);
-    SQ_SUM_2_BLOCK_ROWS(sums[1], ptr, width, 1, -2);
-    SQ_SUM_4_BLOCK_ROWS(sums[3], ptr, width, 2, 3, -3, -4);
-    SQ_SUM_8_BLOCK_ROWS(sums[3], ptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
+    SQ_SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
+    SQ_SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_ROWS(sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_ROWS(sums[4], hptr, width, 0, -1);
+    SQ_SUM_2_BLOCK_ROWS(sums[5], hptr, width, 1, -2);
+    SQ_SUM_4_BLOCK_ROWS(sums[6], hptr, width, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_ROWS(sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
   }
 
   sums[1] += sums[0];
   sums[2] += sums[1];
   sums[3] += sums[2];
+  
+  sums[5] += sums[4];
+  sums[6] += sums[5];
+  sums[7] += sums[6];
 
   /* Calculate metrics for block row of block_offset */
   float* means = new float[kMetricsPerBorder];
   float* vars = new float[kMetricsPerBorder];
   means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
   means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
-  means[2] = static_cast<float>(sums[2]) / kPixelsPerBlocklength;  
-  means[3] = static_cast<float>(sums[3]) / kPixelsPerBlocklength;  
+  means[2] = static_cast<float>(sums[2]) / kPixelsPerBlocklength;
+  means[3] = static_cast<float>(sums[3]) / kPixelsPerBlocklength;
+  means[4] = static_cast<float>(sums[4]) / kPixelsPerBlocklength;
+  means[5] = static_cast<float>(sums[5]) / kPixelsPerBlocklength;
+  means[6] = static_cast<float>(sums[6]) / kPixelsPerBlocklength;
+  means[7] = static_cast<float>(sums[7]) / kPixelsPerBlocklength;
   vars[0] = static_cast<float>(sq_sums[0]) / kPixelsPerBlocklength - means[0]*means[0];
   vars[1] = static_cast<float>(sq_sums[1]) / kPixelsPerBlocklength - means[1]*means[1];
   vars[2] = static_cast<float>(sq_sums[2]) / kPixelsPerBlocklength - means[2]*means[2];
   vars[3] = static_cast<float>(sq_sums[3]) / kPixelsPerBlocklength - means[3]*means[3];
+  vars[4] = static_cast<float>(sq_sums[4]) / kPixelsPerBlocklength - means[4]*means[4];
+  vars[5] = static_cast<float>(sq_sums[5]) / kPixelsPerBlocklength - means[5]*means[5];
+  vars[6] = static_cast<float>(sq_sums[6]) / kPixelsPerBlocklength - means[6]*means[6];
+  vars[7] = static_cast<float>(sq_sums[7]) / kPixelsPerBlocklength - means[7]*means[7];
 
   /* Test if values are correct */
-  printf("means = [%f, %f, %f, %f]\n", means[0], means[1], means[2], means[3]);
-  printf("vars = [%f, %f, %f, %f]\n", vars[0], vars[1], vars[2], vars[3]);
+  printf("means = [%f, %f, %f, %f, %f, %f, %f, %f]\n",
+         means[0], means[1], means[2], means[3],
+         means[1], means[2], means[3], means[4]);
+  printf("vars = [%f, %f, %f, %f, %f, %f, %f, %f]\n",
+         vars[0], vars[1], vars[2], vars[3],
+         vars[4], vars[5], vars[6], vars[7]);
 
 
   // features.push_back();
