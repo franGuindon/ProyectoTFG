@@ -167,12 +167,6 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   }
 
   /* Filter test */
-  /* FIXME: refactor test into unit */
-  // uint8_t* test_in_ptr = data + 100*width + 100;
-  // int32_t* test_out_ptr = horizontal_filtered.get() + 100*width + 100;
-  // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+1), *test_out_ptr);
-  // test_out_ptr = vertical_filtered.get() + 100*width + 100;
-  // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+width), *test_out_ptr);
 
   /* Log */
   /* FIXME: refactor log into unit*/
