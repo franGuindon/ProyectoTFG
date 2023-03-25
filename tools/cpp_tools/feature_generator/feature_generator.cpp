@@ -75,6 +75,10 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
   (dst) += *(src + n0*step) + *(src + n1*step)     \
 )
 
+#define PRINT_2_BLOCK_ROWS(src, step, n0, n1) ( \
+  printf("%d %d\n",*(src + n0*step), *(src + n1*step)) \
+)
+
 #define SUM_4_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) ( \
   (dst) += *(src + n0*step) + *(src + n1*step)             \
          + *(src + n2*step) + *(src + n3*step)             \
@@ -197,6 +201,8 @@ bool generate_frame_features(uint8_t *data, const size_t width,
 
   /* Calculate sums for top border of block at block_offset */
   for (; vptr != vptr_end; ++vptr, ++hptr) {
+    PRINT_2_BLOCK_ROWS(vptr, width, 0, -1);
+
     SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
     SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
     SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
@@ -206,14 +212,14 @@ bool generate_frame_features(uint8_t *data, const size_t width,
     SUM_4_BLOCK_ROWS(sums[6], hptr, width, 2, 3, -3, -4);
     SUM_8_BLOCK_ROWS(sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
 
-    SQ_SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
-    SQ_SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
-    SQ_SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
-    SQ_SUM_8_BLOCK_ROWS(sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
-    SQ_SUM_2_BLOCK_ROWS(sums[4], hptr, width, 0, -1);
-    SQ_SUM_2_BLOCK_ROWS(sums[5], hptr, width, 1, -2);
-    SQ_SUM_4_BLOCK_ROWS(sums[6], hptr, width, 2, 3, -3, -4);
-    SQ_SUM_8_BLOCK_ROWS(sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_ROWS(sq_sums[0], vptr, width, 0, -1);
+    SQ_SUM_2_BLOCK_ROWS(sq_sums[1], vptr, width, 1, -2);
+    SQ_SUM_4_BLOCK_ROWS(sq_sums[2], vptr, width, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_ROWS(sq_sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_ROWS(sq_sums[4], hptr, width, 0, -1);
+    SQ_SUM_2_BLOCK_ROWS(sq_sums[5], hptr, width, 1, -2);
+    SQ_SUM_4_BLOCK_ROWS(sq_sums[6], hptr, width, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_ROWS(sq_sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
   }
 
   sums[1] += sums[0];
@@ -223,6 +229,14 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   sums[5] += sums[4];
   sums[6] += sums[5];
   sums[7] += sums[6];
+
+  sq_sums[1] += sq_sums[0];
+  sq_sums[2] += sq_sums[1];
+  sq_sums[3] += sq_sums[2];
+  
+  sq_sums[5] += sq_sums[4];
+  sq_sums[6] += sq_sums[5];
+  sq_sums[7] += sq_sums[6];
 
   /* Calculate metrics for block row of block_offset */
   float* means = new float[kMetricsPerBorder];
