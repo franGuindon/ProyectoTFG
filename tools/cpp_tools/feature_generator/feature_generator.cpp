@@ -166,16 +166,6 @@ bool generate_frame_features(uint8_t *data, const size_t width,
     *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
   }
 
-  /* Filter test */
-
-  /* Log */
-  /* FIXME: refactor log into unit*/
-  /* I trust these filtered results
-   * I must now calculate features.
-   * Rectanges at 1,2,4,8 pixels away from each border
-   * 
-   */
-
   /* Allocate feature memory ... not necessary, memory is parameter */
   /* which feature first? */
   /* how about top border of first macroblock at 1 pixel width */
