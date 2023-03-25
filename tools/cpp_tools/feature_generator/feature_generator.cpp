@@ -174,29 +174,6 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   // test_out_ptr = vertical_filtered.get() + 100*width + 100;
   // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+width), *test_out_ptr);
 
-  // printf("hor fil: %d %d %d\n"
-  //        "         %d %d %d\n"
-  //        "         %d %d %d\n", horizontal_filtered.get()[0],
-  //                               horizontal_filtered.get()[1],
-  //                               horizontal_filtered.get()[2],
-  //                               horizontal_filtered.get()[width],
-  //                               horizontal_filtered.get()[width + 1],
-  //                               horizontal_filtered.get()[width + 2],
-  //                               horizontal_filtered.get()[2*width],
-  //                               horizontal_filtered.get()[2*width + 1],
-  //                               horizontal_filtered.get()[2*width + 2]);
-  // printf("ver fil: %d %d %d\n"
-  //        "         %d %d %d\n"
-  //        "         %d %d %d\n", vertical_filtered.get()[0],
-  //                               vertical_filtered.get()[1],
-  //                               vertical_filtered.get()[2],
-  //                               vertical_filtered.get()[width],
-  //                               vertical_filtered.get()[width + 1],
-  //                               vertical_filtered.get()[width + 2],
-  //                               vertical_filtered.get()[2*width],
-  //                               vertical_filtered.get()[2*width + 1],
-  //                               vertical_filtered.get()[2*width + 2]);
-
   /* Log */
   /* FIXME: refactor log into unit*/
   /* I trust these filtered results
