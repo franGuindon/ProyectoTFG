@@ -174,6 +174,29 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   // test_out_ptr = vertical_filtered.get() + 100*width + 100;
   // printf("|%d-%d|=%d\n", *test_in_ptr, *(test_in_ptr+width), *test_out_ptr);
 
+  printf("hor fil: %d %d %d\n"
+         "         %d %d %d\n"
+         "         %d %d %d\n", horizontal_filtered.get()[0],
+                                horizontal_filtered.get()[1],
+                                horizontal_filtered.get()[2],
+                                horizontal_filtered.get()[width],
+                                horizontal_filtered.get()[width + 1],
+                                horizontal_filtered.get()[width + 2],
+                                horizontal_filtered.get()[2*width],
+                                horizontal_filtered.get()[2*width + 1],
+                                horizontal_filtered.get()[2*width + 2]);
+  printf("ver fil: %d %d %d\n"
+         "         %d %d %d\n"
+         "         %d %d %d\n", vertical_filtered.get()[0],
+                                vertical_filtered.get()[1], 
+                                vertical_filtered.get()[2],
+                                vertical_filtered.get()[width],
+                                vertical_filtered.get()[width + 1],
+                                vertical_filtered.get()[width + 2],
+                                vertical_filtered.get()[2*width],
+                                vertical_filtered.get()[2*width + 1],
+                                vertical_filtered.get()[2*width + 2]);
+
   /* Log */
   /* FIXME: refactor log into unit*/
   /* I trust these filtered results
@@ -230,14 +253,14 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   /* Calculate metrics for block row of block_offset */
   float* means = new float[kMetricsPerBorder];
   float* vars = new float[kMetricsPerBorder];
-  means[0] = sums[0] / kPixelsPerBlocklength;
-  means[1] = sums[1] / kPixelsPerBlocklength;
-  means[2] = sums[2] / kPixelsPerBlocklength;  
-  means[3] = sums[3] / kPixelsPerBlocklength;  
-  vars[0] = sq_sums[0] / kPixelsPerBlocklength - means[0]*means[0];
-  vars[1] = sq_sums[1] / kPixelsPerBlocklength - means[1]*means[1];
-  vars[2] = sq_sums[2] / kPixelsPerBlocklength - means[2]*means[2];
-  vars[3] = sq_sums[3] / kPixelsPerBlocklength - means[3]*means[3];
+  means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
+  means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
+  means[2] = static_cast<float>(sums[2]) / kPixelsPerBlocklength;  
+  means[3] = static_cast<float>(sums[3]) / kPixelsPerBlocklength;  
+  vars[0] = static_cast<float>(sq_sums[0]) / kPixelsPerBlocklength - means[0]*means[0];
+  vars[1] = static_cast<float>(sq_sums[1]) / kPixelsPerBlocklength - means[1]*means[1];
+  vars[2] = static_cast<float>(sq_sums[2]) / kPixelsPerBlocklength - means[2]*means[2];
+  vars[3] = static_cast<float>(sq_sums[3]) / kPixelsPerBlocklength - means[3]*means[3];
 
   /* Test if values are correct */
   printf("means = [%f, %f, %f, %f]\n", means[0], means[1], means[2], means[3]);
