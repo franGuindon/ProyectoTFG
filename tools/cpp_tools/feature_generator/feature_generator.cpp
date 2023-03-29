@@ -58,17 +58,6 @@ GstElement *build_pipeline(const std::string &format, Args... args) {
   return pipeline;
 }
 
-/**
- * @brief Calculate absolute diference of two values using ternary operator
- * 
- * @param in1       : First input
- * @param in2       : Second input
- * @returns uint8_t : Absolute difference
- */
-inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
-  return in1 > in2 ? in1 - in2 : in2 - in1;
-}
-
 #define ABS_DIFF(in1, in2) in1 > in2 ? in1 - in2 : in2 - in1
 
 #define SUM_2_BLOCK_ROWS(dst, src, step, n0, n1) ( \
@@ -77,6 +66,12 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
 
 #define PRINT_2_BLOCK_ROWS(src, step, n0, n1) ( \
   printf("%d %d\n",*(src + n0*step), *(src + n1*step)) \
+)
+
+#define PRINT_8_BLOCK_ROWS(src, step, n0, n1, n2, n3, n4, n5, n6, n7) (          \
+  printf("%d %d %d %d %d %d %d %d\n",                                            \
+         *(src + n0*step), *(src + n1*step), *(src + n2*step), *(src + n3*step), \
+         *(src + n4*step), *(src + n5*step), *(src + n6*step), *(src + n7*step)) \
 )
 
 #define SUM_4_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) ( \
@@ -115,32 +110,33 @@ inline uint8_t absolute_difference(const uint8_t in1, const uint8_t in2) {
 )
 
 /**
- * @brief Generate feature for single frame
+ * @brief Applies [-1, 1] filter horizontally and vertically on input frame
  * 
- * @param map            : Frame data
- * @param width          : Frame width
- * @param height         : Frame height
- * @param feature_vector : 
- * @param size           : Feature vector size
- * @returns bool         : Operation status
+ * Note: Filtered results must have the same dimensions as input data
+ * 
+ * @param data : Input frame of dimensions 'width' and 'height'
+ * @param vfiltered : where vertically filtered result will be stored.
+ * @param hfiltered : where horizontally filtered result will be stored.
+ * @param width     : Width for data, vfiltered, and hfiltered buffers.
+ * @param height    : Height for data, vfiltered, and hfiltered buffers.
+ * @return true     : In case of success
+ * @return false    : In case of failure
  */
-/* FIXME: Abstract whole procedure to class perhaps*/
-bool generate_frame_features(uint8_t *data, const size_t width,
-                      const size_t height, std::vector<float> features) {
-  /* Allocate vertical filter and horizontal filter */
-  auto vertical_filtered = std::unique_ptr<int32_t>(new int[width*height]);
-  auto horizontal_filtered = std::unique_ptr<int32_t>(new int[width*height]);
+bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
+                  size_t width, size_t height) {
+  if (!data || !vfiltered || !hfiltered) {
+    printf("Filter frame error: null parameters");
+    return false;
+  }
 
-  /* Calculate filters*/
-  uint8_t* in_row_ptr = data;
-  int32_t* ver_row_ptr = vertical_filtered.get();
-  int32_t* hor_row_ptr = horizontal_filtered.get();
+  const uint8_t* in_row_ptr = data;
+  uint8_t* ver_row_ptr = vfiltered;
+  uint8_t* hor_row_ptr = hfiltered;
 
-  uint8_t* in_elem_ptr = nullptr;
-  int32_t* ver_elem_ptr = nullptr;
-  int32_t* hor_elem_ptr = nullptr;
+  const uint8_t* in_elem_ptr = nullptr;
+  uint8_t* ver_elem_ptr = nullptr;
+  uint8_t* hor_elem_ptr = nullptr;
 
-  
   const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
 
   /* Loop excludes last row by subtracting width from end */
@@ -170,6 +166,29 @@ bool generate_frame_features(uint8_t *data, const size_t width,
     *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
   }
 
+  return true;
+}
+
+/**
+ * @brief Generate feature for single frame
+ * 
+ * @param data           : Frame data
+ * @param width          : Frame width
+ * @param height         : Frame height
+ * @param feature_vector : 
+ * @param size           : Feature vector size
+ * @returns bool         : Operation status
+ */
+/* FIXME: Abstract whole procedure to class perhaps*/
+bool generate_frame_features(const uint8_t *data, const size_t width,
+                      const size_t height, std::vector<float> features) {
+
+  /* Allocate vertical filter and horizontal filter */
+  auto vertical_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto horizontal_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+
+  filter_frame(data, vertical_filtered.get(), horizontal_filtered.get(), width, height);
+
   /* Allocate feature memory ... not necessary, memory is parameter */
   /* which feature first? */
   /* how about top border of first macroblock at 1 pixel width */
@@ -195,14 +214,33 @@ bool generate_frame_features(uint8_t *data, const size_t width,
   memset(sums, 0, sizeof(size_t)*kMetricsPerBorder);
   memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBorder);
 
-  int32_t *vptr = vertical_filtered.get() + block_offset;
-  int32_t *hptr = horizontal_filtered.get() + block_offset;
-  const int32_t *vptr_end = vptr + kPixelsPerBlocklength;
+  uint8_t *vptr = vertical_filtered.get() + block_offset;
+  uint8_t *hptr = horizontal_filtered.get() + block_offset;
+  const uint8_t *vptr_end = vptr + kPixelsPerBlocklength;
 
+  printf("Original image range\n");
+  const uint8_t *in_elem_ptr = data + block_offset;
+  const uint8_t *in_elem_ptr_end = in_elem_ptr + kPixelsPerBlocklength;
+  for (; in_elem_ptr != in_elem_ptr_end; ++in_elem_ptr) {
+    PRINT_8_BLOCK_ROWS(in_elem_ptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
+  }
+
+  printf("Horizontal range\n");
+  for (; vptr != vptr_end; ++vptr, ++hptr) {
+    PRINT_8_BLOCK_ROWS(hptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
+  }
+  vptr = vertical_filtered.get() + block_offset;
+  hptr = horizontal_filtered.get() + block_offset;
+
+  printf("Vertical range\n");
+  for (; vptr != vptr_end; ++vptr, ++hptr) {
+    PRINT_8_BLOCK_ROWS(vptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
+  }
+  vptr = vertical_filtered.get() + block_offset;
+  hptr = horizontal_filtered.get() + block_offset;
+  
   /* Calculate sums for top border of block at block_offset */
   for (; vptr != vptr_end; ++vptr, ++hptr) {
-    PRINT_2_BLOCK_ROWS(vptr, width, 0, -1);
-
     SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
     SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
     SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
@@ -315,7 +353,7 @@ bool generate_dataset(std::string video_path, std::string labels_path,
 
   printf("Starting pipeline wrapper for input pipeline\n");
   InputPipeline.start_pipeline("sink");
-  int total_frames = 200;
+  int total_frames = 1;// 200;
 
   /* Loop to process frames */
   printf("Starting processing loop\n");
