@@ -14,7 +14,11 @@
 #include <fstream>
 #include <memory>
 #include <string>
-//#include
+
+constexpr size_t kBlockDimension = 16;
+constexpr size_t kRowsPerBlocklength = kBlockDimension;
+constexpr size_t kPixelsPerBlocklength = kBlockDimension;
+constexpr size_t kMetricsPerBorder = 8;
 
 /**
  * @brief Returns formated string with  input arguments
@@ -33,29 +37,6 @@ const std::string format(const std::string &format, Args... args) {
   std::unique_ptr<char[]> buf(new char[size]);
   std::snprintf(buf.get(), size, format.c_str(), args...);
   return std::string(buf.get(), buf.get() + size - 1);
-}
-
-/**
- * @brief Converts string to a GstElement with pipeline.
- *
- * @tparam Args.
- * @param format: string with the pipeline to be build.
- * @param args: arguments to format the string with.
- * @return GstElement*: pipeline element.
- */
-template <typename... Args>
-GstElement *build_pipeline(const std::string &format, Args... args) {
-  int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
-  auto size = static_cast<size_t>(size_s);
-  std::unique_ptr<char[]> buf(new char[size]);
-  std::snprintf(buf.get(), size, format.c_str(), args...);
-  std::string tmp_str = std::string(buf.get(), buf.get() + size - 1);
-  const char *pipeline_char = tmp_str.c_str();
-  printf("%s\n", pipeline_char);
-  GstElement *pipeline = NULL;
-  pipeline = gst_parse_launch(pipeline_char, NULL);
-
-  return pipeline;
 }
 
 #define ABS_DIFF(in1, in2) in1 > in2 ? in1 - in2 : in2 - in1
@@ -123,7 +104,7 @@ GstElement *build_pipeline(const std::string &format, Args... args) {
  * @return false    : In case of failure
  */
 bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
-                  size_t width, size_t height) {
+                  const size_t width, const size_t height) {
   if (!data || !vfiltered || !hfiltered) {
     printf("Filter frame error: null parameters");
     return false;
@@ -170,76 +151,42 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
 }
 
 /**
- * @brief Generate feature for single frame
+ * @brief Generate features for a horizontal border of a block
  * 
- * @param data           : Frame data
- * @param width          : Frame width
- * @param height         : Frame height
- * @param feature_vector : 
- * @param size           : Feature vector size
- * @returns bool         : Operation status
+ * Note: The order of features that are pushed back into the features vector:
+ * - First, the mean of a height 2 block border of the vertical filtered frame
+ * - Then, the mean of a height 4 border, then 8, then 16
+ * - Then, the means of the horizontal filtered frame block border
+ *   (following the same height order)
+ * - Then the variances for the vertical filtered frame
+ * - Finally, the variances for the horizontal filtered frame
+ * 
+ * @param vfiltered     : Vertical filtered frame data
+ * @param hfiltered     : Horizontal filtered frame data
+ * @param border_offset : Border location within frame data (left block corner)
+ * @param width         : Frame data width
+ * @param height        : Frame data height
+ * @param features      : Feature memory
+ * @return true         : In case of success
+ * @return false        : In case of failure
  */
-/* FIXME: Abstract whole procedure to class perhaps*/
-bool generate_frame_features(const uint8_t *data, const size_t width,
-                      const size_t height, std::vector<float> features) {
-
-  /* Allocate vertical filter and horizontal filter */
-  auto vertical_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
-  auto horizontal_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
-
-  filter_frame(data, vertical_filtered.get(), horizontal_filtered.get(), width, height);
-
-  /* Allocate feature memory ... not necessary, memory is parameter */
-  /* which feature first? */
-  /* how about top border of first macroblock at 1 pixel width */
-  /* how to calculate offset and size? */
-  /* pixel(i,j) = i*width + j goes pixel by pixel row major */
-  /* pixel(i,j) = j*height + i goes pixel by pixel col major ... */
-  /* macroblock_topleftcorner(bi,bj) = 
-            bi*block_width*num_blocks_in_row + bj*block_height */
-  constexpr size_t kRowsPerBlocklength = 16;
-  constexpr size_t kPixelsPerBlocklength = 16;
-  const size_t kPixelsPerRow = width;
-  // const size_t kPixelsPerCol = height;
-  
-  size_t block_i = 1; /* Measured in blocklengths */
-  size_t block_j = 1; /* Measured in blocklengths */
-  size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
-                        block_j*kPixelsPerBlocklength;
-
-  constexpr size_t kMetricsPerBorder = 8;
+bool horizontal_border_block_features(const uint8_t *vfiltered,
+                                      const uint8_t *hfiltered,
+                                      const size_t border_offset,
+                                      const size_t width, const size_t height,
+                                      std::vector<float> &features) {
   size_t* sums = new size_t[kMetricsPerBorder];
   size_t* sq_sums = new size_t[kMetricsPerBorder];
+  float* means = new float[kMetricsPerBorder];
+  float* vars = new float[kMetricsPerBorder];
 
   memset(sums, 0, sizeof(size_t)*kMetricsPerBorder);
   memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBorder);
 
-  uint8_t *vptr = vertical_filtered.get() + block_offset;
-  uint8_t *hptr = horizontal_filtered.get() + block_offset;
+  const uint8_t *vptr = vfiltered + border_offset;
+  const uint8_t *hptr = hfiltered + border_offset;
   const uint8_t *vptr_end = vptr + kPixelsPerBlocklength;
 
-  printf("Original image range\n");
-  const uint8_t *in_elem_ptr = data + block_offset;
-  const uint8_t *in_elem_ptr_end = in_elem_ptr + kPixelsPerBlocklength;
-  for (; in_elem_ptr != in_elem_ptr_end; ++in_elem_ptr) {
-    PRINT_8_BLOCK_ROWS(in_elem_ptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
-  }
-
-  printf("Horizontal range\n");
-  for (; vptr != vptr_end; ++vptr, ++hptr) {
-    PRINT_8_BLOCK_ROWS(hptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
-  }
-  vptr = vertical_filtered.get() + block_offset;
-  hptr = horizontal_filtered.get() + block_offset;
-
-  printf("Vertical range\n");
-  for (; vptr != vptr_end; ++vptr, ++hptr) {
-    PRINT_8_BLOCK_ROWS(vptr, width, -4, -3, -2, -1, 0, 1, 2, 3);
-  }
-  vptr = vertical_filtered.get() + block_offset;
-  hptr = horizontal_filtered.get() + block_offset;
-  
-  /* Calculate sums for top border of block at block_offset */
   for (; vptr != vptr_end; ++vptr, ++hptr) {
     SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
     SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
@@ -277,8 +224,6 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   sq_sums[7] += sq_sums[6];
 
   /* Calculate metrics for block row of block_offset */
-  float* means = new float[kMetricsPerBorder];
-  float* vars = new float[kMetricsPerBorder];
   means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
   means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
   means[2] = static_cast<float>(sums[2]) / kPixelsPerBlocklength;
@@ -296,20 +241,87 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   vars[6] = static_cast<float>(sq_sums[6]) / kPixelsPerBlocklength - means[6]*means[6];
   vars[7] = static_cast<float>(sq_sums[7]) / kPixelsPerBlocklength - means[7]*means[7];
 
-  /* Test if values are correct */
-  printf("means = [%f, %f, %f, %f, %f, %f, %f, %f]\n",
-         means[0], means[1], means[2], means[3],
-         means[1], means[2], means[3], means[4]);
-  printf("vars = [%f, %f, %f, %f, %f, %f, %f, %f]\n",
-         vars[0], vars[1], vars[2], vars[3],
-         vars[4], vars[5], vars[6], vars[7]);
+  features.push_back(means[0]);
+  features.push_back(means[1]);
+  features.push_back(means[2]);
+  features.push_back(means[3]);
+  features.push_back(means[4]);
+  features.push_back(means[5]);
+  features.push_back(means[6]);
+  features.push_back(means[7]);
+  features.push_back(vars[0]);
+  features.push_back(vars[1]);
+  features.push_back(vars[2]);
+  features.push_back(vars[3]);
+  features.push_back(vars[4]);
+  features.push_back(vars[5]);
+  features.push_back(vars[6]);
+  features.push_back(vars[7]);
 
-
-  // features.push_back();
   delete[] means;
   delete[] vars;
   delete[] sums;
   delete[] sq_sums;
+
+  return true;
+}
+
+/**
+ * @brief Generate features for single block
+ * 
+ * @param vfiltered    : Vertical filtered frame data
+ * @param hfiltered    : Horizontal filtered frame data
+ * @param block_offset : Block location within frame data (top left corner)
+ * @param width        : Frame data width
+ * @param height       : Frame data height
+ * @param features     : Feature memory
+ * @return true        : In case of success
+ * @return false       : In case of failure
+ */
+bool generate_block_features(const uint8_t *vfiltered, const uint8_t *hfiltered,
+                             const size_t block_offset, const size_t width,
+                             const size_t height, std::vector<float> &features) {
+  
+  horizontal_border_block_features(vfiltered, hfiltered, block_offset, width,
+                                   height, features);
+
+  for (size_t i = 0; i < 2*kMetricsPerBorder; ++i) {
+    printf("%f ", features[i]);
+  }
+  printf("\n");
+
+  return true;
+}
+
+/**
+ * @brief Generate features for single frame
+ * 
+ * @param data           : Frame data
+ * @param width          : Frame width
+ * @param height         : Frame height
+ * @param features       : Features vector
+ * @returns true         : In case of success
+ * @returns false        : In case of failure
+ */
+/* FIXME: Abstract whole procedure to class perhaps*/
+bool generate_frame_features(const uint8_t *data, const size_t width,
+                      const size_t height, std::vector<float> &features) {
+
+  /* Allocate vertical filter and horizontal filter */
+  auto vertical_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto horizontal_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+
+  filter_frame(data, vertical_filtered.get(), horizontal_filtered.get(), width, height);
+  
+  const size_t kPixelsPerRow = width;
+  
+  size_t block_i = 1; /* Measured in blocklengths */
+  size_t block_j = 1; /* Measured in blocklengths */
+  size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
+                        block_j*kPixelsPerBlocklength;
+
+  generate_block_features(vertical_filtered.get(), horizontal_filtered.get(),
+                          block_offset, width, height, features);
 
   return true;
 }
@@ -329,7 +341,7 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
  * @returns bool      : Operation status
  */
 bool generate_dataset(std::string video_path, std::string labels_path,
-                      std::vector<float> features, std::vector<float> labels) {
+                      std::vector<float> &features, std::vector<float> labels) {
   GstElement *input_pipeline = NULL;
   int processed_frames = 0;
   GstBuffer *input_buffer = NULL;
