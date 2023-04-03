@@ -163,9 +163,7 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
   const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
 
   /* Loop excludes last row by subtracting width from end */
-  for (; in_row_ptr != in_row_ptr_end - width; in_row_ptr += width,
-                                               ver_row_ptr += width,
-                                               hor_row_ptr += width) {
+  for (; in_row_ptr != in_row_ptr_end - width;) {
     in_elem_ptr = in_row_ptr;
     ver_elem_ptr = ver_row_ptr;
     hor_elem_ptr = hor_row_ptr;
@@ -173,28 +171,53 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
     const uint8_t* in_elem_ptr_end = in_elem_ptr + width;
     
     /* Loop excludes last element in row by subtracting 1 from end */
-    for (; in_elem_ptr != in_elem_ptr_end - 1; ++in_elem_ptr) {
-      *ver_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + width));
-      *hor_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+    for (; in_elem_ptr != in_elem_ptr_end - 1;) {
+      *ver_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + width));
+      *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+
+      ++in_elem_ptr;
+      ++ver_elem_ptr;
+      ++hor_elem_ptr;
     }
 
     /* Last element of row (not considered in loop) */
     *ver_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + width));
     *hor_elem_ptr = 0;
+
+    in_row_ptr += width;
+    ver_row_ptr += width;
+    hor_row_ptr += width;
   }
 
   /* Last row in image (not considered in loop) */
-  for (; in_elem_ptr != in_row_ptr_end - 1; ++in_elem_ptr) {
-    *ver_elem_ptr++ = 0;
-    *hor_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+  for (; in_elem_ptr != in_row_ptr_end - 1;) {
+    *ver_elem_ptr = 0;
+    *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+
+    ++in_elem_ptr;
+    ++ver_elem_ptr;
+    ++hor_elem_ptr;
   }
   
   *ver_elem_ptr = 0;
   *hor_elem_ptr = 0;
 
+  printf("Problematic val: %d\n", *(hfiltered + 718*1280+1279));
+
   return true;
 }
 
+/**
+ * @brief Get the frame sat object
+ * 
+ * @param data 
+ * @param sat 
+ * @param sq_sat 
+ * @param width 
+ * @param height 
+ * @return true 
+ * @return false 
+ */
 bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
                    const size_t width, const size_t height) {
   if (!data || !sat || !sq_sat) {
