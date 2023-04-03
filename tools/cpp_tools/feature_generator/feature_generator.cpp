@@ -234,22 +234,34 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
   uint8_t* sq_sat_elem_ptr = sq_sat_row_ptr;
 
   /* First element in image */
-  *sat_elem_ptr++ = *in_elem_ptr;
-  *sq_sat_elem_ptr++ = (*in_elem_ptr)*(*in_elem_ptr);
+  *sat_elem_ptr = *in_elem_ptr;
+  *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr);
 
   /* First row in image (not considered in loop) */
   ++in_elem_ptr;
+  ++sat_elem_ptr;
+  ++sq_sat_elem_ptr;
   const uint8_t* in_elem_ptr_end = in_row_ptr + width;
   for (; in_elem_ptr != in_elem_ptr_end; ++in_elem_ptr,
                                          ++sat_elem_ptr,
                                          ++sq_sat_elem_ptr) {
     *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-1);
     *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sq_sat_elem_ptr-1);
+
+    if (in_elem_ptr == data + 88) {
+      printf("%d (%p) (%p)\n", *in_elem_ptr, in_elem_ptr, data + 88);
+      printf("%d (%p) (%p)\n", *(sat_elem_ptr-1), sat_elem_ptr-1, sat + 87);
+      printf("%d (%p) (%p)\n", *sat_elem_ptr, sat_elem_ptr, sat + 88);
+    }
   }
+
+  printf("Problematic value: %d (%p)\n", *(sat + 88), sat + 88);
 
   /* Loop excludes first row */
   in_row_ptr += width;
-  const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
+  sat_row_ptr += width;
+  sq_sat_row_ptr += width;
+  const uint8_t* in_row_ptr_end = data + width*height;
   for (; in_row_ptr != in_row_ptr_end; in_row_ptr += width,
                                        sat_row_ptr += width,
                                        sq_sat_row_ptr += width) {
@@ -259,7 +271,7 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
 
     /* First element in row */
     *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-width);
-    *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sat_elem_ptr-width);
+    *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sq_sat_elem_ptr-width);
     
     /* Loop excludes first element in row */
     ++sat_elem_ptr;
@@ -276,6 +288,8 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
                        - *(sq_sat_elem_ptr-width-1);
     }
   }
+
+  printf("Problematic value: %d (%p)\n", *(sat + 88), sat + 88);
 
   return true;
 }
