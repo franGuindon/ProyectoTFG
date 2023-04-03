@@ -156,17 +156,14 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
   uint8_t* ver_row_ptr = vfiltered;
   uint8_t* hor_row_ptr = hfiltered;
 
-  const uint8_t* in_elem_ptr = nullptr;
-  uint8_t* ver_elem_ptr = nullptr;
-  uint8_t* hor_elem_ptr = nullptr;
+  const uint8_t* in_elem_ptr = in_row_ptr;
+  uint8_t* ver_elem_ptr = ver_row_ptr;
+  uint8_t* hor_elem_ptr = hor_row_ptr;
 
   const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
 
   /* Loop excludes last row by subtracting width from end */
   for (; in_row_ptr != in_row_ptr_end - width;) {
-    in_elem_ptr = in_row_ptr;
-    ver_elem_ptr = ver_row_ptr;
-    hor_elem_ptr = hor_row_ptr;
 
     const uint8_t* in_elem_ptr_end = in_elem_ptr + width;
     
@@ -187,6 +184,10 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
     in_row_ptr += width;
     ver_row_ptr += width;
     hor_row_ptr += width;
+
+    in_elem_ptr = in_row_ptr;
+    ver_elem_ptr = ver_row_ptr;
+    hor_elem_ptr = hor_row_ptr;
   }
 
   /* Last row in image (not considered in loop) */
@@ -199,10 +200,9 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
     ++hor_elem_ptr;
   }
   
+  /* Last element in last row (not considered in loop) */
   *ver_elem_ptr = 0;
   *hor_elem_ptr = 0;
-
-  printf("Problematic val: %d\n", *(hfiltered + 718*1280+1279));
 
   return true;
 }
