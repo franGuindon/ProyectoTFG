@@ -103,15 +103,17 @@ const std::string format(const std::string &format, Args... args) {
 )
 
 /**
- * @brief FIXME: Missing docs
+ * @brief Saves a buffer to a file
  * 
- * @param filename 
- * @param data 
- * @param size 
- * @return true 
- * @return false 
+ * @tparam dtype   : Data type for data to save
+ * @param filename : Filename to save data
+ * @param data     : Data pointer of dtype type
+ * @param size     : In dtype units
+ * @return true    : In case of success
+ * @return false   : In case of failure
  */
-bool save_frame(const std::string filename, const uint8_t *data,
+template <typename dtype>
+bool save_frame(const std::string filename, const dtype *data,
                 const size_t size) {
   if (!data) {
     printf("Save frame error: Data pointer is null\n");
@@ -125,7 +127,7 @@ bool save_frame(const std::string filename, const uint8_t *data,
     return false;
   }
 
-  file.write(reinterpret_cast<const char *>(data), size);
+  file.write(reinterpret_cast<const char *>(data), sizeof(dtype)*size);
 
   file.close();
 
@@ -218,7 +220,7 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
  * @return true 
  * @return false 
  */
-bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
+bool get_frame_sat(const uint8_t *data, uint32_t *sat, uint32_t *sq_sat,
                    const size_t width, const size_t height) {
   if (!data || !sat || !sq_sat) {
     printf("Get frame sat error: null parameters");
@@ -226,12 +228,12 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
   }
 
   const uint8_t* in_row_ptr = data;
-  uint8_t* sat_row_ptr = sat;
-  uint8_t* sq_sat_row_ptr = sq_sat;
+  uint32_t* sat_row_ptr = sat;
+  uint32_t* sq_sat_row_ptr = sq_sat;
 
   const uint8_t* in_elem_ptr = in_row_ptr;
-  uint8_t* sat_elem_ptr = sat_row_ptr;
-  uint8_t* sq_sat_elem_ptr = sq_sat_row_ptr;
+  uint32_t* sat_elem_ptr = sat_row_ptr;
+  uint32_t* sq_sat_elem_ptr = sq_sat_row_ptr;
 
   /* First element in image */
   *sat_elem_ptr = *in_elem_ptr;
@@ -247,16 +249,8 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
                                          ++sq_sat_elem_ptr) {
     *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-1);
     *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sq_sat_elem_ptr-1);
-
-    if (in_elem_ptr == data + 88) {
-      printf("%d (%p) (%p)\n", *in_elem_ptr, in_elem_ptr, data + 88);
-      printf("%d (%p) (%p)\n", *(sat_elem_ptr-1), sat_elem_ptr-1, sat + 87);
-      printf("%d (%p) (%p)\n", *sat_elem_ptr, sat_elem_ptr, sat + 88);
-    }
   }
-
-  printf("Problematic value: %d (%p)\n", *(sat + 88), sat + 88);
-
+  
   /* Loop excludes first row */
   in_row_ptr += width;
   sat_row_ptr += width;
@@ -288,8 +282,6 @@ bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
                        - *(sq_sat_elem_ptr-width-1);
     }
   }
-
-  printf("Problematic value: %d (%p)\n", *(sat + 88), sat + 88);
 
   return true;
 }
@@ -545,10 +537,10 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   auto vertical_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
   auto horizontal_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
 
-  auto vertical_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
-  auto vertical_sq_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
-  auto horizontal_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
-  auto horizontal_sq_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto vertical_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
+  auto vertical_sq_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
+  auto horizontal_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
+  auto horizontal_sq_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
 
   uint64_t now = 0;
 
