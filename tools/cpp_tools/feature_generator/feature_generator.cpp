@@ -14,6 +14,18 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <chrono>
+
+constexpr uint32_t kMicrosPerSecond = 1000000;
+using MicroSeconds = std::chrono::microseconds;
+
+uint64_t GetCurrentTimeSinceEpochUs() {
+  auto now = std::chrono::system_clock::now();
+  auto now_us = std::chrono::time_point_cast<MicroSeconds>(now);
+  auto epoch = now_us.time_since_epoch();
+  auto value = std::chrono::duration_cast<MicroSeconds>(epoch);
+  return value.count();
+}
 
 constexpr size_t kBlockDimension = 16;
 constexpr size_t kRowsPerBlocklength = kBlockDimension;
@@ -41,45 +53,45 @@ const std::string format(const std::string &format, Args... args) {
 
 #define ABS_DIFF(in1, in2) in1 > in2 ? in1 - in2 : in2 - in1
 
-#define SUM_2_BLOCK_ROWS(dst, src, step, n0, n1) ( \
-  (dst) += *(src + n0*step) + *(src + n1*step)     \
-)
-
-#define PRINT_2_BLOCK_ROWS(src, step, n0, n1) ( \
+#define PRINT_2_BLOCK_VALS(src, step, n0, n1) ( \
   printf("%d %d\n",*(src + n0*step), *(src + n1*step)) \
 )
 
-#define PRINT_8_BLOCK_ROWS(src, step, n0, n1, n2, n3, n4, n5, n6, n7) (          \
+#define PRINT_8_BLOCK_VALS(src, step, n0, n1, n2, n3, n4, n5, n6, n7) (          \
   printf("%d %d %d %d %d %d %d %d\n",                                            \
          *(src + n0*step), *(src + n1*step), *(src + n2*step), *(src + n3*step), \
          *(src + n4*step), *(src + n5*step), *(src + n6*step), *(src + n7*step)) \
 )
 
-#define SUM_4_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) ( \
+#define SUM_2_BLOCK_VALS(dst, src, step, n0, n1) ( \
+  (dst) += *(src + n0*step) + *(src + n1*step)     \
+)
+
+#define SUM_4_BLOCK_VALS(dst, src, step, n0, n1, n2, n3) ( \
   (dst) += *(src + n0*step) + *(src + n1*step)             \
          + *(src + n2*step) + *(src + n3*step)             \
 )
 
-#define SUM_8_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
+#define SUM_8_BLOCK_VALS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
   (dst) += *(src + n0*step) + *(src + n1*step)                             \
          + *(src + n2*step) + *(src + n3*step)                             \
          + *(src + n4*step) + *(src + n5*step)                             \
          + *(src + n6*step) + *(src + n7*step)                             \
 )
 
-#define SQ_SUM_2_BLOCK_ROWS(dst, src, step, n0, n1) ( \
+#define SQ_SUM_2_BLOCK_VALS(dst, src, step, n0, n1) ( \
   (dst) += (*(src + n0*step))*(*(src + n0*step))      \
          + (*(src + n1*step))*(*(src + n1*step))      \
 )
 
-#define SQ_SUM_4_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3) ( \
+#define SQ_SUM_4_BLOCK_VALS(dst, src, step, n0, n1, n2, n3) ( \
       (dst) += (*(src + n0*step))*(*(src + n0*step))          \
              + (*(src + n1*step))*(*(src + n1*step))          \
              + (*(src + n2*step))*(*(src + n2*step))          \
              + (*(src + n3*step))*(*(src + n3*step))          \
 )
 
-#define SQ_SUM_8_BLOCK_ROWS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
+#define SQ_SUM_8_BLOCK_VALS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
     (dst) += (*(src + n0*step))*(*(src + n0*step))                            \
            + (*(src + n1*step))*(*(src + n1*step))                            \
            + (*(src + n2*step))*(*(src + n2*step))                            \
@@ -89,6 +101,36 @@ const std::string format(const std::string &format, Args... args) {
            + (*(src + n6*step))*(*(src + n6*step))                            \
            + (*(src + n7*step))*(*(src + n7*step))                            \
 )
+
+/**
+ * @brief FIXME: Missing docs
+ * 
+ * @param filename 
+ * @param data 
+ * @param size 
+ * @return true 
+ * @return false 
+ */
+bool save_frame(const std::string filename, const uint8_t *data,
+                const size_t size) {
+  if (!data) {
+    printf("Save frame error: Data pointer is null\n");
+    return false;
+  }
+
+  std::ofstream file(filename, std::ios::out | std::ios::binary | std::ios::ate);
+
+  if (!file.is_open()) {
+    printf("Save frame error: File did not open\n");
+    return false;
+  }
+
+  file.write(reinterpret_cast<const char *>(data), size);
+
+  file.close();
+
+  return true;
+}
 
 /**
  * @brief Applies [-1, 1] filter horizontally and vertically on input frame
@@ -143,38 +185,117 @@ bool filter_frame(const uint8_t *data, uint8_t *vfiltered, uint8_t *hfiltered,
 
   /* Last row in image (not considered in loop) */
   for (; in_elem_ptr != in_row_ptr_end - 1; ++in_elem_ptr) {
-    *ver_elem_ptr = 0;
-    *hor_elem_ptr = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+    *ver_elem_ptr++ = 0;
+    *hor_elem_ptr++ = ABS_DIFF(*in_elem_ptr, *(in_elem_ptr + 1));
+  }
+  
+  *ver_elem_ptr = 0;
+  *hor_elem_ptr = 0;
+
+  return true;
+}
+
+bool get_frame_sat(const uint8_t *data, uint8_t *sat, uint8_t *sq_sat,
+                   const size_t width, const size_t height) {
+  if (!data || !sat || !sq_sat) {
+    printf("Get frame sat error: null parameters");
+    return false;
+  }
+
+  const uint8_t* in_row_ptr = data;
+  uint8_t* sat_row_ptr = sat;
+  uint8_t* sq_sat_row_ptr = sq_sat;
+
+  const uint8_t* in_elem_ptr = in_row_ptr;
+  uint8_t* sat_elem_ptr = sat_row_ptr;
+  uint8_t* sq_sat_elem_ptr = sq_sat_row_ptr;
+
+  /* First element in image */
+  *sat_elem_ptr++ = *in_elem_ptr;
+  *sq_sat_elem_ptr++ = (*in_elem_ptr)*(*in_elem_ptr);
+
+  /* First row in image (not considered in loop) */
+  ++in_elem_ptr;
+  const uint8_t* in_elem_ptr_end = in_row_ptr + width;
+  for (; in_elem_ptr != in_elem_ptr_end; ++in_elem_ptr,
+                                         ++sat_elem_ptr,
+                                         ++sq_sat_elem_ptr) {
+    *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-1);
+    *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sq_sat_elem_ptr-1);
+  }
+
+  /* Loop excludes first row */
+  in_row_ptr += width;
+  const uint8_t* in_row_ptr_end = in_row_ptr + width*height;
+  for (; in_row_ptr != in_row_ptr_end; in_row_ptr += width,
+                                       sat_row_ptr += width,
+                                       sq_sat_row_ptr += width) {
+    in_elem_ptr = in_row_ptr;
+    sat_elem_ptr = sat_row_ptr;
+    sq_sat_elem_ptr = sq_sat_row_ptr;
+
+    /* First element in row */
+    *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-width);
+    *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr) + *(sat_elem_ptr-width);
+    
+    /* Loop excludes first element in row */
+    ++sat_elem_ptr;
+    ++sq_sat_elem_ptr;
+    ++in_elem_ptr;
+    const uint8_t* in_elem_ptr_end = in_row_ptr + width;
+    for (; in_elem_ptr != in_elem_ptr_end; ++in_elem_ptr,
+                                           ++sat_elem_ptr,
+                                           ++sq_sat_elem_ptr) {
+      *sat_elem_ptr = *in_elem_ptr + *(sat_elem_ptr-1) + *(sat_elem_ptr-width)
+                    - *(sat_elem_ptr-width-1);
+      *sq_sat_elem_ptr = (*in_elem_ptr)*(*in_elem_ptr)
+                       + *(sq_sat_elem_ptr-1) + *(sq_sat_elem_ptr-width)
+                       - *(sq_sat_elem_ptr-width-1);
+    }
   }
 
   return true;
 }
 
 /**
- * @brief Generate features for a horizontal border of a block
+ * @brief Generate features for a border of a block
  * 
  * Note: The order of features that are pushed back into the features vector:
- * - First, the mean of a height 2 block border of the vertical filtered frame
- * - Then, the mean of a height 4 border, then 8, then 16
+ * - First, the mean of a size 2 block border of the vertical filtered frame
+ * - Then, the mean of a size 4 border, then 8, then 16
  * - Then, the means of the horizontal filtered frame block border
- *   (following the same height order)
+ *   (following the same size order)
  * - Then the variances for the vertical filtered frame
  * - Finally, the variances for the horizontal filtered frame
  * 
+ * Note: Value and group terminology:
+ * The algorithm involves a loop that iterates over groups of values within the
+ * block.
+ * For horizontal borders, each border column is a group and values are
+ * arranged vertically. So vstep = width and gstep = 1
+ * For vertical borders, each border row is a group and
+ * values are arranges horizontally. So vstep = 1 and gstep = width
+ * 
+ * Note: Border offset:
+ * Each border offset should always correspond to a block top left corner (not
+ * necesarily for the block that the border is being calculated for).
+ * For horizontal borders, use the leftmost block top left corner within border
+ * For vertical borders, use the topmost block top left corner within border
+ * 
  * @param vfiltered     : Vertical filtered frame data
  * @param hfiltered     : Horizontal filtered frame data
- * @param border_offset : Border location within frame data (left block corner)
- * @param width         : Frame data width
- * @param height        : Frame data height
+ * @param border_offset : Border location within frame data
+ * @param vstep         : Value step used to jump between values within group
+ * @param gstep         : Group step used to jump between groups within border
  * @param features      : Feature memory
  * @return true         : In case of success
  * @return false        : In case of failure
  */
-bool horizontal_border_block_features(const uint8_t *vfiltered,
-                                      const uint8_t *hfiltered,
-                                      const size_t border_offset,
-                                      const size_t width, const size_t height,
-                                      std::vector<float> &features) {
+bool generate_border_features(const uint8_t *vfiltered,
+                              const uint8_t *hfiltered,
+                              const size_t border_offset,
+                              const size_t vstep, const size_t gstep,
+                              std::vector<float> &features) {
   size_t* sums = new size_t[kMetricsPerBorder];
   size_t* sq_sums = new size_t[kMetricsPerBorder];
   float* means = new float[kMetricsPerBorder];
@@ -185,26 +306,26 @@ bool horizontal_border_block_features(const uint8_t *vfiltered,
 
   const uint8_t *vptr = vfiltered + border_offset;
   const uint8_t *hptr = hfiltered + border_offset;
-  const uint8_t *vptr_end = vptr + kPixelsPerBlocklength;
+  const uint8_t *vptr_end = vptr + gstep*kPixelsPerBlocklength;
 
-  for (; vptr != vptr_end; ++vptr, ++hptr) {
-    SUM_2_BLOCK_ROWS(sums[0], vptr, width, 0, -1);
-    SUM_2_BLOCK_ROWS(sums[1], vptr, width, 1, -2);
-    SUM_4_BLOCK_ROWS(sums[2], vptr, width, 2, 3, -3, -4);
-    SUM_8_BLOCK_ROWS(sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
-    SUM_2_BLOCK_ROWS(sums[4], hptr, width, 0, -1);
-    SUM_2_BLOCK_ROWS(sums[5], hptr, width, 1, -2);
-    SUM_4_BLOCK_ROWS(sums[6], hptr, width, 2, 3, -3, -4);
-    SUM_8_BLOCK_ROWS(sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+  for (; vptr != vptr_end; vptr += gstep, hptr += gstep) {
+    SUM_2_BLOCK_VALS(sums[0], vptr, vstep, 0, -1);
+    SUM_2_BLOCK_VALS(sums[1], vptr, vstep, 1, -2);
+    SUM_4_BLOCK_VALS(sums[2], vptr, vstep, 2, 3, -3, -4);
+    SUM_8_BLOCK_VALS(sums[3], vptr, vstep, 4, 5, 6, 7, -5, -6, -7, -8);
+    SUM_2_BLOCK_VALS(sums[4], hptr, vstep, 0, -1);
+    SUM_2_BLOCK_VALS(sums[5], hptr, vstep, 1, -2);
+    SUM_4_BLOCK_VALS(sums[6], hptr, vstep, 2, 3, -3, -4);
+    SUM_8_BLOCK_VALS(sums[7], hptr, vstep, 4, 5, 6, 7, -5, -6, -7, -8);
 
-    SQ_SUM_2_BLOCK_ROWS(sq_sums[0], vptr, width, 0, -1);
-    SQ_SUM_2_BLOCK_ROWS(sq_sums[1], vptr, width, 1, -2);
-    SQ_SUM_4_BLOCK_ROWS(sq_sums[2], vptr, width, 2, 3, -3, -4);
-    SQ_SUM_8_BLOCK_ROWS(sq_sums[3], vptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
-    SQ_SUM_2_BLOCK_ROWS(sq_sums[4], hptr, width, 0, -1);
-    SQ_SUM_2_BLOCK_ROWS(sq_sums[5], hptr, width, 1, -2);
-    SQ_SUM_4_BLOCK_ROWS(sq_sums[6], hptr, width, 2, 3, -3, -4);
-    SQ_SUM_8_BLOCK_ROWS(sq_sums[7], hptr, width, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_VALS(sq_sums[0], vptr, vstep, 0, -1);
+    SQ_SUM_2_BLOCK_VALS(sq_sums[1], vptr, vstep, 1, -2);
+    SQ_SUM_4_BLOCK_VALS(sq_sums[2], vptr, vstep, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_VALS(sq_sums[3], vptr, vstep, 4, 5, 6, 7, -5, -6, -7, -8);
+    SQ_SUM_2_BLOCK_VALS(sq_sums[4], hptr, vstep, 0, -1);
+    SQ_SUM_2_BLOCK_VALS(sq_sums[5], hptr, vstep, 1, -2);
+    SQ_SUM_4_BLOCK_VALS(sq_sums[6], hptr, vstep, 2, 3, -3, -4);
+    SQ_SUM_8_BLOCK_VALS(sq_sums[7], hptr, vstep, 4, 5, 6, 7, -5, -6, -7, -8);
   }
 
   sums[1] += sums[0];
@@ -267,6 +388,72 @@ bool horizontal_border_block_features(const uint8_t *vfiltered,
 }
 
 /**
+ * @brief Generate mean and variance features for the block proper
+ * 
+ * Note: Feature order:
+ * First, mean of vertical filtered block data,
+ * Then, mean of horizontal filtered block data,
+ * Then, variance of vertical filtered block data,
+ * Then, variance of horizontal filtered block data.
+ * 
+ * @param vfiltered     : Vertical filtered frame data
+ * @param hfiltered     : Horizontal filtered frame data
+ * @param border_offset : Border location within frame data
+ * @param step          : Step between rows of block
+ * @param features      : Feature memory
+ * @return true         : In case of success
+ * @return false        : In case of failure
+ */
+bool generate_block_proper_features(const uint8_t *vfiltered,
+                                    const uint8_t *hfiltered,
+                                    const size_t border_offset,
+                                    const size_t step,
+                                    std::vector<float> &features) {
+  constexpr size_t kMetricsPerBlockProper = 2;
+  size_t* sums = new size_t[kMetricsPerBlockProper];
+  size_t* sq_sums = new size_t[kMetricsPerBlockProper];
+  float* means = new float[kMetricsPerBlockProper];
+  float* vars = new float[kMetricsPerBlockProper];
+
+  memset(sums, 0, sizeof(size_t)*kMetricsPerBlockProper);
+  memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBlockProper);
+
+  const uint8_t *vptr = vfiltered + border_offset;
+  const uint8_t *hptr = hfiltered + border_offset;
+  const uint8_t *vptr_end = vptr + step*kPixelsPerBlocklength;
+
+  for (; vptr != vptr_end; vptr += step, hptr += step) {
+    SUM_8_BLOCK_VALS(sums[0], vptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
+    SUM_8_BLOCK_VALS(sums[0], vptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
+    SUM_8_BLOCK_VALS(sums[1], hptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
+    SUM_8_BLOCK_VALS(sums[1], hptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
+
+    SQ_SUM_8_BLOCK_VALS(sq_sums[0], vptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
+    SQ_SUM_8_BLOCK_VALS(sq_sums[0], vptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
+    SQ_SUM_8_BLOCK_VALS(sq_sums[1], hptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
+    SQ_SUM_8_BLOCK_VALS(sq_sums[1], hptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
+  }
+
+  /* Calculate metrics for block row of block_offset */
+  means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
+  means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
+  vars[0] = static_cast<float>(sq_sums[0]) / kPixelsPerBlocklength - means[0]*means[0];
+  vars[1] = static_cast<float>(sq_sums[1]) / kPixelsPerBlocklength - means[1]*means[1];
+
+  features.push_back(means[0]);
+  features.push_back(means[1]);
+  features.push_back(vars[0]);
+  features.push_back(vars[1]);
+
+  delete[] means;
+  delete[] vars;
+  delete[] sums;
+  delete[] sq_sums;
+
+  return true;
+}
+
+/**
  * @brief Generate features for single block
  * 
  * @param vfiltered    : Vertical filtered frame data
@@ -281,11 +468,21 @@ bool horizontal_border_block_features(const uint8_t *vfiltered,
 bool generate_block_features(const uint8_t *vfiltered, const uint8_t *hfiltered,
                              const size_t block_offset, const size_t width,
                              const size_t height, std::vector<float> &features) {
-  
-  horizontal_border_block_features(vfiltered, hfiltered, block_offset, width,
-                                   height, features);
+  constexpr size_t kFeaturesPerBorder = 2*2*4;
 
-  for (size_t i = 0; i < 2*kMetricsPerBorder; ++i) {
+  /* Top border */
+  generate_border_features(vfiltered, hfiltered, block_offset, width, 1, features);
+  /* Bottom border */
+  generate_border_features(vfiltered, hfiltered, block_offset + kRowsPerBlocklength*width, width, 1, features);
+  /* Left border */
+  generate_border_features(vfiltered, hfiltered, block_offset, 1, width, features);
+  /* Right border */
+  generate_border_features(vfiltered, hfiltered, block_offset + kPixelsPerBlocklength, 1, width, features);
+  /* Block proper features */
+  generate_block_proper_features(vfiltered, hfiltered, block_offset, width, features);
+
+
+  for (size_t i = 0; i < 4*kFeaturesPerBorder + 4; ++i) {
     printf("%f ", features[i]);
   }
   printf("\n");
@@ -311,8 +508,36 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   auto vertical_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
   auto horizontal_filtered = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
 
+  auto vertical_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto vertical_sq_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto horizontal_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+  auto horizontal_sq_sat = std::unique_ptr<uint8_t>(new uint8_t[width*height]);
+
+  uint64_t now = 0;
+
+  now = GetCurrentTimeSinceEpochUs();
   filter_frame(data, vertical_filtered.get(), horizontal_filtered.get(), width, height);
+  printf("Filtering duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+
+  now = GetCurrentTimeSinceEpochUs();
+  get_frame_sat(vertical_filtered.get(), vertical_sat.get(),
+                vertical_sq_sat.get(), width, height);
+  printf("Vertical SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+
+  now = GetCurrentTimeSinceEpochUs();
+  get_frame_sat(horizontal_filtered.get(), horizontal_sat.get(),
+                horizontal_sq_sat.get(), width, height);
+  printf("Horizontal SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
   
+  save_frame("raw_frame", data, width*height);
+  save_frame("vertical_filtered", vertical_filtered.get(), width*height);
+  save_frame("horizontal_filtered", horizontal_filtered.get(), width*height);
+
+  save_frame("vertical_sat", vertical_sat.get(), width*height);
+  save_frame("vertical_sat2", vertical_sq_sat.get(), width*height);
+  save_frame("horizontal_sat", horizontal_sat.get(), width*height);
+  save_frame("horizontal_sat2", horizontal_sq_sat.get(), width*height);
+
   const size_t kPixelsPerRow = width;
   
   size_t block_i = 1; /* Measured in blocklengths */
@@ -320,9 +545,10 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
                         block_j*kPixelsPerBlocklength;
 
+  now = GetCurrentTimeSinceEpochUs();
   generate_block_features(vertical_filtered.get(), horizontal_filtered.get(),
                           block_offset, width, height, features);
-
+  printf("Feature extraction duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
   return true;
 }
 
