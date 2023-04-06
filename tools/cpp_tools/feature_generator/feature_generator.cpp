@@ -459,7 +459,7 @@ bool generate_block_proper_features(const uint8_t *vfiltered,
   return true;
 }
 
-bool get_vertical_border_sums(const uint32_t *sat, const size_t offset,
+inline bool get_vertical_border_sums(const uint32_t *sat, const size_t offset,
                               const size_t stride, uint32_t *sum_ptr) {
   sum_ptr[0] = sat[offset + (kBlockDimension-1)*stride]
              - sat[offset + (kBlockDimension-1)*stride - 2]
@@ -480,7 +480,7 @@ bool get_vertical_border_sums(const uint32_t *sat, const size_t offset,
   return true;
 }
 
-bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
+inline bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
                               const size_t stride, uint32_t *sum_ptr) {
   sum_ptr[0] = sat[offset + (kBlockDimension-1)]
              - sat[offset + (kBlockDimension-1) - stride*2]
@@ -537,13 +537,13 @@ bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
   auto sums = std::unique_ptr<uint32_t>(new uint32_t[sums_size]);
   get_vertical_border_sums(vsat, block_offset, width, sums.get());
   get_horizontal_border_sums(vsat, block_offset, width, sums.get()+4);
-  get_vertical_border_sums(vsat, block_offset+kBlockDimension*width, width, sums.get()+8);
-  get_horizontal_border_sums(vsat, block_offset+kBlockDimension, width, sums.get()+12);
+  get_vertical_border_sums(vsat, block_offset+kBlockDimension, width, sums.get()+8);
+  get_horizontal_border_sums(vsat, block_offset+kBlockDimension*width, width, sums.get()+12);
 
   get_vertical_border_sums(vsat2, block_offset, width, sums.get()+16);
   get_horizontal_border_sums(vsat2, block_offset, width, sums.get()+20);
-  get_vertical_border_sums(vsat2, block_offset+kBlockDimension*width, width, sums.get()+24);
-  get_horizontal_border_sums(vsat2, block_offset+kBlockDimension, width, sums.get()+28);
+  get_vertical_border_sums(vsat2, block_offset+kBlockDimension, width, sums.get()+24);
+  get_horizontal_border_sums(vsat2, block_offset+kBlockDimension*width, width, sums.get()+28);
 
   /* Printing results */
   for (size_t i = 0; i < sums_size; ++i) {
@@ -639,6 +639,7 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
                 horizontal_sq_sat.get(), width, height);
   printf("Horizontal SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
   
+  now = GetCurrentTimeSinceEpochUs();
   save_frame("raw_frame", data, width*height);
   save_frame("vertical_filtered", vertical_filtered.get(), width*height);
   save_frame("horizontal_filtered", horizontal_filtered.get(), width*height);
@@ -647,6 +648,7 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   save_frame("vertical_sat2", vertical_sq_sat.get(), width*height);
   save_frame("horizontal_sat", horizontal_sat.get(), width*height);
   save_frame("horizontal_sat2", horizontal_sq_sat.get(), width*height);
+  printf("Saving data duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
   const size_t kPixelsPerRow = width;
   const size_t kBlocksPerRow = width/16;
