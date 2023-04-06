@@ -482,22 +482,22 @@ bool get_vertical_border_sums(const uint32_t *sat, const size_t offset,
 
 bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
                               const size_t stride, uint32_t *sum_ptr) {
-  sum_ptr[0] = sat[offset + (kBlockDimension-1)*stride]
-             - sat[offset + (kBlockDimension-1)*stride - 2]
-             - sat[offset - stride]
-             + sat[offset - stride - 2];
-  sum_ptr[1] = sat[offset + (kBlockDimension-1)*stride + 1]
-             - sat[offset + (kBlockDimension-1)*stride - 3]
-             - sat[offset - stride + 1]
-             + sat[offset - stride - 3];
-  sum_ptr[2] = sat[offset + (kBlockDimension-1)*stride + 3]
-             - sat[offset + (kBlockDimension-1)*stride - 5]
-             - sat[offset - stride + 3]
-             + sat[offset - stride - 5];
-  sum_ptr[3] = sat[offset + (kBlockDimension-1)*stride + 7]
-             - sat[offset + (kBlockDimension-1)*stride - 9]
-             - sat[offset - stride + 7]
-             + sat[offset - stride - 9];
+  sum_ptr[0] = sat[offset + (kBlockDimension-1)]
+             - sat[offset + (kBlockDimension-1) - stride*2]
+             - sat[offset - 1]
+             + sat[offset - 1 - stride*2];
+  sum_ptr[1] = sat[offset + (kBlockDimension-1) + stride]
+             - sat[offset + (kBlockDimension-1) - stride*3]
+             - sat[offset - 1 + stride]
+             + sat[offset - 1 - stride*3];
+  sum_ptr[2] = sat[offset + (kBlockDimension-1) + stride*3]
+             - sat[offset + (kBlockDimension-1) - stride*5]
+             - sat[offset - 1 + stride*3]
+             + sat[offset - 1 - stride*5];
+  sum_ptr[3] = sat[offset + (kBlockDimension-1) + stride*7]
+             - sat[offset + (kBlockDimension-1) - stride*9]
+             - sat[offset - 1 + stride*7]
+             + sat[offset - 1 - stride*9];
   return true;
 }
 
@@ -533,10 +533,19 @@ bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
                              const size_t block_offset, const size_t width,
                              const size_t height,
                              std::vector<float> &features) {
-  const size_t sums_size = 8;
+  const size_t sums_size = 8*4;
   auto sums = std::unique_ptr<uint32_t>(new uint32_t[sums_size]);
   get_vertical_border_sums(vsat, block_offset, width, sums.get());
-  get_vertical_border_sums(vsat2, block_offset, width, sums.get()+4);
+  get_horizontal_border_sums(vsat, block_offset, width, sums.get()+4);
+  get_vertical_border_sums(vsat, block_offset+kBlockDimension*width, width, sums.get()+8);
+  get_horizontal_border_sums(vsat, block_offset+kBlockDimension, width, sums.get()+12);
+
+  get_vertical_border_sums(vsat2, block_offset, width, sums.get()+16);
+  get_horizontal_border_sums(vsat2, block_offset, width, sums.get()+20);
+  get_vertical_border_sums(vsat2, block_offset+kBlockDimension*width, width, sums.get()+24);
+  get_horizontal_border_sums(vsat2, block_offset+kBlockDimension, width, sums.get()+28);
+
+  /* Printing results */
   for (size_t i = 0; i < sums_size; ++i) {
     printf("%d ", sums.get()[i]);
   }
