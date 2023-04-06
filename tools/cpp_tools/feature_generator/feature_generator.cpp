@@ -551,52 +551,6 @@ bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
   }
   printf("\n");
 
-  /* Method # 2 */
-  // const uint32_t sum2 = vsat[block_offset + (kBlockDimension-1)*width]
-  //                     + vsat[block_offset - width - 2]
-  //                     - vsat[block_offset + (kBlockDimension-1)*width - 2]
-  //                     - vsat[block_offset - width];
-  // const uint32_t sum4 = vsat[block_offset + (kBlockDimension-1)*width + 1]
-  //                     + vsat[block_offset - width - 3]
-  //                     - vsat[block_offset + (kBlockDimension-1)*width - 3]
-  //                     - vsat[block_offset - width + 1];
-  // const uint32_t sum8 = vsat[block_offset + (kBlockDimension-1)*width + 3]
-  //                     + vsat[block_offset - width - 5]
-  //                     - vsat[block_offset + (kBlockDimension-1)*width - 5]
-  //                     - vsat[block_offset - width + 3];
-  // const uint32_t sum16 = vsat[block_offset + (kBlockDimension-1)*width + 7]
-  //                      + vsat[block_offset - width - 9]
-  //                      - vsat[block_offset + (kBlockDimension-1)*width - 9]
-  //                      - vsat[block_offset - width + 7];
-  // printf("%d %d %d %d\n",
-  //        vsat[block_offset + kBlockDimension*width + 7],
-  //        vsat[block_offset - width - 9],
-  //        vsat[block_offset + kBlockDimension*width - 9],
-  //        vsat[block_offset - width + 7]);
-  // printf("Sum2 vsat: %d\n", sum2);
-  // printf("Sum4 vsat: %d\n", sum4);
-  // printf("Sum8 vsat: %d\n", sum8);
-  // printf("Sum16 vsat: %d\n", sum16);
-
-  /* Method # 1 */
-  // constexpr size_t kFeaturesPerBorder = 2*2*4;
-  // /* Top border */
-  // generate_border_features(vfiltered, hfiltered, block_offset, width, 1, features);
-  // /* Bottom border */
-  // generate_border_features(vfiltered, hfiltered, block_offset + kRowsPerBlocklength*width, width, 1, features);
-  // /* Left border */
-  // generate_border_features(vfiltered, hfiltered, block_offset, 1, width, features);
-  // /* Right border */
-  // generate_border_features(vfiltered, hfiltered, block_offset + kPixelsPerBlocklength, 1, width, features);
-  // /* Block proper features */
-  // generate_block_proper_features(vfiltered, hfiltered, block_offset, width, features);
-
-
-  // for (size_t i = 0; i < 4*kFeaturesPerBorder + 4; ++i) {
-  //   printf("%f ", features[i]);
-  // }
-  // printf("\n");
-
   return true;
 }
 
