@@ -6,6 +6,8 @@
  * published by the Free Software Foundation.
  */
 
+#define DEBUG
+
 #include "buffer_utils.h"
 #include "pipeline.h"
 
@@ -52,55 +54,6 @@ const std::string format(const std::string &format, Args... args) {
 }
 
 #define ABS_DIFF(in1, in2) in1 > in2 ? in1 - in2 : in2 - in1
-
-#define PRINT_2_BLOCK_VALS(src, step, n0, n1) ( \
-  printf("%d %d\n",*(src + n0*step), *(src + n1*step)) \
-)
-
-#define PRINT_8_BLOCK_VALS(src, step, n0, n1, n2, n3, n4, n5, n6, n7) (          \
-  printf("%d %d %d %d %d %d %d %d\n",                                            \
-         *(src + n0*step), *(src + n1*step), *(src + n2*step), *(src + n3*step), \
-         *(src + n4*step), *(src + n5*step), *(src + n6*step), *(src + n7*step)) \
-)
-
-#define SUM_2_BLOCK_VALS(dst, src, step, n0, n1) ( \
-  (dst) += *(src + n0*step) + *(src + n1*step)     \
-)
-
-#define SUM_4_BLOCK_VALS(dst, src, step, n0, n1, n2, n3) ( \
-  (dst) += *(src + n0*step) + *(src + n1*step)             \
-         + *(src + n2*step) + *(src + n3*step)             \
-)
-
-#define SUM_8_BLOCK_VALS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
-  (dst) += *(src + n0*step) + *(src + n1*step)                             \
-         + *(src + n2*step) + *(src + n3*step)                             \
-         + *(src + n4*step) + *(src + n5*step)                             \
-         + *(src + n6*step) + *(src + n7*step)                             \
-)
-
-#define SQ_SUM_2_BLOCK_VALS(dst, src, step, n0, n1) ( \
-  (dst) += (*(src + n0*step))*(*(src + n0*step))      \
-         + (*(src + n1*step))*(*(src + n1*step))      \
-)
-
-#define SQ_SUM_4_BLOCK_VALS(dst, src, step, n0, n1, n2, n3) ( \
-      (dst) += (*(src + n0*step))*(*(src + n0*step))          \
-             + (*(src + n1*step))*(*(src + n1*step))          \
-             + (*(src + n2*step))*(*(src + n2*step))          \
-             + (*(src + n3*step))*(*(src + n3*step))          \
-)
-
-#define SQ_SUM_8_BLOCK_VALS(dst, src, step, n0, n1, n2, n3, n4, n5, n6, n7) ( \
-    (dst) += (*(src + n0*step))*(*(src + n0*step))                            \
-           + (*(src + n1*step))*(*(src + n1*step))                            \
-           + (*(src + n2*step))*(*(src + n2*step))                            \
-           + (*(src + n3*step))*(*(src + n3*step))                            \
-           + (*(src + n4*step))*(*(src + n4*step))                            \
-           + (*(src + n5*step))*(*(src + n5*step))                            \
-           + (*(src + n6*step))*(*(src + n6*step))                            \
-           + (*(src + n7*step))*(*(src + n7*step))                            \
-)
 
 /**
  * @brief Saves a buffer to a file
@@ -286,179 +239,6 @@ bool get_frame_sat(const uint8_t *data, uint32_t *sat, uint32_t *sq_sat,
   return true;
 }
 
-/**
- * @brief Generate features for a border of a block
- * 
- * Note: The order of features that are pushed back into the features vector:
- * - First, the mean of a size 2 block border of the vertical filtered frame
- * - Then, the mean of a size 4 border, then 8, then 16
- * - Then, the means of the horizontal filtered frame block border
- *   (following the same size order)
- * - Then the variances for the vertical filtered frame
- * - Finally, the variances for the horizontal filtered frame
- * 
- * Note: Value and group terminology:
- * The algorithm involves a loop that iterates over groups of values within the
- * block.
- * For horizontal borders, each border column is a group and values are
- * arranged vertically. So vstep = width and gstep = 1
- * For vertical borders, each border row is a group and
- * values are arranges horizontally. So vstep = 1 and gstep = width
- * 
- * Note: Border offset:
- * Each border offset should always correspond to a block top left corner (not
- * necesarily for the block that the border is being calculated for).
- * For horizontal borders, use the leftmost block top left corner within border
- * For vertical borders, use the topmost block top left corner within border
- * 
- * @param vfiltered     : Vertical filtered frame data
- * @param hfiltered     : Horizontal filtered frame data
- * @param border_offset : Border location within frame data
- * @param vstep         : Value step used to jump between values within group
- * @param gstep         : Group step used to jump between groups within border
- * @param features      : Feature memory
- * @return true         : In case of success
- * @return false        : In case of failure
- */
-// bool generate_border_features(const uint32_t *vsat, const uint32_t *vsat2,
-//                               const uint32_t *hsat, const uint32_t *hsat2,
-//                               const size_t border_offset,
-//                               const size_t vstep, const size_t gstep,
-//                               std::vector<float> &features) {
-//   size_t* sums = new size_t[kMetricsPerBorder];
-//   size_t* sq_sums = new size_t[kMetricsPerBorder];
-//   float* means = new float[kMetricsPerBorder];
-//   float* vars = new float[kMetricsPerBorder];
-
-//   memset(sums, 0, sizeof(size_t)*kMetricsPerBorder);
-//   memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBorder);
-
-//   const uint32_t sum2 = vsat[block_offset + (kBlockDimension-1)*width]
-//                       + vsat[block_offset - width - 2]
-//                       - vsat[block_offset + (kBlockDimension-1)*width - 2]
-//                       - vsat[block_offset - width];
-//   const uint32_t sum4 = vsat[block_offset + (kBlockDimension-1)*width + 1]
-//                       + vsat[block_offset - width - 3]
-//                       - vsat[block_offset + (kBlockDimension-1)*width - 3]
-//                       - vsat[block_offset - width + 1];
-//   const uint32_t sum8 = vsat[block_offset + (kBlockDimension-1)*width + 3]
-//                       + vsat[block_offset - width - 5]
-//                       - vsat[block_offset + (kBlockDimension-1)*width - 5]
-//                       - vsat[block_offset - width + 3];
-//   const uint32_t sum16 = vsat[block_offset + (kBlockDimension-1)*width + 7]
-//                        + vsat[block_offset - width - 9]
-//                        - vsat[block_offset + (kBlockDimension-1)*width - 9]
-//                        - vsat[block_offset - width + 7];
-
-//   /* Calculate metrics for block row of block_offset */
-//   means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
-//   means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
-//   means[2] = static_cast<float>(sums[2]) / kPixelsPerBlocklength;
-//   means[3] = static_cast<float>(sums[3]) / kPixelsPerBlocklength;
-//   means[4] = static_cast<float>(sums[4]) / kPixelsPerBlocklength;
-//   means[5] = static_cast<float>(sums[5]) / kPixelsPerBlocklength;
-//   means[6] = static_cast<float>(sums[6]) / kPixelsPerBlocklength;
-//   means[7] = static_cast<float>(sums[7]) / kPixelsPerBlocklength;
-//   vars[0] = static_cast<float>(sq_sums[0]) / kPixelsPerBlocklength - means[0]*means[0];
-//   vars[1] = static_cast<float>(sq_sums[1]) / kPixelsPerBlocklength - means[1]*means[1];
-//   vars[2] = static_cast<float>(sq_sums[2]) / kPixelsPerBlocklength - means[2]*means[2];
-//   vars[3] = static_cast<float>(sq_sums[3]) / kPixelsPerBlocklength - means[3]*means[3];
-//   vars[4] = static_cast<float>(sq_sums[4]) / kPixelsPerBlocklength - means[4]*means[4];
-//   vars[5] = static_cast<float>(sq_sums[5]) / kPixelsPerBlocklength - means[5]*means[5];
-//   vars[6] = static_cast<float>(sq_sums[6]) / kPixelsPerBlocklength - means[6]*means[6];
-//   vars[7] = static_cast<float>(sq_sums[7]) / kPixelsPerBlocklength - means[7]*means[7];
-
-//   features.push_back(means[0]);
-//   features.push_back(means[1]);
-//   features.push_back(means[2]);
-//   features.push_back(means[3]);
-//   features.push_back(means[4]);
-//   features.push_back(means[5]);
-//   features.push_back(means[6]);
-//   features.push_back(means[7]);
-//   features.push_back(vars[0]);
-//   features.push_back(vars[1]);
-//   features.push_back(vars[2]);
-//   features.push_back(vars[3]);
-//   features.push_back(vars[4]);
-//   features.push_back(vars[5]);
-//   features.push_back(vars[6]);
-//   features.push_back(vars[7]);
-
-//   delete[] means;
-//   delete[] vars;
-//   delete[] sums;
-//   delete[] sq_sums;
-
-//   return true;
-// }
-
-/**
- * @brief Generate mean and variance features for the block proper
- * 
- * Note: Feature order:
- * First, mean of vertical filtered block data,
- * Then, mean of horizontal filtered block data,
- * Then, variance of vertical filtered block data,
- * Then, variance of horizontal filtered block data.
- * 
- * @param vfiltered     : Vertical filtered frame data
- * @param hfiltered     : Horizontal filtered frame data
- * @param border_offset : Border location within frame data
- * @param step          : Step between rows of block
- * @param features      : Feature memory
- * @return true         : In case of success
- * @return false        : In case of failure
- */
-bool generate_block_proper_features(const uint8_t *vfiltered,
-                                    const uint8_t *hfiltered,
-                                    const size_t border_offset,
-                                    const size_t step,
-                                    std::vector<float> &features) {
-  constexpr size_t kMetricsPerBlockProper = 2;
-  size_t* sums = new size_t[kMetricsPerBlockProper];
-  size_t* sq_sums = new size_t[kMetricsPerBlockProper];
-  float* means = new float[kMetricsPerBlockProper];
-  float* vars = new float[kMetricsPerBlockProper];
-
-  memset(sums, 0, sizeof(size_t)*kMetricsPerBlockProper);
-  memset(sq_sums, 0, sizeof(size_t)*kMetricsPerBlockProper);
-
-  const uint8_t *vptr = vfiltered + border_offset;
-  const uint8_t *hptr = hfiltered + border_offset;
-  const uint8_t *vptr_end = vptr + step*kPixelsPerBlocklength;
-
-  for (; vptr != vptr_end; vptr += step, hptr += step) {
-    SUM_8_BLOCK_VALS(sums[0], vptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
-    SUM_8_BLOCK_VALS(sums[0], vptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
-    SUM_8_BLOCK_VALS(sums[1], hptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
-    SUM_8_BLOCK_VALS(sums[1], hptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
-
-    SQ_SUM_8_BLOCK_VALS(sq_sums[0], vptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
-    SQ_SUM_8_BLOCK_VALS(sq_sums[0], vptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
-    SQ_SUM_8_BLOCK_VALS(sq_sums[1], hptr, 1, 0, 1, 2, 3, 4, 5, 6, 7);
-    SQ_SUM_8_BLOCK_VALS(sq_sums[1], hptr, 1, 8, 9, 10, 11, 12, 13, 14, 15);
-  }
-
-  /* Calculate metrics for block row of block_offset */
-  means[0] = static_cast<float>(sums[0]) / kPixelsPerBlocklength;
-  means[1] = static_cast<float>(sums[1]) / kPixelsPerBlocklength;
-  vars[0] = static_cast<float>(sq_sums[0]) / kPixelsPerBlocklength - means[0]*means[0];
-  vars[1] = static_cast<float>(sq_sums[1]) / kPixelsPerBlocklength - means[1]*means[1];
-
-  features.push_back(means[0]);
-  features.push_back(means[1]);
-  features.push_back(vars[0]);
-  features.push_back(vars[1]);
-
-  delete[] means;
-  delete[] vars;
-  delete[] sums;
-  delete[] sq_sums;
-
-  return true;
-}
-
 inline bool get_vertical_border_sums(const uint32_t *sat, const size_t offset,
                               const size_t stride, uint32_t *sum_ptr) {
   sum_ptr[0] = sat[offset + (kBlockDimension-1)*stride]
@@ -532,24 +312,122 @@ bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
                              const uint32_t *hsat, const uint32_t *hsat2,
                              const size_t block_offset, const size_t width,
                              const size_t height,
-                             std::vector<float> &features) {
-  const size_t sums_size = 8*4;
-  auto sums = std::unique_ptr<uint32_t>(new uint32_t[sums_size]);
+                             std::vector<float> &features, const bool debug) {
+  const size_t group_size = 8*4;
+  auto sums = std::unique_ptr<uint32_t[]>(new uint32_t[group_size]);
+  auto sums2 = std::unique_ptr<uint32_t[]>(new uint32_t[group_size]);
+  auto means = std::unique_ptr<float[]>(new float[group_size]);
+  auto vars = std::unique_ptr<float[]>(new float[group_size]);
+
+  /* Block proper stats */
+  uint32_t vblock_sum = vsat[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)]
+                      - vsat[block_offset + (kBlockDimension-1)*width - 1]
+                      - vsat[block_offset - width + (kBlockDimension-1)]
+                      + vsat[block_offset - width - 1];
+  uint32_t vblock_sum2 = vsat2[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)]
+                       - vsat2[block_offset + (kBlockDimension-1)*width - 1]
+                       - vsat2[block_offset - width + (kBlockDimension-1)]
+                       + vsat2[block_offset - width - 1];
+  uint32_t hblock_sum = hsat[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)]
+                      - hsat[block_offset + (kBlockDimension-1)*width - 1]
+                      - hsat[block_offset - width + (kBlockDimension-1)]
+                      + hsat[block_offset - width - 1];
+  uint32_t hblock_sum2 = hsat2[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)]
+                       - hsat2[block_offset + (kBlockDimension-1)*width - 1]
+                       - hsat2[block_offset - width + (kBlockDimension-1)]
+                       + hsat2[block_offset - width - 1];
+  float vblock_mean = static_cast<float>(vblock_sum)/(16*16);
+  float vblock_var = static_cast<float>(vblock_sum2)/(16*16)
+                  - vblock_mean*vblock_mean;
+  float hblock_mean = static_cast<float>(hblock_sum)/(16*16);
+  float hblock_var = static_cast<float>(hblock_sum2)/(16*16)
+                  - hblock_mean*hblock_mean;
+
+#ifdef DEBUG
+#endif
+
+  features.push_back(vblock_mean);
+  features.push_back(vblock_var);
+  features.push_back(hblock_mean);
+  features.push_back(hblock_var);
+
+  /* Border stats */
+  /* Left */
   get_vertical_border_sums(vsat, block_offset, width, sums.get());
+  /* Top */
   get_horizontal_border_sums(vsat, block_offset, width, sums.get()+4);
-  get_vertical_border_sums(vsat, block_offset+kBlockDimension, width, sums.get()+8);
-  get_horizontal_border_sums(vsat, block_offset+kBlockDimension*width, width, sums.get()+12);
+  /* Right */
+  get_vertical_border_sums(vsat, block_offset+kBlockDimension, width,
+                           sums.get()+8);
+  /* Bottom */
+  get_horizontal_border_sums(vsat, block_offset+kBlockDimension*width, width,
+                             sums.get()+12);
+  /* Left */
+  get_vertical_border_sums(hsat, block_offset, width, sums.get()+16);
+  /* Top */
+  get_horizontal_border_sums(hsat, block_offset, width, sums.get()+20);
+  /* Right */
+  get_vertical_border_sums(hsat, block_offset+kBlockDimension, width,
+                           sums.get()+24);
+  /* Bottom */
+  get_horizontal_border_sums(hsat, block_offset+kBlockDimension*width, width,
+                             sums.get()+28);
+  
+  /* Left */
+  get_vertical_border_sums(vsat2, block_offset, width, sums2.get());
+  /* Top */
+  get_horizontal_border_sums(vsat2, block_offset, width, sums2.get()+4);
+  /* Right */
+  get_vertical_border_sums(vsat2, block_offset+kBlockDimension, width,
+                           sums2.get()+8);
+  /* Bottom */
+  get_horizontal_border_sums(vsat2, block_offset+kBlockDimension*width, width,
+                             sums2.get()+12);
+  /* Left */
+  get_vertical_border_sums(hsat2, block_offset, width, sums2.get()+16);
+  /* Top */
+  get_horizontal_border_sums(hsat2, block_offset, width, sums2.get()+20);
+  /* Right */
+  get_vertical_border_sums(hsat2, block_offset+kBlockDimension, width,
+                           sums2.get()+24);
+  /* Bottom */
+  get_horizontal_border_sums(hsat2, block_offset+kBlockDimension*width, width,
+                             sums2.get()+28);
 
-  get_vertical_border_sums(vsat2, block_offset, width, sums.get()+16);
-  get_horizontal_border_sums(vsat2, block_offset, width, sums.get()+20);
-  get_vertical_border_sums(vsat2, block_offset+kBlockDimension, width, sums.get()+24);
-  get_horizontal_border_sums(vsat2, block_offset+kBlockDimension*width, width, sums.get()+28);
+  for (size_t i = 0; i < group_size; i += 4) {
+    means[i] = static_cast<float>(sums[i]) / (16*2);
+    means[i + 1] = static_cast<float>(sums[i + 1]) / (16*4);
+    means[i + 2] = static_cast<float>(sums[i + 2]) / (16*8);
+    means[i + 3] = static_cast<float>(sums[i + 3]) / (16*16);
 
-  /* Printing results */
-  for (size_t i = 0; i < sums_size; ++i) {
-    printf("%d ", sums.get()[i]);
+    vars[i] = static_cast<float>(sums2[i]) / (16*2) - means[i]*means[i];
+    vars[i + 1] = static_cast<float>(sums2[i + 1]) / (16*4)
+                - means[i + 1]*means[i + 1];
+    vars[i + 2] = static_cast<float>(sums2[i + 2]) / (16*8)
+                - means[i + 2]*means[i + 2];
+    vars[i + 3] = static_cast<float>(sums2[i + 3]) / (16*16)
+                - means[i + 3]*means[i + 3];
+
+    features.push_back(means[i]);
+    features.push_back(means[i+1]);
+    features.push_back(means[i+2]);
+    features.push_back(means[i+3]);
+
+    features.push_back(vars[i]);
+    features.push_back(vars[i+1]);
+    features.push_back(vars[i+2]);
+    features.push_back(vars[i+3]);
+
+    features.push_back(means[i] - (i < group_size/2 ? vblock_mean : hblock_mean));
+    features.push_back(means[i+1] - (i < group_size/2 ? vblock_mean : hblock_mean));
+    features.push_back(means[i+2] - (i < group_size/2 ? vblock_mean : hblock_mean));
+    features.push_back(means[i+3] - (i < group_size/2 ? vblock_mean : hblock_mean));
+
+    features.push_back(vars[i] - (i < group_size/2 ? vblock_var : hblock_var));
+    features.push_back(vars[i+1] - (i < group_size/2 ? vblock_var : hblock_var));
+    features.push_back(vars[i+2] - (i < group_size/2 ? vblock_var : hblock_var));
+    features.push_back(vars[i+3] - (i < group_size/2 ? vblock_var : hblock_var));
   }
-  printf("\n");
 
   return true;
 }
@@ -592,6 +470,25 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   get_frame_sat(horizontal_filtered.get(), horizontal_sat.get(),
                 horizontal_sq_sat.get(), width, height);
   printf("Horizontal SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+
+  const size_t kPixelsPerRow = width;
+  const size_t kBlocksPerRow = width/kBlockDimension;
+  const size_t kBlocksPerCol = height/kBlockDimension;
+
+  now = GetCurrentTimeSinceEpochUs();
+  for (size_t block_i = 1; block_i < 2 /* kBlocksPerCol - 1 */; ++block_i) {
+    for (size_t block_j = 1; block_j < kBlocksPerRow - 1; ++block_j) {
+      const size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
+                                  block_j*kPixelsPerBlocklength;
+
+      bool debug = ((block_i == 1) && (block_j == 17)) ? true : false;
+
+      generate_block_features(vertical_sat.get(), vertical_sq_sat.get(),
+                          horizontal_sat.get(), horizontal_sq_sat.get(),
+                          block_offset, width, height, features, debug);
+    }
+  }
+  printf("Feature extraction duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
   
   now = GetCurrentTimeSinceEpochUs();
   save_frame("raw_frame", data, width*height);
@@ -602,26 +499,10 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   save_frame("vertical_sat2", vertical_sq_sat.get(), width*height);
   save_frame("horizontal_sat", horizontal_sat.get(), width*height);
   save_frame("horizontal_sat2", horizontal_sq_sat.get(), width*height);
+
+  save_frame("features", features.data(), features.size());
   printf("Saving data duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
-  const size_t kPixelsPerRow = width;
-  const size_t kBlocksPerRow = width/16;
-  const size_t kBlocksPerCol = height/16;
-
-  now = GetCurrentTimeSinceEpochUs();
-  for (size_t block_i = 1; block_i < kBlocksPerRow - 1; ++block_i) {
-    for (size_t block_j = 1; block_j < kBlocksPerCol - 1; ++block_j) {
-      const size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
-                                  block_j*kPixelsPerBlocklength;
-      generate_block_features(vertical_sat.get(), vertical_sq_sat.get(),
-                          horizontal_sat.get(), horizontal_sq_sat.get(),
-                          block_offset, width, height, features);
-      break; /* FIXME: Remove break */
-    }
-    break; /* FIXME: Remove break */
-  }
-  printf("Feature extraction duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
-  
   return true;
 }
 
