@@ -1,0 +1,7 @@
+if activate_ranger_ext
+  subdir('ranger_ext')
+endif
+
+if activate_feature_generator
+  subdir('feature_generator')
+endif

@@ -1,0 +1,504 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 2}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      15/2/23 & 1 h & Reunión de avance 2 & Metas: Completar conjunto de datos, Montar ejemplo de ranger, Avanzar con creación de vectores de características \\
+      18/2/23 & 4 h &  Montar ejemplo Ranger & Se clonó y construyó Ranger. Se escribió un script de python para fabricar datasets \\
+      & 2 h & & Se entrenó ranger sobre un dataset fabricado. Se tomó métrica de velocidad. Se empezó a replicar en jetson \\
+      19/2/23 & 2 h & & Se replicó resultados en jetson (es más lento, pero aún así es rápido). \\
+      20/2/23 & 3 h & & Estudiando implementación API de Ranger. Parece que hay que hacerle unos cuantos ajustes al API ya que la clase Forest asume que uno va a pasarle archivos de datos y yo quiero pasarle la memoria directamente, pero no parecen ser ajustes complejos. \\
+      21/2/23 & 5 h & Avanzar con creación de vectores de características & Adaptando la herramienta de generación de ground truth de Greivin para generar el conjunto de datos de entrenamiento \\
+      22/2/23 & 4 h & & Se escribió un script de python para traducir datos de ground truths a dataset para ranger \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section{Notas}
+
+Primero cloné y construí el repositorio:
+\begin{lstlisting}
+  git clone https://github.com/imbs-hl/ranger.git
+  cd cpp_version
+  mkdir build
+  cd build
+  cmake ..
+  make \end{lstlisting}
+
+En el directorio aparece un binario.
+Para aprender cómo usarlo:
+\begin{lstlisting}
+  ./ranger --help \end{lstlisting}
+  
+La salida:
+\begin{lstlisting}
+  Usage: 
+      ./ranger [options]
+  
+  Options:
+      --help                        Print this help.
+      --version                     Print version and citation information.
+      --verbose                     Turn on verbose mode.
+      --file FILE                   Filename of input data. Only numerical values are supported.
+      --treetype TYPE               Set tree type to:
+                                    TYPE = 1: Classification.
+                                    TYPE = 3: Regression.
+                                    TYPE = 5: Survival.
+                                    (Default: 1)
+      --probability                 Grow a Classification forest with probability estimation for the classes.
+                                    Use in combination with --treetype 1.
+      --depvarname NAME             Name of dependent variable. For survival trees this is the time variable.
+      --statusvarname NAME          Name of status variable, only applicable for survival trees.
+                                    Coding is 1 for event and 0 for censored.
+      --ntree N                     Set number of trees to N.
+                                    (Default: 500)
+      --mtry N                      Number of variables to possibly split at in each node.
+                                    (Default: sqrt(p) with p = number of independent variables)
+      --targetpartitionsize N       Set minimal node size to N.
+                                    For Classification and Regression growing is stopped if a node reaches a size smaller than N.
+                                    For Survival growing is stopped if one child would reach a size smaller than N.
+                                    This means nodes with size smaller N can occur for Classification and Regression.
+                                    (Default: 1 for Classification, 5 for Regression, and 3 for Survival)
+      --maxdepth N                  Set maximal tree depth to N.
+                                    Set to 0 for unlimited depth. A value of 1 corresponds to tree stumps (1 split).
+      --catvars V1,V2,..            Comma separated list of names of (unordered) categorical variables. 
+                                    Categorical variables must contain only positive integer values.
+      --write                       Save forest to file <outprefix>.forest.
+      --predict FILE                Load forest from FILE and predict with new data. The new data is expected in the exact same 
+                                    shape as the training data. If the outcome of your new dataset is unknown, add a dummy column.
+      --predall                     Return a matrix with individual predictions for each tree instead of aggregated 
+                                    predictions for all trees (classification and regression only).
+      --predictiontype TYPE         Set type of prediction to:
+                                    TYPE = 1: Return predicted classes or values.
+                                    TYPE = 2: Return terminal node IDs per tree for new observations.
+                                    (Default: 1)
+      --impmeasure TYPE             Set importance mode to:
+                                    TYPE = 0: none.
+                                    TYPE = 1: Node impurity: Gini for Classification, variance for Regression, sum of test statistic for Survival.
+                                    TYPE = 2: Permutation importance, scaled by standard errors.
+                                    TYPE = 3: Permutation importance, no scaling.
+                                    TYPE = 5: Corrected node impurity: Bias-corrected version of node impurity importance.
+                                    TYPE = 6: Local (casewise) permutation importance.
+                                    (Default: 0)
+      --noreplace                   Sample without replacement.
+      --fraction X                  Fraction of observations to sample. Default is 1 for sampling with replacement 
+                                    and 0.632 for sampling without replacement.
+      --splitrule RULE              Splitting rule:
+                                    RULE = 1: Gini for Classification, variance for Regression, logrank for Survival.
+                                    RULE = 2: AUC for Survival, not available for Classification and Regression.
+                                    RULE = 3: AUC (ignore ties) for Survival, not available for Classification and Regression.
+                                    RULE = 4: MAXSTAT for Survival and Regression, not available for Classification.
+                                    RULE = 5: ExtraTrees for all tree types.
+                                    RULE = 6: BETA for regression, only for (0,1) bounded outcomes.
+                                    RULE = 7: Hellinger for Classification, not available for Regression and Survival.
+                                    (Default: 1)
+      --randomsplits N              Number of random splits to consider for each splitting variable (ExtraTrees splitrule only).
+      --alpha VAL                   Significance threshold to allow splitting (MAXSTAT splitrule only).
+      --minprop VAL                 Lower quantile of covariate distribtuion to be considered for splitting (MAXSTAT splitrule only).
+      --caseweights FILE            Filename of case weights file.
+      --holdout                     Hold-out mode. Hold-out all samples with case weight 0 and use these for variable 
+                                    importance and prediction error.
+      --splitweights FILE           Filename of split select weights file.
+      --alwayssplitvars V1,V2,..    Comma separated list of variable names to be always considered for splitting.
+      --regcoef r1,r2,..            Comma separated list of regularization coefficients (one for all variables or one for each variable).
+      --usedepth                    Use node depth for regularization.
+      --skipoob                     Skip computation of OOB error.
+      --nthreads N                  Set number of parallel threads to N.
+                                    (Default: Number of CPUs available)
+      --seed SEED                   Set random seed to SEED.
+                                    (Default: No seed)
+      --outprefix PREFIX            Prefix for output files.
+      --memmode MODE                Set memory mode to:
+                                    MODE = 0: double.
+                                    MODE = 1: float.
+                                    MODE = 2: char.
+                                    (Default: 0)
+      --savemem                     Use memory saving (but slower) splitting mode.
+  
+  See README file for details and examples.\end{lstlisting}
+
+Hice script para generar datos de prueba. Corrí el siguiente comando, según recomendaciones del README. Corrió exageradamente rápido.
+
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ ./ranger --verbose --file test_data.dat --depvarname y --treetype 1 --ntree 1000 --nthreads 12
+  Starting Ranger.
+  Loading input file: test_data.dat.
+  Growing trees ..
+  Computing prediction error ..
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   1000
+  Sample size:                       400
+  Number of independent variables:   2
+  Mtry:                              1
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 12
+  
+  Overall OOB prediction error:      0.0025
+  
+  Saved confusion matrix to file ranger_out.confusion.
+  Finished Ranger. \end{lstlisting}
+
+Para aproximar la duración, corrí:
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ touch `date +%s.%N`.pts; ./ranger --verbose --file test_data.dat --depvarname y --treetype 1 --ntree 1000 --nthreads 12; touch `date +%s.%N`.pts;
+  Starting Ranger.
+  Loading input file: test_data.dat.
+  Growing trees ..
+  Computing prediction error ..
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   1000
+  Sample size:                       400
+  Number of independent variables:   2
+  Mtry:                              1
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 12
+  
+  Overall OOB prediction error:      0.0025
+  
+  Saved confusion matrix to file ranger_out.confusion.
+  Finished Ranger. \end{lstlisting}
+
+Tengo estos dos archivos:
+
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ ls *.pts
+  1676829641.825818338.pts  1676829641.848423306.pts \end{lstlisting}
+
+Con este comando conseguí:
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ NEW=`echo 1676829641.848423306.pts | sed 's/\.pts$//'`
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ OLD=`echo 1676829641.825818338.pts | sed 's/\.pts$//'`
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ echo $NEW-$OLD | bc
+  .022604968 \end{lstlisting}
+
+Una velocidad menor a 22.6 ms para entrenar y calcular métricas de precisión.
+
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ cat ranger_out.confusion 
+  Overall OOB prediction error (Fraction missclassified): 0.0025
+  
+  Class specific prediction errors:
+                  0     1
+  predicted 0     222   1     
+  predicted 1     0     177 \end{lstlisting}
+
+I'll replicate steps on jetson to see duration:
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/repos/ranger/cpp_version/build$ ssh jetson-tec 
+  Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 4.9.201-tegra aarch64)
+  
+    * Documentation:  https://help.ubuntu.com
+    * Management:     https://landscape.canonical.com
+    * Support:        https://ubuntu.com/advantage
+  This system has been minimized by removing packages and content that are
+  not required on a system that users do not log into.
+  
+  To restore this content, you can run the 'unminimize' command.
+  
+  301 updates can be applied immediately.
+  277 of these updates are standard security updates.
+  To see these additional updates run: apt list --upgradable
+  
+  Last login: Sun Feb 19 12:35:58 2023 from 172.21.6.206
+  disptec@disptec-jetson:~$ \end{lstlisting}
+
+Measured time in Jetson for train command is 117 ms (using 12 threads).
+
+Possible next steps:
+\begin{enumerate}
+  \item Poke around ranger API and try to write my own example code
+    how does tree object expect input and output?
+    can I recycle my test code from last time?
+    how can I capitalize on the ranger example?
+
+  \item Work on feature selection:
+    \begin{enumerate}[label*=\arabic*.]
+      \item Clone disptec repo and poke around status
+      \item poke gstreamer element in develop
+      \item poke inpainter element in develop (lower priority)
+      \item poke training tool in one of the dirty branches
+      \item poke Greivin's histograms in one of the dirty branches
+      \item create my own histograms
+    \end{enumerate}
+
+  \item Fun alternative: Fast build feature files with python to make some
+    quick training tests. The disadvantage in the long run is that probably these files would become too large. Maybe not though, I think I should try it out.
+\end{enumerate}
+
+First, I'll poke around the disptec-2022 repo
+\begin{lstlisting}
+  git clone git@gitlab.ridgerun.com:ridgerun/tec/disptec-2022.git
+  cd disptec-2022
+  git checkout develop
+  cd artifact_detection
+  meson setup build --prefix=/usr/ # failed because meson was not found
+  pip3 show meson # meson is not installed 
+  pip3 install meson
+  meson setup build --prefix=/usr/ # failed because ninja was not found
+  sudo apt-get install python3 python3-pip python3-setuptools python3-wheel ninja-build
+  meson setup build --prefix=/usr/ # success
+  cd build
+  ninja # success
+  sudo ninja install # success
+  GST_DEBUG=WARNING gst-launch-1.0 videotestsrc ! video/x-raw, width=1920, height=1080, format=I420 ! artifactdetector modelpath=$MODELPATH upscale=true ! xvimagesink # Failed, did not find artifactdetector
+  ls /usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstartifactdetect.so # success
+  gst-inspect-1.0 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstartifactdetect.so # failed \end{lstlisting}
+
+Here is the failed message:
+\begin{lstlisting}
+  (gst-inspect-1.0:15870): GStreamer-WARNING **: 04:59:51.781: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstartifactdetect.so': liblibdetector.so: cannot open shared object file: No such file or directory
+  Could not load plugin file: Opening module failed: liblibdetector.so: cannot open shared object file: No such file or directory\end{lstlisting}
+    
+Never heard of liblibdetector.so, not sure why it is being looked for. Perhaps there is a missing 'silent' dependency to the library I wasn't aware of that I should install (and require in the meson build).
+
+Out of convenience:
+\begin{lstlisting}
+  git clone git@gitlab.ridgerun.com:ridgerun/it/rr-tools.git
+  cd rr-tools
+  echo "source $PWD/environment" >> ~/.bashrc
+  source ~/.bashrc \end{lstlisting}
+
+For now, I'll leave that issue be and ask people at RR later. I'm going to test Greivin's ground truth tool:
+\begin{lstlisting}
+  cd disptec-2022/tools/ground_truth
+  cat README.md
+  \end{lstlisting}
+
+Which produces:
+\begin{lstlisting}
+  ## Tools usage
+  The ground truth tool is used to generate datasets with custom videos. The generated dataset includes:
+  
+  - Folder with video corrupted images
+  - Folder with respective mask of the video corrupted images
+  
+  To use the tool follow the next steps:
+  
+  Create and setup the tool project.
+  ```
+  mkdir build && meson build
+  ```
+  
+  Build the executable file to use the tool.
+  ```
+  ninja -C build
+  ```
+  
+  Setup the directories to store the images.
+  
+  ```
+  mkdir video masks
+  ```
+  
+  Use the tool (the input path should be of a H264 video):
+  
+  ```
+  ./build/getvideo path/to/h264video
+  ```
+  
+  After running the tool, the folders will contain the generated dataset of the given video.  
+  \end{lstlisting}
+
+I will explicitly use meson differently, because of personal preference haha:
+\begin{lstlisting}
+  meson setup build \end{lstlisting}
+Compilation will have to wait haha:
+\begin{lstlisting}
+  francis@francis-laptop:~/Documents/PleaseCleanUp/TEC/2023_S1/Proyecto/$ ssh jetson-tec 
+  ssh: connect to host 201.207.53.225 port 2222: No route to host
+  kex_exchange_identification: Connection closed by remote host \end{lstlisting}
+
+Back in business:
+\begin{lstlisting}
+  ninja -C build
+  mkdir video masks\end{lstlisting}
+
+I should have some test videos on my machine. I think I'll move them to the project folder:
+\begin{lstlisting}
+  scp SOS_20220204_122232.MOV VID_20220220_152529.MOV jetson-tec:/home/disptec/proyecto/videos \end{lstlisting}
+
+Time to test:
+\begin{lstlisting}
+  disptec@disptec-jetson:~/proyecto/disptec-2022/tools/ground_truth (develop=)$ ./build/getvideo ~/proyecto/videos/SOS_20220204_122232.MOV \end{lstlisting}
+
+Which outputs:
+
+\begin{lstlisting}
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:16.897: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.152: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.248: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.266: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.374: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.687: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.728: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.772: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.876: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:17.987: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.041: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.105: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.286: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.394: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.487: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.567: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.599: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.663: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.769: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:18.931: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:19.012: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:19.817: gst_buffer_get_sizes_range: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:19.817: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:20.075: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:20.086: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:20.117: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:20.340: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed
+
+  (getvideo:18621): GStreamer-CRITICAL **: 06:23:20.373: gst_buffer_unmap: assertion 'GST_IS_BUFFER (buffer)' failed \end{lstlisting}
+
+\begin{lstlisting}
+  disptec@disptec-jetson:~/proyecto/disptec-2022/tools/ground_truth (develop=)$ ls video/
+  000.png    00107.png  00114.png  00121.png  00129.png  00136.png  00143.png  0015.png  0022.png  002.png   0037.png  0044.png  0051.png  0059.png  0066.png  0073.png  0080.png  0088.png  0095.png
+  00100.png  00108.png  00115.png  00122.png  0012.png   00137.png  00144.png  0016.png  0023.png  0030.png  0038.png  0045.png  0052.png  005.png   0067.png  0074.png  0081.png  0089.png  0096.png
+  00101.png  00109.png  00116.png  00123.png  00130.png  00138.png  00145.png  0017.png  0024.png  0031.png  0039.png  0046.png  0053.png  0060.png  0068.png  0075.png  0082.png  008.png   0097.png
+  00102.png  0010.png   00117.png  00124.png  00131.png  00139.png  00146.png  0018.png  0025.png  0032.png  003.png   0047.png  0054.png  0061.png  0069.png  0076.png  0083.png  0090.png  0098.png
+  00103.png  00110.png  00118.png  00125.png  00132.png  0013.png   00147.png  0019.png  0026.png  0033.png  0040.png  0048.png  0055.png  0062.png  006.png   0077.png  0084.png  0091.png  0099.png
+  00104.png  00111.png  00119.png  00126.png  00133.png  00140.png  00148.png  001.png   0027.png  0034.png  0041.png  0049.png  0056.png  0063.png  0070.png  0078.png  0085.png  0092.png  009.png
+  00105.png  00112.png  0011.png   00127.png  00134.png  00141.png  00149.png  0020.png  0028.png  0035.png  0042.png  004.png   0057.png  0064.png  0071.png  0079.png  0086.png  0093.png
+  00106.png  00113.png  00120.png  00128.png  00135.png  00142.png  0014.png   0021.png  0029.png  0036.png  0043.png  0050.png  0058.png  0065.png  0072.png  007.png   0087.png  0094.png
+  disptec@disptec-jetson:~/proyecto/disptec-2022/tools/ground_truth (develop=)$ ls masks/
+  000.png    00107.png  00114.png  00121.png  00129.png  00136.png  00143.png  0015.png  0022.png  002.png   0037.png  0044.png  0051.png  0059.png  0066.png  0073.png  0080.png  0088.png  0095.png
+  00100.png  00108.png  00115.png  00122.png  0012.png   00137.png  00144.png  0016.png  0023.png  0030.png  0038.png  0045.png  0052.png  005.png   0067.png  0074.png  0081.png  0089.png  0096.png
+  00101.png  00109.png  00116.png  00123.png  00130.png  00138.png  00145.png  0017.png  0024.png  0031.png  0039.png  0046.png  0053.png  0060.png  0068.png  0075.png  0082.png  008.png   0097.png
+  00102.png  0010.png   00117.png  00124.png  00131.png  00139.png  00146.png  0018.png  0025.png  0032.png  003.png   0047.png  0054.png  0061.png  0069.png  0076.png  0083.png  0090.png  0098.png
+  00103.png  00110.png  00118.png  00125.png  00132.png  0013.png   00147.png  0019.png  0026.png  0033.png  0040.png  0048.png  0055.png  0062.png  006.png   0077.png  0084.png  0091.png  0099.png
+  00104.png  00111.png  00119.png  00126.png  00133.png  00140.png  00148.png  001.png   0027.png  0034.png  0041.png  0049.png  0056.png  0063.png  0070.png  0078.png  0085.png  0092.png  009.png
+  00105.png  00112.png  0011.png   00127.png  00134.png  00141.png  00149.png  0020.png  0028.png  0035.png  0042.png  004.png   0057.png  0064.png  0071.png  0079.png  0086.png  0093.png
+  00106.png  00113.png  00120.png  00128.png  00135.png  00142.png  0014.png   0021.png  0029.png  0036.png  0043.png  0050.png  0058.png  0065.png  0072.png  007.png   0087.png  0094.png\end{lstlisting}
+
+This works. It produces images at a $432\times240$ resolution. I did notice something interesting about these images though:
+
+  \begin{figure} [!h]
+    \centering
+    
+    \begin{subfigure}[t]{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{0020_video}
+      \caption{Lossy video frame 20}
+      \label{fig:1.1.a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{0020_mask}
+      \caption{Ground truth mask for frame 20}
+      \label{fig:1.1.b}
+    \end{subfigure}
+    
+    \caption{Comparison of corresponding lossy frame and ground truth mask generated with Greivin's ground truth tool}
+    \label{fig:1.1}
+  
+  \end{figure}
+
+White means a detected artefact, Black means a non corrupted macroblock.
+However, these images don't seem to correspond very well. Also, it seems to me that the artefacts were generated in a higher resolution and then the image was downscaled, and then the masks were generated.
+
+For these reasons, I don't believe I may use the tool as is.
+However, I think that with some adjustments, I might be able to use it.
+
+First, I'll make my own `develop' branch to keep track of completed features:
+\begin{lstlisting}
+  git checkout -b dev_francis_tfg\end{lstlisting}
+
+The first feature I want to complete is to duplicate the tool as is with a new name.
+\begin{lstlisting}
+  git checkout -b feature/duplicate_ground_truth_tool\end{lstlisting}
+
+I'll name the new tool `detector\_dataset\_generator'. I copied the files. Now I am going to test the tool again to make sure it still works. All seems fine. I will now merge this branch into my `develop'. As a next step, I'll remove the downsampling.
+
+This one proved to be more complicated than I originally imagined. By removing downsampling, I'm getting strange segmentation faults. I'll continue working on removing downsampling later. I have managed to generate some lossy frames and some masks. I will work on a script to translate these into a data file that I might train Ranger on.
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

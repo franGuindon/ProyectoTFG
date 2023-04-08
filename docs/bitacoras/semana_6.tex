@@ -1,0 +1,198 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 6}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      15/3/23 & 1 h & Reunión de avance 5 & Metas es: Terminar de montar función de Ranger para estar entrenando \\
+      15/3/23 & 1 h & Función Ranger & Se logró desacoplar la creación del objeto de datos de la función de Ranger \\ 
+      15/3/23 & 3 h & Presentación anteproyecto & Se alistó una presentación para el anteproyecto \\
+      16/3/23 & 1 h & & Se presentó el anteproyecto ante el tribunal \\
+      16/3/23 & 3 h & Función Ranger & Se logró completar implementación con algunos errores sencillos \\
+      19/3/23 & 4 h & & Se terminó de arreglar errores y se generó código para probar la función \\
+      20/3/23 & 4 h & Generación de features en C++ & Se logró arreglar código viejo para cargar imágenes con Gstreamer y procesarlas cuadro por cuadro \\
+      21/3/23 & 4 h & & Se logró reciclar código para filtrar imágenes y se inició con códigos para tomar estadísticas sobre filtros \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Notes from meeting}
+
+  Sugerencias del profe:
+  \begin{enumerate}
+    \item presentación 10 min 6 folios
+    \item contexto disptec - cola, brete de Greivin, problema tiene que quedar claro
+    \item objetivos y indicadores y entregable
+    \item cronograma
+    \item Recordar sobre tesis en ingles
+  \end{enumerate}
+
+  Metas de la semana:
+  \begin{enumerate}
+    \item Agregar y entrenar con nuevos features
+    \item Terminar funcion de Ranger
+    \item Investigar porcentaje comun de perdida en h264 streaming
+  \end{enumerate}
+
+  Observaciones de la reunión:
+  \begin{enumerate}
+    \item Comparar con resultados disptec ¿Métricas de detección-tiempo?
+    \item Justificar 70\% en base a lo que se ha logrado
+    \item Justificar 30 fps en base de lo que se ha logrado ... ?
+    \item Agregar más sobre generación de conjunto de entrenamiento
+    \item ¿Cómo se genera y porqué?
+    \item ir escribiendo tesis
+    \item tener intro lista
+    \item diagrama de bloques
+    \item Figuras y tablas son subjetos (voz activa)
+    \item formalizmos de tec español, maybe portada, 
+  \end{enumerate}
+
+\begin{lstlisting}
+  Goal: connect to custom init fnc ... done
+  Status:
+    The creation of data objects during Forest loader has been decoupled
+    This allows the replacement of the data loading function
+  8:39
+  Goal: Add custom data obj loader (to forest)
+  8:48
+  Breakfast break
+  12:46
+  Goal: Add custom data obj loader (to forest) ... done
+  13:37
+  Goal: Add custom data obj loader (to data)
+  16:51
+  17:51
+  Status:
+    I have copied the Data.h file to the extension directory.
+    I have added the function.
+    However, it has not been recognized.
+    I suspect it might be related with having 2 Data.h in the namespace
+    I am experimenting with changing the file name and such
+    Currently no success
+  Goal: Identify error source ... done
+  Goal: Identify possible solution ... done
+  17:53
+  Goal: Implement solution (include ext files in main) ... failed :'c
+  Idea: Can a file be excluded from an inc dir? Nope
+  Goal: Make a new directory within ranger ... done
+  Goal: Fixing duplicated namespace error ... done
+  19:03
+  Goal: Adding minimal data definition ... done
+  19:20
+  Goal: Adding ptr guards ... done
+  20:29
+  Goal: Load basic data ... 
+  04:26
+  Status:
+    I have a general understanding of what I have to do.
+    The data superclass does not hold the actual data.
+    Each data subclass has a x vector and a y vector.
+    These subclasses have an element by element setter for these vectors.
+    I believe it makes more sense to use an underlying array setter to be
+    more efficient.
+  Goal: Add vector setter for Data subclass
+  05:27
+  Status:
+    Added documentation and separate label array parameter to functions
+  Goal: Add vector setter for Data subclass ... done
+  Goal: Use setter in function ... done
+  Status:
+    When running the program, a segfault occurs.
+    Fixing this segfault is close to being one of the last tasks in finishing
+    the function
+  6:48
+  Goal: Track segfault origin ... done
+  Goal: Finished function ... done
+  7:48
+  Goal: Test function with more realistic data ... done
+  Status:
+    Git has been updated
+    Function has been tested with 2 million floats
+    This procedure takes a few seconds
+  8:24
+  Work time
+  14:57
+  Status:
+    There is another cpp tool I started work on to do feature construction
+    The basic set of steps now is:
+    Link with Forest and see if I can create a minimal example where I create
+    a forest and train it.
+    Start work on function to parse file into features.
+  15:12
+  Goal: Get feature tool status
+  Status:
+    After a quick fix, it compiles.
+    Now I am trying to decide how to modify it appropiately
+    Here is an idea for a design:
+
+// pseudo C++
+std::pair<std::shared_ptr<float>, std::shared_ptr<float>> dataset = 
+    generate_dataset("path/to/feature/file", "path/to/label/file");
+- The problem here is that I don't know how much data I will use beforehand
+- I will use vectors to store the data
+
+bool generate_dataset("path/to/lossy/video",
+                      "path/to/labels",
+                      feature_vector_obj,
+                      label_vector_obj)
+
+  4:30
+  Goal: Review python feature code ... done
+  Status:
+    Old filtering code was reused (using pointer arithmetic).
+    Still working on adding statistics.
+\end{lstlisting}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

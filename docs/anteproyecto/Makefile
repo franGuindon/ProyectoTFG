@@ -6,7 +6,7 @@
 # creation ...: 14.08.2018
 #----------------------------------------------------------------
 
-MAINFILE=not_for_human_use
+MAINFILE=main
 
 LATEX=/usr/bin/latex -interaction=batchmode -file-line-error-style
 PDFLATEX=pdflatex -interaction=batchmode
