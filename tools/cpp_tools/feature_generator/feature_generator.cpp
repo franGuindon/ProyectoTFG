@@ -6,7 +6,10 @@
  * published by the Free Software Foundation.
  */
 
-#define DEBUG
+// #define DEBUG
+//#define PROF_BY_FILTER_SAT_STAT
+#define PROF_BY_FRAME
+//#define SAVE_FRAME_FILTER_SAT_STAT
 
 #include "buffer_utils.h"
 #include "pipeline.h"
@@ -295,7 +298,41 @@ inline bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
  */
 
 /**
- * @brief 
+ * @brief Generate features for a single block
+ * 
+ * Some definitons:
+ * vblock : Vertically filtered (16 px)x(16 px) block region
+ * hblock : Horizontally filtered (16 px)x(16 px) block region
+ * vtop : Vertically filtered top border of block
+ * vleft : Vertically filtered left border of block
+ * vbot : Vertically filtered bottom border of block
+ * vright : Vertically filtered right border of block
+ * htop : Horizontally filtered top border of block
+ * hleft : Horizontally filtered left border of block
+ * hbot : Horizontally filtered bottom border of block
+ * hright : Horizontally filtered right border of block
+ * 
+ * Feature order: There are 132 features per block (indices range from 0-131):
+ * 0: vblock mean
+ * 1: vblock var
+ * 2: hblock mean
+ * 3: hblock var
+ * 4-19: vtop stats
+ *   4-7: vtop means
+ *     4:  2 px width
+ *     5:  4 px width
+ *     6:  8 px width
+ *     7: 16 px width
+ *   8-11: vtop vars
+ *   12-15: differences between vtop means and vblock mean
+ *   16-19: differences between vtop vars and vblock mean
+ * 20-35: vleft stats
+ * 36-51: vbot stats
+ * 52-67: vright stats
+ * 68-83: htop stats
+ * 84-99: hleft stats
+ * 100-115: hbot stats
+ * 116-131: hright stats
  * 
  * @param vsat         : SAT for vertically filtered frame
  * @param vsat2        : Squared SAT for vertically filtered frame
@@ -308,11 +345,19 @@ inline bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
  * @return true        : In case of success
  * @return false       : In case of failure
  */
+#ifdef DEBUG
 bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
                              const uint32_t *hsat, const uint32_t *hsat2,
                              const size_t block_offset, const size_t width,
                              const size_t height,
                              std::vector<float> &features, const bool debug) {
+#else
+bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
+                             const uint32_t *hsat, const uint32_t *hsat2,
+                             const size_t block_offset, const size_t width,
+                             const size_t height,
+                             std::vector<float> &features) {
+#endif
   const size_t group_size = 8*4;
   auto sums = std::unique_ptr<uint32_t[]>(new uint32_t[group_size]);
   auto sums2 = std::unique_ptr<uint32_t[]>(new uint32_t[group_size]);
@@ -344,6 +389,23 @@ bool generate_block_features(const uint32_t *vsat, const uint32_t *vsat2,
                   - hblock_mean*hblock_mean;
 
 #ifdef DEBUG
+  if (!debug) goto debug_end;
+  printf("%d %d %d %d %d\n",
+    hsat2[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)],
+    hsat2[block_offset + (kBlockDimension-1)*width - 1],
+    hsat2[block_offset - width + (kBlockDimension-1)],
+    hsat2[block_offset - width - 1],
+    hsat2[block_offset + (kBlockDimension-1)*width + (kBlockDimension-1)]
+                       - hsat2[block_offset + (kBlockDimension-1)*width - 1]
+                       - hsat2[block_offset - width + (kBlockDimension-1)]
+                       + hsat2[block_offset - width - 1]
+  );
+  printf("%d %d %d %d %f %f %f %f\n", 
+    vblock_sum, vblock_sum2, hblock_sum, hblock_sum2,
+    vblock_mean, vblock_var, hblock_mean, hblock_var
+  );
+
+  debug_end:
 #endif
 
   features.push_back(vblock_mean);
@@ -455,42 +517,60 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   auto horizontal_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
   auto horizontal_sq_sat = std::unique_ptr<uint32_t>(new uint32_t[width*height]);
 
+#ifdef PROF_BY_FILTER_SAT_STAT
   uint64_t now = 0;
 
   now = GetCurrentTimeSinceEpochUs();
+#endif
   filter_frame(data, vertical_filtered.get(), horizontal_filtered.get(), width, height);
+#ifdef PROF_BY_FILTER_SAT_STAT
   printf("Filtering duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
   now = GetCurrentTimeSinceEpochUs();
+#endif
   get_frame_sat(vertical_filtered.get(), vertical_sat.get(),
                 vertical_sq_sat.get(), width, height);
+#ifdef PROF_BY_FILTER_SAT_STAT
   printf("Vertical SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
   now = GetCurrentTimeSinceEpochUs();
+#endif
   get_frame_sat(horizontal_filtered.get(), horizontal_sat.get(),
                 horizontal_sq_sat.get(), width, height);
+#ifdef PROF_BY_FILTER_SAT_STAT
   printf("Horizontal SAT and SAT2 duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
-
+#endif
   const size_t kPixelsPerRow = width;
   const size_t kBlocksPerRow = width/kBlockDimension;
   const size_t kBlocksPerCol = height/kBlockDimension;
 
+#ifdef PROF_BY_FILTER_SAT_STAT
   now = GetCurrentTimeSinceEpochUs();
-  for (size_t block_i = 1; block_i < 2 /* kBlocksPerCol - 1 */; ++block_i) {
+#endif
+  for (size_t block_i = 1; block_i < kBlocksPerCol - 1; ++block_i) {
     for (size_t block_j = 1; block_j < kBlocksPerRow - 1; ++block_j) {
       const size_t block_offset = block_i*kRowsPerBlocklength*kPixelsPerRow +
                                   block_j*kPixelsPerBlocklength;
-
+#ifdef DEBUG
       bool debug = ((block_i == 1) && (block_j == 17)) ? true : false;
 
       generate_block_features(vertical_sat.get(), vertical_sq_sat.get(),
                           horizontal_sat.get(), horizontal_sq_sat.get(),
                           block_offset, width, height, features, debug);
+#else
+      generate_block_features(vertical_sat.get(), vertical_sq_sat.get(),
+                          horizontal_sat.get(), horizontal_sq_sat.get(),
+                          block_offset, width, height, features);
+#endif
     }
   }
+#ifdef PROF_BY_FILTER_SAT_STAT
   printf("Feature extraction duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
   
   now = GetCurrentTimeSinceEpochUs();
+#endif
+
+#ifdef SAVE_FRAME_FILTER_SAT_STAT
   save_frame("raw_frame", data, width*height);
   save_frame("vertical_filtered", vertical_filtered.get(), width*height);
   save_frame("horizontal_filtered", horizontal_filtered.get(), width*height);
@@ -501,8 +581,11 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   save_frame("horizontal_sat2", horizontal_sq_sat.get(), width*height);
 
   save_frame("features", features.data(), features.size());
-  printf("Saving data duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+#endif
 
+#ifdef PROF_BY_FILTER_SAT_STAT
+  printf("Saving data duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+#endif
   return true;
 }
 
@@ -545,7 +628,7 @@ bool generate_dataset(std::string video_path, std::string labels_path,
 
   printf("Starting pipeline wrapper for input pipeline\n");
   InputPipeline.start_pipeline("sink");
-  int total_frames = 1;// 200;
+  int total_frames = 200;
 
   /* Loop to process frames */
   printf("Starting processing loop\n");
@@ -562,10 +645,17 @@ bool generate_dataset(std::string video_path, std::string labels_path,
     /* Use InputPipeline.map to process frame info */
     printf("Generating feature\n");
     uint8_t* data = static_cast<uint8_t*>(InputPipeline.map.data);
+    #ifdef PROF_BY_FRAME
+    uint64_t now = GetCurrentTimeSinceEpochUs();
+    #endif
     if (!generate_frame_features(data, width, height, features)) {
       /** FIXME: Perhaps ensure no memory leaks before throwing error */
       throw std::runtime_error("Feature generation failed");
     }
+    #ifdef PROF_BY_FRAME
+    printf("Frame feature extraction duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+    #endif
+
     data = nullptr;
 
     printf("Unmapping buffer\n");
