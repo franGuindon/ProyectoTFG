@@ -46,12 +46,22 @@ activate_ranger_ext = true
 ################################################################################
 # Feature Generator
 #
-# This tool is capable of parsing and loading the datset files
+# This tool is capable of parsing and loading the dataset files
 # into an array of features
 ################################################################################
 
 # Switches
 activate_feature_generator = true
+
+################################################################################
+# Trainer
+#
+# This tool is capable of taking features and ground truth labels and training
+# a RDF model using Rangerx
+################################################################################
+
+# Switches
+activate_trainer = true
 
 ################################################################################
 # Switch Cases

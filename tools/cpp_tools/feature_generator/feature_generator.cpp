@@ -69,7 +69,7 @@ const std::string format(const std::string &format, Args... args) {
  * @return false   : In case of failure
  */
 template <typename dtype>
-bool save_frame(const std::string filename, const dtype *data,
+bool save_frame(const std::string &filename, const dtype *data,
                 const size_t size) {
   if (!data) {
     printf("Save frame error: Data pointer is null\n");
@@ -682,7 +682,7 @@ bool generate_dataset(std::string video_path, std::string labels_path,
 int run_generator(int argc, char **argv, std::ostream& verbose_out) {
   if (argc != 4) {
     printf("Usage feature_generator [LOSSY_VID_FILE] [LABEL_FILE] [OUTPUT_FILE]\n");
-    return -1;
+    return 1;
   }
   
   std::vector<float> features;
@@ -690,12 +690,12 @@ int run_generator(int argc, char **argv, std::ostream& verbose_out) {
 
   if (!generate_dataset(argv[1], argv[2], features, labels)) {
     printf("Data generation failed\n");
-    return -1;
+    return 1;
   }
 
   if (!save_frame(argv[3], features.data(), features.size())) {
     printf("Saving feature file failed\n");
-    return -1;
+    return 1;
   }
 
   return 0;
@@ -715,7 +715,7 @@ int main(int argc, char **argv) {
     }
   } catch (std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
-    return -1;
+    return 1;
   }
   return 0;
 }
