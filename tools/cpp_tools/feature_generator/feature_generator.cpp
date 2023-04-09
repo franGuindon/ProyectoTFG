@@ -69,7 +69,7 @@ const std::string format(const std::string &format, Args... args) {
  * @return false   : In case of failure
  */
 template <typename dtype>
-bool save_frame(const std::string filename, const dtype *data,
+bool save_frame(const std::string &filename, const dtype *data,
                 const size_t size) {
   if (!data) {
     printf("Save frame error: Data pointer is null\n");
