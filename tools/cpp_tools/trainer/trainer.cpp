@@ -23,9 +23,9 @@ bool load_frame(const std::string &filename, dtype *data, const size_t size) {
 
   file_size = file.tellg();
 
-  if (file_size != sizeof(dtype)*size) {
-    printf("Load frame error: Expected size (%d) and file size (%d) differ\n",
-           sizeof(dtype)*size, file_size);
+  if (file_size != static_cast<long long>(sizeof(dtype)*size)) {
+    printf("Load frame error: Expected size (%ld) and file size (%lld) differ\n",
+           sizeof(dtype)*size, static_cast<long long>(file_size));
     return false;
   }
 
@@ -123,7 +123,6 @@ int main(int argc, char** argv) {
       }
     }
   }
-  printf("%d %d\n", y_offset, num_rows);
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
