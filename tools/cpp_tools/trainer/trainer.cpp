@@ -90,24 +90,40 @@ int main(int argc, char** argv) {
   arg_handler.nthreads = 12;
   arg_handler.write = true;
 
-  size_t block_dimension = 16;
-  size_t frame_width = 1280; 
-  size_t frame_height = 720;
-  size_t blocks_per_row = frame_width/block_dimension;
-  size_t blocks_per_col = frame_height/block_dimension;
-  size_t num_frames_per_snip = 200;
-  size_t features_per_block = 132;
+  const size_t block_dimension = 16;
+  const size_t frame_width = 1280; 
+  const size_t frame_height = 720;
+  const size_t blocks_per_row = frame_width/block_dimension;
+  const size_t blocks_per_col = frame_height/block_dimension;
+  const size_t blocks_per_frame = blocks_per_row*blocks_per_col;
+  const size_t num_frames_per_snip = 200;
+  const size_t features_per_block = 132;
 
-  size_t block_mem_size = blocks_per_row*blocks_per_col*num_frames_per_snip;
-  size_t num_rows = (blocks_per_row-2)*(blocks_per_col-2)*num_frames_per_snip;
-  size_t num_cols = features_per_block;
-  size_t mem_size = num_rows*num_cols;
-  auto x_mem = std::unique_ptr<float>(new float[mem_size]);
-  auto block_mem = std::unique_ptr<char>(new char[block_mem_size]);
-  auto y_mem = std::unique_ptr<float>(new float[num_rows]);
+  const size_t block_mem_size = blocks_per_row*blocks_per_col*num_frames_per_snip;
+  const size_t num_rows = (blocks_per_row-2)*(blocks_per_col-2)*num_frames_per_snip;
+  const size_t num_cols = features_per_block;
+  const size_t mem_size = num_rows*num_cols;
+  auto x_mem = std::unique_ptr<float[]>(new float[mem_size]);
+  auto block_mem = std::unique_ptr<unsigned char[]>(new unsigned char[block_mem_size]);
+  auto y_mem = std::unique_ptr<float[]>(new float[num_rows]);
 
+  printf("Loading feature file\n");
   load_frame(argv[1], x_mem.get(), mem_size);
+  printf("Loading label file\n");
   load_frame(argv[2], block_mem.get(), block_mem_size);
+
+  printf("Building label memory\n");
+  size_t y_offset = 0;
+  for (size_t i = 0; i < num_frames_per_snip; ++i) {
+    for (size_t j = 1; j < blocks_per_col-1; ++j) {
+      for (size_t k = 1; k < blocks_per_row-1; ++k) {
+        size_t offset = i*blocks_per_frame + j*blocks_per_row + k;
+        y_mem[y_offset] = static_cast<float>(block_mem[offset]);
+        ++y_offset;
+      }
+    }
+  }
+  printf("%d %d\n", y_offset, num_rows);
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
