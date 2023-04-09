@@ -92,11 +92,13 @@ int main() {
   size_t num_frames_per_snip = 200;
   size_t features_per_block = 132;
 
-  size_t num_rows = 2*(blocks_per_row-2)*(blocks_per_col-2)*num_frames_per_snip;
+  size_t num_rows = (blocks_per_row-2)*(blocks_per_col-2)*num_frames_per_snip;
   size_t num_cols = features_per_block;
   size_t mem_size = num_rows*num_cols;
   auto x_mem = std::unique_ptr<float>(new float[mem_size]);
   auto y_mem = std::unique_ptr<float>(new float[num_rows]);
+
+
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
