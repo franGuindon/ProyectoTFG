@@ -222,7 +222,7 @@ void ForestClassification::writeConfusionFile() {
         outfile << "   ";
       } else if (value < 10000) {
         outfile << "  ";
-      } else if (value < 100000) {
+      } else {
         outfile << " ";
       }
     }
