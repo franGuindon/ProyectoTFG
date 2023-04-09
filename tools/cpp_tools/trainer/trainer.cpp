@@ -1,3 +1,4 @@
+#include <fstream>
 #include <memory>
 #include <stdio.h>
 #include <ForestClassification.h>
@@ -22,9 +23,9 @@ bool load_frame(const std::string &filename, dtype *data, const size_t size) {
 
   file_size = file.tellg();
 
-  if (file_size != size) {
+  if (file_size != sizeof(dtype)*size) {
     printf("Load frame error: Expected size (%d) and file size (%d) differ\n",
-           size, file_size);
+           sizeof(dtype)*size, file_size);
     return false;
   }
 
@@ -72,7 +73,12 @@ struct Args {
   bool write = false;
 };
 
-int main() {
+int main(int argc, char** argv) {
+  if (argc != 3) {
+    printf("Usage: trainer [FEATURE_FILE] [LABEL_FILE]\n");
+    return 1;
+  }
+
   auto forest = std::make_unique<ForestRangerx>();
 
   Args arg_handler{};
@@ -92,13 +98,16 @@ int main() {
   size_t num_frames_per_snip = 200;
   size_t features_per_block = 132;
 
+  size_t block_mem_size = blocks_per_row*blocks_per_col*num_frames_per_snip;
   size_t num_rows = (blocks_per_row-2)*(blocks_per_col-2)*num_frames_per_snip;
   size_t num_cols = features_per_block;
   size_t mem_size = num_rows*num_cols;
   auto x_mem = std::unique_ptr<float>(new float[mem_size]);
+  auto block_mem = std::unique_ptr<char>(new char[block_mem_size]);
   auto y_mem = std::unique_ptr<float>(new float[num_rows]);
 
-
+  load_frame(argv[1], x_mem.get(), mem_size);
+  load_frame(argv[2], block_mem.get(), block_mem_size);
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
