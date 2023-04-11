@@ -14,6 +14,8 @@
 #include "Tree.h"
 #include "utility.h"
 
+#include <stdio.h>
+
 namespace ranger {
 
 Tree::Tree() :
@@ -202,7 +204,7 @@ void Tree::predict(const Data* prediction_data, bool oob_prediction) {
 }
 
 void Tree::print() {
-  
+  printf("Printing tree\n");
 }
 
 void Tree::computePermutationImportance(std::vector<double>& forest_importance, std::vector<double>& forest_variance,
