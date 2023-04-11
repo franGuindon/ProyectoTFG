@@ -652,7 +652,10 @@ void Forest::grow() {
 }
 
 void Forest::print() {
-  printf("Running print\n");
+  printf("Printing forest\n");
+  for (size_t i = 0; i < num_trees; ++i) {
+    trees[i]->print();
+  }
 }
 
 void Forest::predict() {
