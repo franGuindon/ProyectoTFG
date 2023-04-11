@@ -10,13 +10,15 @@ ranger_ext_headers = [
   'DataFloat.h',
   'Forest.h',
   'ForestClassification.h',
-  'ArgumentHandler.h']
+  'ArgumentHandler.h',
+  'Tree.h']
 
 ranger_ext_sources = [
   'Data.cpp',
   'Forest.cpp',
   'ForestClassification.cpp',
-  'ArgumentHandler.cpp']
+  'ArgumentHandler.cpp',
+  'Tree.cpp']
 ranger_ext_sources += ext_sources
 
 ################################################################################
