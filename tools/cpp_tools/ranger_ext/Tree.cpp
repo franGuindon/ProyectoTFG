@@ -201,6 +201,10 @@ void Tree::predict(const Data* prediction_data, bool oob_prediction) {
   }
 }
 
+void Tree::print() {
+  
+}
+
 void Tree::computePermutationImportance(std::vector<double>& forest_importance, std::vector<double>& forest_variance,
     std::vector<double>& forest_importance_casewise) {
 
