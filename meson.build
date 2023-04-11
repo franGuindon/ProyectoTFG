@@ -64,6 +64,16 @@ activate_feature_generator = true
 activate_trainer = true
 
 ################################################################################
+# Analyzer
+#
+# This tool is capable of printing information on Ranger and Rangerx models that
+# might be useful for further analysis
+################################################################################
+
+# Switches
+activate_analyzer = true
+
+################################################################################
 # Switch Cases
 #
 # Some of the switches defined in this file are used here
