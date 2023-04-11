@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
   arg_handler.ntree = 20;
   arg_handler.nthreads = 12;
   arg_handler.write = true;
-  arg_handler.maxdepth = 10;
+  arg_handler.maxdepth = 100;
 
   const size_t block_dimension = 16;
   const size_t frame_width = 1280; 
