@@ -14,4 +14,10 @@ tree_sources = files(
   'TreeSurvival.cpp'
 )
 
-ext_tree_sources = tree_sources
+ext_tree_sources = files(
+  'TreeClassification.cpp',
+  #'Tree.cpp',
+  'TreeProbability.cpp',
+  'TreeRegression.cpp',
+  'TreeSurvival.cpp',
+)
