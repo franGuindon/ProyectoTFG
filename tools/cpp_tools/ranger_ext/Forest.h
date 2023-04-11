@@ -166,6 +166,8 @@ public:
     return data->getSnpOrder();
   }
 
+  void print();
+
 protected:
   void grow();
   virtual void growInternal() = 0;

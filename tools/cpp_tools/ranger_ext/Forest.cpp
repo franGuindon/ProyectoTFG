@@ -651,6 +651,10 @@ void Forest::grow() {
   }
 }
 
+void Forest::print() {
+  printf("Running print\n");
+}
+
 void Forest::predict() {
 
   // Predict trees in multiple threads and join the threads with the main thread
