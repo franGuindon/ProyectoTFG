@@ -1,0 +1,700 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{Vranjes2018}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=4668a14de22343e9e27143c698f06863}{%
+           family={Vranjes},
+           familyi={V\bibinitperiod},
+           given={Mario},
+           giveni={M\bibinitperiod}}}%
+        {{hash=9b6a85bbc3aca6c32e68d5e1c5637581}{%
+           family={Herceg},
+           familyi={H\bibinitperiod},
+           given={Marijan},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c77adc2a7b01ece7162c98452f1bfba8}{%
+           family={Vranjes},
+           familyi={V\bibinitperiod},
+           given={Denis},
+           giveni={D\bibinitperiod}}}%
+        {{hash=41990cfef8d939f17ced9b0df8270e4e}{%
+           family={Vajak},
+           familyi={V\bibinitperiod},
+           given={Denis},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{b5cc6f5d405695e8656f84d436375e4e}
+      \strng{fullhash}{b5cc6f5d405695e8656f84d436375e4e}
+      \strng{bibnamehash}{b5cc6f5d405695e8656f84d436375e4e}
+      \strng{authorbibnamehash}{b5cc6f5d405695e8656f84d436375e4e}
+      \strng{authornamehash}{b5cc6f5d405695e8656f84d436375e4e}
+      \strng{authorfullhash}{b5cc6f5d405695e8656f84d436375e4e}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2018 Zooming Innovation in Consumer Technologies Conference (ZINC)}
+      \field{title}{Video Transmission Artifacts Detection Using No-Reference Approach}
+      \field{year}{2018}
+      \field{pages}{72\bibrangedash 77}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1109/ZINC.2018.8448669
+      \endverb
+    \endentry
+    \entry{Korhonen2018}{article}{}
+      \name{author}{1}{}{%
+        {{hash=a0b0f9d29bcf70fa49dbbef3f0eaab35}{%
+           family={Korhonen},
+           familyi={K\bibinitperiod},
+           given={Jari},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \strng{fullhash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \strng{bibnamehash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \strng{authorbibnamehash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \strng{authornamehash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \strng{authorfullhash}{a0b0f9d29bcf70fa49dbbef3f0eaab35}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Broadcasting}
+      \field{number}{2}
+      \field{title}{Study of the Subjective Visibility of Packet Loss Artifacts in Decoded Video Sequences}
+      \field{volume}{64}
+      \field{year}{2018}
+      \field{pages}{354\bibrangedash 366}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.1109/TBC.2018.2832465
+      \endverb
+    \endentry
+    \entry{Greengrass2009}{article}{}
+      \name{author}{3}{}{%
+        {{hash=e834c91ef428a75321c66b2c377fedba}{%
+           family={Greengrass},
+           familyi={G\bibinitperiod},
+           given={Jason},
+           giveni={J\bibinitperiod}}}%
+        {{hash=02c9fee5af4987d8ec22207277ace861}{%
+           family={Evans},
+           familyi={E\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod}}}%
+        {{hash=44bd935f16ca188aced00b3c8499a308}{%
+           family={Begen},
+           familyi={B\bibinitperiod},
+           given={Ali\bibnamedelima C.},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{40594f3e50e73a22f5dea79661ef4467}
+      \strng{fullhash}{40594f3e50e73a22f5dea79661ef4467}
+      \strng{bibnamehash}{40594f3e50e73a22f5dea79661ef4467}
+      \strng{authorbibnamehash}{40594f3e50e73a22f5dea79661ef4467}
+      \strng{authornamehash}{40594f3e50e73a22f5dea79661ef4467}
+      \strng{authorfullhash}{40594f3e50e73a22f5dea79661ef4467}
+      \field{sortinit}{2}
+      \field{sortinithash}{ed39bb39cf854d5250e95b1c1f94f4ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Internet Computing}
+      \field{number}{2}
+      \field{title}{Not All Packets Are Equal, Part 2: The Impact of Network Packet Loss on Video Quality}
+      \field{volume}{13}
+      \field{year}{2009}
+      \field{pages}{74\bibrangedash 82}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1109/MIC.2009.40
+      \endverb
+    \endentry
+    \entry{Sanyal2021}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=b3b972c4f2bc7c59e40e09d9d091e3d6}{%
+           family={Sanyal},
+           familyi={S\bibinitperiod},
+           given={Shreyan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=d762690c20c170a75acc74e244384c70}{%
+           family={Palit},
+           familyi={P\bibinitperiod},
+           given={Sarbani},
+           giveni={S\bibinitperiod}}}%
+      }
+      \name{editor}{5}{}{%
+        {{hash=5d63d8c982d3e8008a340553969745f1}{%
+           family={Mantoro},
+           familyi={M\bibinitperiod},
+           given={Teddy},
+           giveni={T\bibinitperiod}}}%
+        {{hash=bff450ebd68aa9d233c17814c8db428d}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Minho},
+           giveni={M\bibinitperiod}}}%
+        {{hash=502dd998698665efe7997d2a9b58c6ba}{%
+           family={Ayu},
+           familyi={A\bibinitperiod},
+           given={Media\bibnamedelima Anugerah},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=e200a397874518e4390e1b1cc0a9750f}{%
+           family={Wong},
+           familyi={W\bibinitperiod},
+           given={Kok\bibnamedelima Wai},
+           giveni={K\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=c4fc6b25335f3b23ddc355f890ec1012}{%
+           family={Hidayanto},
+           familyi={H\bibinitperiod},
+           given={Achmad\bibnamedelima Nizar},
+           giveni={A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Cham}%
+      }
+      \list{publisher}{1}{%
+        {Springer International Publishing}%
+      }
+      \strng{namehash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{fullhash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{bibnamehash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{authorbibnamehash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{authornamehash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{authorfullhash}{d65a5136b75bfe3a7f8e7f8ee7df12fd}
+      \strng{editorbibnamehash}{27635b63d8a2b097cfd7da4abea97988}
+      \strng{editornamehash}{27635b63d8a2b097cfd7da4abea97988}
+      \strng{editorfullhash}{27635b63d8a2b097cfd7da4abea97988}
+      \field{sortinit}{4}
+      \field{sortinithash}{e071e0bcb44634fab398d68ad04e69f4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Objective quality measures are usually concerned with overall degradation in quality, disregarding impairments and artifacts such as those due to packet loss error concealment. Unfortunately, it is particularly hard to model due to its unpredictable nature and content-dependency. We propose a human perception based no-reference framework utilizing motion-compensated frame interpolation and colour gradients to identify and localize packet loss impaired regions in video frames. The unique and principal contribution of this work is the attempt to mimic the human visual system throughout the process instead of the traditional approach of trying to replicate the mean opinion score.}
+      \field{booktitle}{Neural Information Processing}
+      \field{isbn}{978-3-030-92310-5}
+      \field{title}{A No-Reference Perception Based Metric for Detection of Packet Loss Induced Artifacts in Videos}
+      \field{year}{2021}
+      \field{pages}{615\bibrangedash 623}
+      \range{pages}{9}
+    \endentry
+    \entry{Goodall2019}{article}{}
+      \name{author}{2}{}{%
+        {{hash=f7deed9024182b02d963d6ab682729a1}{%
+           family={Goodall},
+           familyi={G\bibinitperiod},
+           given={Todd\bibnamedelima R.},
+           giveni={T\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=d9c2ab9a8cbcab08292923a454c88ce7}{%
+           family={Bovik},
+           familyi={B\bibinitperiod},
+           given={Alan\bibnamedelima C.},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{50bc8cb5dd69942d61f7774136041ad6}
+      \strng{fullhash}{50bc8cb5dd69942d61f7774136041ad6}
+      \strng{bibnamehash}{50bc8cb5dd69942d61f7774136041ad6}
+      \strng{authorbibnamehash}{50bc8cb5dd69942d61f7774136041ad6}
+      \strng{authornamehash}{50bc8cb5dd69942d61f7774136041ad6}
+      \strng{authorfullhash}{50bc8cb5dd69942d61f7774136041ad6}
+      \field{sortinit}{5}
+      \field{sortinithash}{5dd416adbafacc8226114bc0202d5fdd}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Image Processing}
+      \field{number}{6}
+      \field{title}{Detecting and Mapping Video Impairments}
+      \field{volume}{28}
+      \field{year}{2019}
+      \field{pages}{2680\bibrangedash 2691}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/TIP.2018.2889276
+      \endverb
+    \endentry
+    \entry{Li2022}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=1e181d320377f5c489b768686bb952ee}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Zhen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=bacd3c42aefdb747282bec54ea7d0d4c}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Cheng-Ze},
+           giveni={C\bibinithyphendelim Z\bibinitperiod}}}%
+        {{hash=6f8e54291b06c98836d3a34a36996148}{%
+           family={Qin},
+           familyi={Q\bibinitperiod},
+           given={Jianhua},
+           giveni={J\bibinitperiod}}}%
+        {{hash=81b833cfe474571b00ba39ba529dbb06}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Chun-Le},
+           giveni={C\bibinithyphendelim L\bibinitperiod}}}%
+        {{hash=bfbe355b6a8257baeffd5b8814bc5c57}{%
+           family={Cheng},
+           familyi={C\bibinitperiod},
+           given={Ming-Ming},
+           giveni={M\bibinithyphendelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{c471dcb50716dc448302f822b9eec024}
+      \strng{fullhash}{c471dcb50716dc448302f822b9eec024}
+      \strng{bibnamehash}{c471dcb50716dc448302f822b9eec024}
+      \strng{authorbibnamehash}{c471dcb50716dc448302f822b9eec024}
+      \strng{authornamehash}{c471dcb50716dc448302f822b9eec024}
+      \strng{authorfullhash}{c471dcb50716dc448302f822b9eec024}
+      \field{sortinit}{6}
+      \field{sortinithash}{7851c86048328b027313775d8fbd2131}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}
+      \field{title}{Towards An End-to-End Framework for Flow-Guided Video Inpainting}
+      \field{year}{2022}
+      \field{pages}{17541\bibrangedash 17550}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/CVPR52688.2022.01704
+      \endverb
+    \endentry
+    \entry{Zhou2021}{article}{}
+      \name{author}{6}{}{%
+        {{hash=a5a7e1da5f8e899211f04d84a59d0dd6}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Peng},
+           giveni={P\bibinitperiod}}}%
+        {{hash=d8674254cf6a6c4c17d103ffa80d81f3}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Ning},
+           giveni={N\bibinitperiod}}}%
+        {{hash=caf7e7b2a89c8c3c4fd78cf3eca8dc14}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Zuxuan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=dcd7f4d5fae52e84cdfcfb7809b2d5a2}{%
+           family={Davis},
+           familyi={D\bibinitperiod},
+           given={Larry\bibnamedelima S.},
+           giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=7244177886497a3743e18fc63c2efcad}{%
+           family={Shrivastava},
+           familyi={S\bibinitperiod},
+           given={Abhinav},
+           giveni={A\bibinitperiod}}}%
+        {{hash=006882fca87091a5efb1080cf10de450}{%
+           family={Lim},
+           familyi={L\bibinitperiod},
+           given={Ser-Nam},
+           giveni={S\bibinithyphendelim N\bibinitperiod}}}%
+      }
+      \strng{namehash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \strng{fullhash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \strng{bibnamehash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \strng{authorbibnamehash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \strng{authornamehash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \strng{authorfullhash}{b0fae003c6f85e30a775f2e3a0a553e8}
+      \field{sortinit}{6}
+      \field{sortinithash}{7851c86048328b027313775d8fbd2131}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ArXiv}
+      \field{title}{Deep Video Inpainting Detection}
+      \field{volume}{abs/2101.11080}
+      \field{year}{2021}
+    \endentry
+    \entry{Dong2023}{article}{}
+      \name{author}{4}{}{%
+        {{hash=4c912e8c72d347873935b8d3f29a7634}{%
+           family={Dong},
+           familyi={D\bibinitperiod},
+           given={Xiucheng},
+           giveni={X\bibinitperiod}}}%
+        {{hash=c008e0f90bb442e454ec3819ee2d0921}{%
+           family={Jiang},
+           familyi={J\bibinitperiod},
+           given={Jinyang},
+           giveni={J\bibinitperiod}}}%
+        {{hash=aafe6dc20b817609c7490084689c8e59}{%
+           family={Hou},
+           familyi={H\bibinitperiod},
+           given={Shuang},
+           giveni={S\bibinitperiod}}}%
+        {{hash=d24469b1aaa9ca03fb40db61fe4432f5}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Chencheng},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{81873231b61c40226dfee84d2c3fe990}
+      \strng{fullhash}{81873231b61c40226dfee84d2c3fe990}
+      \strng{bibnamehash}{81873231b61c40226dfee84d2c3fe990}
+      \strng{authorbibnamehash}{81873231b61c40226dfee84d2c3fe990}
+      \strng{authornamehash}{81873231b61c40226dfee84d2c3fe990}
+      \strng{authorfullhash}{81873231b61c40226dfee84d2c3fe990}
+      \field{sortinit}{7}
+      \field{sortinithash}{f615fb9c6fba11c6f962fb3fd599810e}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Complex \& Intelligent Systems}
+      \field{title}{Inpainting larger missing regions via progressive guidance decoding network}
+      \field{year}{2023}
+    \endentry
+    \entry{Brenes2022}{thesis}{}
+      \name{author}{1}{}{%
+        {{hash=7c2ed0e47c2624f5123846cb65fb60fb}{%
+           family={Brenes},
+           familyi={B\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Escuela de Ingeniería Electrónica, Tecnológico de Costa Rica}%
+      }
+      \strng{namehash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \strng{fullhash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \strng{bibnamehash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \strng{authorbibnamehash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \strng{authornamehash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \strng{authorfullhash}{7c2ed0e47c2624f5123846cb65fb60fb}
+      \field{sortinit}{7}
+      \field{sortinithash}{f615fb9c6fba11c6f962fb3fd599810e}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Restauración de señales de video en línea en un sistema embebido}
+      \field{type}{Tesis de Licenciatura}
+      \field{year}{2022}
+    \endentry
+    \entry{Liu2021}{article}{}
+      \name{author}{9}{}{%
+        {{hash=47fa1cfa42f039e59f4e014c1941c712}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={R.},
+           giveni={R\bibinitperiod}}}%
+        {{hash=598eb4c75c20df36bfd4101b2df3a3f9}{%
+           family={Deng},
+           familyi={D\bibinitperiod},
+           given={Hanming},
+           giveni={H\bibinitperiod}}}%
+        {{hash=e0dc96a3c2a38fe753201cf60447a57e}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Yangyi},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=bec12cf5fdc8987a6081b724e3f4bc20}{%
+           family={Shi},
+           familyi={S\bibinitperiod},
+           given={Xiaoyu},
+           giveni={X\bibinitperiod}}}%
+        {{hash=1d33474fafd3bc29d4e8af08cf36e8d4}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Lewei},
+           giveni={L\bibinitperiod}}}%
+        {{hash=50ceec7cc1ea11fac6386bd90e2e0e92}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Wenxiu},
+           giveni={W\bibinitperiod}}}%
+        {{hash=e88500bd6ca50746707a22554761b61a}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaogang},
+           giveni={X\bibinitperiod}}}%
+        {{hash=c80dbb87ee6058c0b81ab8ee017f1170}{%
+           family={Dai},
+           familyi={D\bibinitperiod},
+           given={Jifeng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c727733707a60b57a65c544b07a9825e}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Hongsheng},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \strng{fullhash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \strng{bibnamehash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \strng{authorbibnamehash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \strng{authornamehash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \strng{authorfullhash}{0b4ff3cc33f99dc936acb5fe3fa2e08e}
+      \field{sortinit}{8}
+      \field{sortinithash}{1b24cab5087933ef0826a7cd3b99e994}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ArXiv}
+      \field{title}{Decoupled Spatial-Temporal Transformer for Video Inpainting}
+      \field{volume}{abs/2104.06637}
+      \field{year}{2021}
+    \endentry
+    \entry{Glavota2016}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=20cde6f20407777e7c428c612ccaf768}{%
+           family={Glavota},
+           familyi={G\bibinitperiod},
+           given={Ivan},
+           giveni={I\bibinitperiod}}}%
+        {{hash=39a17f039e26dd4e9b8853c0b85cb15a}{%
+           family={Vranješ},
+           familyi={V\bibinitperiod},
+           given={Mario},
+           giveni={M\bibinitperiod}}}%
+        {{hash=9b6a85bbc3aca6c32e68d5e1c5637581}{%
+           family={Herceg},
+           familyi={H\bibinitperiod},
+           given={Marijan},
+           giveni={M\bibinitperiod}}}%
+        {{hash=4f98d857cf81e0dc6272b16b91337059}{%
+           family={Grbić},
+           familyi={G\bibinitperiod},
+           given={Ratko},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \strng{fullhash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \strng{bibnamehash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \strng{authorbibnamehash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \strng{authornamehash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \strng{authorfullhash}{146c1f4eaad0a48c4e90fa8e9906dc53}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2016 Zooming Innovation in Consumer Electronics International Conference (ZINC)}
+      \field{title}{Pixel-based statistical analysis of packet loss artifact features}
+      \field{year}{2016}
+      \field{pages}{16\bibrangedash 19}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1109/ZINC.2016.7513644
+      \endverb
+    \endentry
+    \entry{Vranjes2019}{article}{}
+      \name{author}{4}{}{%
+        {{hash=39a17f039e26dd4e9b8853c0b85cb15a}{%
+           family={Vranješ},
+           familyi={V\bibinitperiod},
+           given={Mario},
+           giveni={M\bibinitperiod}}}%
+        {{hash=7dd695fa0abfa2dada60be40a001a3e5}{%
+           family={Bajčinovci},
+           familyi={B\bibinitperiod},
+           given={Viliams},
+           giveni={V\bibinitperiod}}}%
+        {{hash=4f98d857cf81e0dc6272b16b91337059}{%
+           family={Grbić},
+           familyi={G\bibinitperiod},
+           given={Ratko},
+           giveni={R\bibinitperiod}}}%
+        {{hash=41990cfef8d939f17ced9b0df8270e4e}{%
+           family={Vajak},
+           familyi={V\bibinitperiod},
+           given={Denis},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \strng{fullhash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \strng{bibnamehash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \strng{authorbibnamehash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \strng{authornamehash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \strng{authorfullhash}{8adb89e45a4d1a622af5c448c1e57c24}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Signal Process. Image Commun.}
+      \field{title}{No-reference artifacts measurements based video quality metric}
+      \field{volume}{78}
+      \field{year}{2019}
+      \field{pages}{345\bibrangedash 358}
+      \range{pages}{14}
+    \endentry
+    \entry{Glavota2018}{article}{}
+      \name{author}{4}{}{%
+        {{hash=20cde6f20407777e7c428c612ccaf768}{%
+           family={Glavota},
+           familyi={G\bibinitperiod},
+           given={Ivan},
+           giveni={I\bibinitperiod}}}%
+        {{hash=efea97fa27acda64b337c50de154adfe}{%
+           family={Kaprocki},
+           familyi={K\bibinitperiod},
+           given={Zvonimir},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=39a17f039e26dd4e9b8853c0b85cb15a}{%
+           family={Vranješ},
+           familyi={V\bibinitperiod},
+           given={Mario},
+           giveni={M\bibinitperiod}}}%
+        {{hash=9b6a85bbc3aca6c32e68d5e1c5637581}{%
+           family={Herceg},
+           familyi={H\bibinitperiod},
+           given={Marijan},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{66102d03e9238cb398c278886b88e509}
+      \strng{fullhash}{66102d03e9238cb398c278886b88e509}
+      \strng{bibnamehash}{66102d03e9238cb398c278886b88e509}
+      \strng{authorbibnamehash}{66102d03e9238cb398c278886b88e509}
+      \strng{authornamehash}{66102d03e9238cb398c278886b88e509}
+      \strng{authorfullhash}{66102d03e9238cb398c278886b88e509}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Real-Time Image Processing}
+      \field{title}{No-reference real-time video transmission artifact detection for video signals}
+      \field{volume}{17}
+      \field{year}{2018}
+      \field{pages}{799\bibrangedash 820}
+      \range{pages}{22}
+    \endentry
+    \entry{Rajasekar2020}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=54975052b1f499451312f71426c5526a}{%
+           family={Rajasekar},
+           familyi={R\bibinitperiod},
+           given={Ganesh},
+           giveni={G\bibinitperiod}}}%
+        {{hash=f244e8ae5eff7776cf2b4b5b84ad8c4a}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Zhou},
+           giveni={Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \strng{fullhash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \strng{bibnamehash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \strng{authorbibnamehash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \strng{authornamehash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \strng{authorfullhash}{e5ade16841bd7f3ff9d23ab84a29b50a}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Image Analysis and Recognition}
+      \field{title}{Detecting Macroblocking in Images Caused by Transmission Error}
+      \field{year}{2020}
+    \endentry
+    \entry{ZoomSupport}{online}{}
+      \name{author}{1}{}{%
+        {{hash=70aa7bca5eee39ae0b560d676d1fecf5}{%
+           family={{Zoom Video Communications}},
+           familyi={Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \strng{fullhash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \strng{bibnamehash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \strng{authorbibnamehash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \strng{authornamehash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \strng{authorfullhash}{70aa7bca5eee39ae0b560d676d1fecf5}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Accessing meeting and phone statistics}
+      \field{urlday}{2}
+      \field{urlmonth}{6}
+      \field{urlyear}{2023}
+      \field{year}{2011}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://support.zoom.us/hc/en-us/articles/202920719-Accessing-meeting-and-phone-statistics
+      \endverb
+      \verb{url}
+      \verb https://support.zoom.us/hc/en-us/articles/202920719-Accessing-meeting-and-phone-statistics
+      \endverb
+    \endentry
+    \entry{ScikitLearn}{online}{}
+      \name{author}{1}{}{%
+        {{hash=2ad72e574157d613a63fe8732cf468a8}{%
+           family={{scikit-learn developers}},
+           familyi={s\bibinitperiod}}}%
+      }
+      \strng{namehash}{2ad72e574157d613a63fe8732cf468a8}
+      \strng{fullhash}{2ad72e574157d613a63fe8732cf468a8}
+      \strng{bibnamehash}{2ad72e574157d613a63fe8732cf468a8}
+      \strng{authorbibnamehash}{2ad72e574157d613a63fe8732cf468a8}
+      \strng{authornamehash}{2ad72e574157d613a63fe8732cf468a8}
+      \strng{authorfullhash}{2ad72e574157d613a63fe8732cf468a8}
+      \field{sortinit}{1}
+      \field{sortinithash}{50c6687d7fc80f50136d75228e3c59ba}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Precision-Recall}
+      \field{urlday}{2}
+      \field{urlmonth}{6}
+      \field{urlyear}{2023}
+      \field{year}{2007}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
+      \endverb
+      \verb{url}
+      \verb https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
+      \endverb
+    \endentry
+    \entry{Keskin2012}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=d38f5fe7b3ce5ae032d2c588b35eaa5a}{%
+           family={Keskin},
+           familyi={K\bibinitperiod},
+           given={Cem},
+           giveni={C\bibinitperiod}}}%
+        {{hash=ca37d4a9782bfabbdb456f25311686db}{%
+           family={Kıraç},
+           familyi={K\bibinitperiod},
+           given={Mustafa\bibnamedelima Furkan},
+           giveni={M\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=aa0ee73352548984747a65ab5e284ded}{%
+           family={Kara},
+           familyi={K\bibinitperiod},
+           given={Yunus\bibnamedelima Emre},
+           giveni={Y\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=49c47e554ffb4db260e0aa2ff42727c5}{%
+           family={Akarun},
+           familyi={A\bibinitperiod},
+           given={Lale},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{63be61db8e54da693191cdd291c6df0b}
+      \strng{fullhash}{63be61db8e54da693191cdd291c6df0b}
+      \strng{bibnamehash}{63be61db8e54da693191cdd291c6df0b}
+      \strng{authorbibnamehash}{63be61db8e54da693191cdd291c6df0b}
+      \strng{authornamehash}{63be61db8e54da693191cdd291c6df0b}
+      \strng{authorfullhash}{63be61db8e54da693191cdd291c6df0b}
+      \field{sortinit}{2}
+      \field{sortinithash}{ed39bb39cf854d5250e95b1c1f94f4ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{European Conference on Computer Vision}
+      \field{title}{Hand Pose Estimation and Hand Shape Classification Using Multi-layered Randomized Decision Forests}
+      \field{year}{2012}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
