@@ -74,15 +74,15 @@ struct Args {
 };
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    printf("Usage: trainer [FEATURE_FILE] [LABEL_FILE]\n");
+  if (argc != 4) {
+    printf("Usage: trainer [FEATURE_FILE] [LABEL_FILE] [OUTPUT_PREFIX]\n");
     return 1;
   }
 
   auto forest = std::make_unique<ForestRangerx>();
 
   Args arg_handler{};
-  arg_handler.outprefix = "rangerx";
+  arg_handler.outprefix = argv[3];
   arg_handler.verbose = true;
   arg_handler.file = "test_data.dat";
   arg_handler.depvarname = "y";
