@@ -1,0 +1,40 @@
+%% ---------------------------------------------------------------------------
+%% intro.tex
+%%
+%% Introduction
+%%
+%% $Id: intro.tex 1477 2010-07-28 21:34:43Z palvarado $
+%% ---------------------------------------------------------------------------
+
+\chapter{Actividades}
+\label{chp:actividades}
+
+Para entrenar y optimizar un bosque de decisión aleatoria que realice detección de artefactos de videos, es necesario iniciar con tareas de investigación y preparación del conjunto de datos. Es necesario investigar las características de los artefactos de video y de los métodos de extracción de características para entrenar bosques de decisión aleatoria. Además es necesario investigar los marcos de trabajo bajo los cuales se desarrollan y optimizan bosques de decisión aleatoria. Se deben investigar las posibles optimizaciones en el hardware a utilizar, pero la mayoría de las tareas de optimización dependen de primero entrenar un bosque que realice la detección de artefactos.
+
+La Tabla \ref{tab:actividades} resume las actividades a desarrollar, además de sus requisitos y los objetivos a los cuales corresponden.
+
+\begin{table} [!h]
+    \caption{Actividades a realizar, organizadas por objetivo e indicando sus respectivos requisitos y duraciones (en días)}
+    \label{tab:actividades}
+    \centering
+    \begin{tabular}{p{0.4 cm} p{7.8 cm} p{1.6 cm} p{2 cm} p{2 cm}}
+        \hline
+        $\#$ & Actividad & Objetivo & Requisitos & Duración \\
+        \hline
+        1 & Coleccionar videos a utilizar como conjunto de datos & 1 & - & 2 \\
+        2 & Simular pérdida de paquetes sobre conjunto de datos & 1 & 1 & 1 \\
+        3 & Generar datos de referencia comparando datos con pérdidas y datos originales & 1 & 2 & 2 \\
+        \hline
+        4 & Investigar características de artefactos de video por pérdida de paquetes & 2 & - & 10 \\
+        5 & Investigar estrategias de extracción de características para bosques de decisión aleatoria orientados a imágenes & 2 & - & 10 \\
+        6 & Investigar marcos de trabajo para entrenar bosques de decisión aleatoria & 2 & - & 10 \\
+        7 & Determinar estrategias de extracción de características sobre datos con pérdidas & 2 & 4, 5 & 5 \\
+        8 & Determinar e instalar marco de trabajo para entrenar bósques de decisión aleatoria & 2 & 6 & 5 \\
+        9 & Entrenar bosques & 2 & 3, 7, 8 & 20 \\
+        \hline
+        10 & Investigar estrategias de optimización por software para estrategias de extracción de características & 3 & 5 & 25 \\
+        11 & Investigar estrategias de optimización por hardware para la Jetson TX2 & 3 & - & 25 \\
+        12 & Implementar estrategias de optimización sobre extracción de características & 3 & 9, 10, 11 & 20 \\
+        \hline
+    \end{tabular}
+\end{table}

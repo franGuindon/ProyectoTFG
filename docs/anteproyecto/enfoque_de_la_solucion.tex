@@ -1,0 +1,74 @@
+%% ---------------------------------------------------------------------------
+%% intro.tex
+%%
+%% Introduction
+%%
+%% $Id: intro.tex 1477 2010-07-28 21:34:43Z palvarado $
+%% ---------------------------------------------------------------------------
+
+\chapter{Enfoque de la solución}
+\label{chp:enfoque}
+
+La elección de un método de detección de artefactos de video está delimitado por las siguientes consideraciones:
+\begin{enumerate}
+    \item Se debe lograr detectar la ubicación de los artefactos de video considerando la precisión y exhaustividad que se desean alcanzar
+    \item Se debe optimizar el uso de recursos del equipo a utilizar, ya que el proceso de detección debe correr junto al proceso de restauración de imágenes.
+    \item Se debe optimizar la velocidad del método de detección para permitir que el sistema de corrección pueda ejecutarse en tiempo real
+\end{enumerate}
+
+\section{Posibles soluciones}
+
+\begin{enumerate}
+    \item Una posible solución al problema es de implementar un algoritmo a base de filtrado de imágenes. Como se menciona en \cite{Vranjes2018, Glavota2018}, es posible aprovechar características estadísticas de los artefactos para lograr determinar sus ubicaciones. Estos algoritmos ofrecen ventajas en términos de su capacidad de correr con pocos recursos y permitir ejecución en tiempo real. El problema con estos algoritmos es que no consideran la variedad de irregularidades en la naturaleza de los artefactos de video, por lo cual no alcanzan niveles altos de detección. Además, estos métodos cuentan con parámetros para ajustar el comportamiento del filtrado que deben ser ajustados a mano, por lo cual tienen configuraciones dependentientes de cada situación.
+
+    \item Otra posible solución al problema es implementar y entrenar una red neuronal que recibe las imágenes de entrada y genere máscaras de salida con las ubicaciones de los artefactos detectados. Estos métodos se utilizan en \cite{Goodall2019,Rajasekar2020}. Las redes neuronales son algoritmos que aprenden a partir de un conjunto de datos de entrenamiento a generalizar la detección de errores con datos de prueba con los cuales no se ha entrenado. Las redes neuronales alcanzan altos niveles de detección, pero requieren de GPU para correr en tiempo real.
+
+    \item Una tercer posible solución al problema es implementar y entrenar un Bosque de Decisión Aleatoria que reciba cierta información sobre el macrobloque de una imagen sobre la cual se desea realizar la detección y decida si tiene o no tiene un error. Estos algoritmos logran altos niveles de detección, pero además tienen la ventaja de ser computacionalmente muy eficientes tanto en recursos como en tiempo de ejecución \cite{Keskin2012}.
+\end{enumerate}
+
+\section{Selección de la solución}
+
+La solución más adecuada al problema de detección de artefactos de video es la implementación de un Bosque de Decisión Aleatoria. Los bosques tienen ventajas sobre las otras posibles soluciones dadas las limitaciones de velocidad, recursos y calidad que se deben considerar. Los algoritmos de filtrado son eficientes en uso de recursos y son veloces, pero están limitados en su habilidad de generalizar a una gran variedad de artefactos, por lo cual no cuentan con la mejor calidad de detección. Las redes neuronales son algoritmos poderosos y resultan en los mejores resultados de detección, pero consumen más recursos de los que se disponen para la detección de artefactos. Si se ejecutan las redes neuronales con recursos limitados, el tiempo de procesamiento aumenta considerablemente. Los bosques de decisión aleatoria son capaces de generalizar tareas de detección con imágenes \cite{Keskin2012}, además de ser eficientes en usos de recursos y velocidad. Por esta razón los Bosques de Decisión Aleatoria son la solución más apropiada para el problema a solucionar.
+
+La Tabla \ref{tab:sel_sol} es una Matriz de Pugh que compara criterios, con tal de demostrar que entre las soluciones propuestas, la implementación de un Bosque de Decisión Aleatoria es la eleción más apropiada. Dos criterios considerados son el consumo de memoria y de CPU. Para la corrección de artefactos de video, el proceso de detección de artefactos debe compartir recursos con el proceso de reconstrucción de imágenes. Además el proceso de reconstrucción debe contar con un acelerador para lograr ejecutarse en tiempo real. Por lo tanto, la elección del método de detección de artefactos debe considerar un uso limitado de recursos. La efectividad de la solución, y en particular la métrica de exhaustividad de la solución determina si la solución es viable. La velocidad que logra alcanzar cada solución se relaciona inversamente con la complejidad algorítmica. El proceso de detección de artefactos debe ejecutarse en tiempo real, por lo cual debe utilizar un algoritmo veloz. La complejidad de implementación determina si la solución es factible de desarrollarse en el periodo establecido para la ejecución del proyecto.
+
+\begin{table} [!h]
+    \caption{Matriz de Pugh para la selección de solución}
+    \label{tab:sel_sol}
+    \centering
+    \begin{tabular}{p{3.5 cm} p{2.5 cm} p{2.5 cm} p{3.5 cm}}
+        \hline
+        Criterios & Algoritmo de Filtrado & Red neuronal & Bosque de decisión aleatoria \\
+        \hline
+        Consumo memoria & 0 & -1 & 0 \\
+        Consumo CPU & 1 & -1 & 1 \\
+        Efectividad & -1 & 1 & 1 \\
+        Velocidad & 1 & -1 & 1 \\
+        Implementación & 0 & 0 & -1 \\
+        \hline
+        Total & 1 & -1 & 2 \\
+        \hline
+        Prioridad & 2 & 3 & 1 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\newpage
+
+La solución debe evaluarse variando las condiciones de captura. En la Tabla \ref{tab:base_de_datos} se resumen los criterios para el conjunto de datos con el que se debe probar la solución.
+
+\begin{table} [!h]
+    \caption{Criterios para base de datos de prueba}
+    \label{tab:base_de_datos}
+    \centering
+    \begin{tabular}{l c}
+        \hline
+        Criterios & Cantidad \\
+        \hline
+        Categorías de actividades & 6 \\
+        Condiciones de luz & 3 \\
+        Tamaño mínimo de cada video (cuadros) & 600 \\
+        Resolución mínima de cada video (pixeles) & $1280 \times 720$ \\
+        \hline
+    \end{tabular}
+\end{table}

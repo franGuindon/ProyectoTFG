@@ -1,0 +1,41 @@
+%% ---------------------------------------------------------------------------
+%% intro.tex
+%%
+%% Introduction
+%%
+%% $Id: intro.tex 1477 2010-07-28 21:34:43Z palvarado $
+%% ---------------------------------------------------------------------------
+
+\chapter{Objetivos}
+\label{chp:objetivos}
+
+\section{Objetivo general}
+
+Desarrollar un sistema para la detección y localización de errores por pérdida de paquetes en imágenes de un video codificado con H264 en tiempo real, utilizando solo los recursos de CPU de la Jetson TX2 de NVIDIA, mediante un Bosque de Decisión Aleatoria.
+
+Indicador: Las métricas de precisión y exhaustividad deben ser mayores a 70\%. La duración de detección menor a 33 ms, y el perfil de uso de recursos debe mostrar el uso exclusivo de CPU.
+
+Entregable: Sistema de detección que recibe imágenes con errores por pérdida de paquetes y produce máscaras binarias con los resultados de detección de errores.
+
+\section{Objetivos Específicos}
+
+\begin{enumerate}
+    \item Generar el conjunto de datos de entrenamiento y prueba que contenga videos base, con variedad de escenas y colores, los videos correspondientes con errores de pérdida de paquetes generados, junto a datos de referencia que indican las ubicaciones de los errores generados.
+
+    Indicador:  El conjunto de datos cumple con los criterios expuestos en la Tabla \ref{tab:base_de_datos}, acompañados por su versión con errores generados y sus datos de referencia que indica las ubicaciones de los errores generados.
+
+    Entregable: El conjunto de datos.
+
+    \item Diseñar e implementar un Bosque de Decisión Aleatoria mediante el conjunto de datos generado para lograr metricas de precisión y exhaustividad mayores a 70\%.
+
+    Indicador: Las métricas de precisión y exhaustividad deben ser mayores a 70\% con un conjunto de prueba con el cual no ha sido entrenado.
+
+    Entregable: El modelo de bosque de decisión aleatoria entrenado.
+
+    \item Optimizar Bosque de Decisión Aleatoria para lograr ejecutar detección en tiempo real de artefactos en una imagen.
+
+    Indicador: El modelo mantiene las métricas de precisión y exhaustividad mayores al 70\% y adicionalmente indica las ubicaciones de los errores en imágenes en menos de 33 ms por imagen.
+
+    Entregable: Un perfil del tiempo de ejecución del modelo
+
+\end{enumerate}
