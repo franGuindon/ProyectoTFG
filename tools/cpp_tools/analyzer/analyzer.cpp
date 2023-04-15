@@ -41,8 +41,8 @@ struct Args {
 };
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    printf("Usage: analyzer [MODEL_FILE]\n");
+  if (argc != 4) {
+    printf("Usage: analyzer [MODEL_FILE] [TREE_ID] [MAXDEPTH]\n");
     return 1;
   }
 
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
       arg_handler.holdout, arg_handler.predictiontype, arg_handler.randomsplits,
       arg_handler.maxdepth, arg_handler.regcoef, arg_handler.usedepth);
   
-  forest->print();
+  forest->print(std::stoi(argv[2]), std::stoi(argv[3]));
 
   return 0;
 }
