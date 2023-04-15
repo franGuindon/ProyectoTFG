@@ -20,6 +20,8 @@
 #include "globals.h"
 #include "Data.h"
 
+#include <unordered_map>
+
 namespace ranger {
 
 class Tree {
@@ -50,6 +52,10 @@ public:
   void predict(const Data* prediction_data, bool oob_prediction);
 
   void print();
+
+  void print(size_t node_id, std::unordered_map<size_t, size_t>& map);
+
+  void print(size_t node_id, size_t maxdepth);
 
   void computePermutationImportance(std::vector<double>& forest_importance, std::vector<double>& forest_variance,
       std::vector<double>& forest_importance_casewise);

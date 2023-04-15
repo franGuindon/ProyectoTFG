@@ -658,6 +658,11 @@ void Forest::print() {
   }
 }
 
+void Forest::print(size_t tree_id, size_t maxdepth) {
+  printf("Printing forest\n");
+  trees[tree_id]->print(0, maxdepth);
+}
+
 void Forest::predict() {
 
   // Predict trees in multiple threads and join the threads with the main thread

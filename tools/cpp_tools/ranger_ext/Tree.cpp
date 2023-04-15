@@ -205,6 +205,60 @@ void Tree::predict(const Data* prediction_data, bool oob_prediction) {
 
 void Tree::print() {
   printf("Printing tree\n");
+
+  std::unordered_map<size_t, size_t> tree_map;
+
+  print(0, tree_map);
+
+  for (const auto& pair : tree_map) {
+    printf("Feature id: %ld, count: %ld\n", pair.first, pair.second);
+  }
+}
+
+void Tree::print(size_t node_id, std::unordered_map<size_t, size_t>& map) {
+  size_t nodeID = node_id;
+
+  if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
+    printf("Reached terminal node\n");
+    return;
+  }
+
+  size_t split_varID = split_varIDs[nodeID];
+  double value = 0;
+
+  printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
+          nodeID, split_varID, split_values[nodeID]);
+  ++map[split_varID];
+  
+  printf("Node %ld: Moving to left child node\n", nodeID);
+  print(child_nodeIDs[0][nodeID], map);
+  printf("Node %ld: Moving to right child node\n", nodeID);
+  print(child_nodeIDs[1][nodeID], map);
+}
+
+void Tree::print(size_t node_id, size_t maxdepth) {
+  size_t nodeID = node_id;
+
+  if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
+    printf("Reached terminal node\n");
+    return;
+  }
+
+  if (maxdepth == 0) {
+    printf("Max depth reached\n");
+    return;
+  }
+
+  size_t split_varID = split_varIDs[nodeID];
+  double value = 0;
+
+  printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
+          nodeID, split_varID, split_values[nodeID]);
+  
+  printf("Node %ld: Moving to left child node\n", nodeID);
+  print(child_nodeIDs[0][nodeID], maxdepth - 1);
+  printf("Node %ld: Moving to right child node\n", nodeID);
+  print(child_nodeIDs[1][nodeID], maxdepth - 1);
 }
 
 void Tree::computePermutationImportance(std::vector<double>& forest_importance, std::vector<double>& forest_variance,

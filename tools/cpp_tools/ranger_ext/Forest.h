@@ -167,6 +167,7 @@ public:
   }
 
   void print();
+  void print(size_t tree_id, size_t maxdepth);
 
 protected:
   void grow();
