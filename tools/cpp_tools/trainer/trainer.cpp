@@ -125,6 +125,24 @@ int main(int argc, char** argv) {
     }
   }
 
+  printf("Measuring raw dataset balance\n");
+  size_t sum_positives = 0;
+  size_t sum_negatives = 0;
+  for (size_t i = 0; i < num_rows; ++i) {
+    if (0.0F == y_mem[i]) {
+      ++sum_negatives;
+    } else if (255.0F == y_mem[i]) {
+      ++sum_positives;
+    } else {
+      printf("Error: Found invalid label value at index: %ld\n", i);
+      return -1;
+    }
+  }
+  float negative_percent = 100.0F*static_cast<float>(sum_negatives)/static_cast<float>(num_rows);
+  float positive_percent = 100.0F*static_cast<float>(sum_positives)/static_cast<float>(num_rows);
+  printf("Negatives: %ld, Positives: %ld, Total: %ld, Balance: %3.2f : %3.2f\n",
+        sum_negatives, sum_positives, num_rows, negative_percent, positive_percent);
+
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
       x_mem.get(), y_mem.get(), num_rows, num_cols, arg_handler.mtry,
