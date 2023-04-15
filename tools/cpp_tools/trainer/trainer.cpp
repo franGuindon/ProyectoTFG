@@ -2,6 +2,7 @@
 #include <memory>
 #include <stdio.h>
 #include <ForestClassification.h>
+#include <algorithm>
 
 using namespace ranger;
 typedef ForestClassification ForestRangerx;
@@ -23,9 +24,9 @@ bool load_frame(const std::string &filename, dtype *data, const size_t size) {
 
   file_size = file.tellg();
 
-  if (file_size != sizeof(dtype)*size) {
-    printf("Load frame error: Expected size (%d) and file size (%d) differ\n",
-           sizeof(dtype)*size, file_size);
+  if (file_size != static_cast<long long>(sizeof(dtype)*size)) {
+    printf("Load frame error: Expected size (%ld) and file size (%lld) differ\n",
+           sizeof(dtype)*size, static_cast<long long>(file_size));
     return false;
   }
 
@@ -74,21 +75,22 @@ struct Args {
 };
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    printf("Usage: trainer [FEATURE_FILE] [LABEL_FILE]\n");
+  if (argc != 4) {
+    printf("Usage: trainer [FEATURE_FILE] [LABEL_FILE] [OUTPUT_PREFIX]\n");
     return 1;
   }
 
   auto forest = std::make_unique<ForestRangerx>();
 
   Args arg_handler{};
-  arg_handler.outprefix = "rangerx";
+  arg_handler.outprefix = argv[3];
   arg_handler.verbose = true;
   arg_handler.file = "test_data.dat";
   arg_handler.depvarname = "y";
-  arg_handler.ntree = 10;
+  arg_handler.ntree = 20;
   arg_handler.nthreads = 12;
   arg_handler.write = true;
+  arg_handler.maxdepth = 100;
 
   const size_t block_dimension = 16;
   const size_t frame_width = 1280; 
@@ -123,11 +125,77 @@ int main(int argc, char** argv) {
       }
     }
   }
-  printf("%d %d\n", y_offset, num_rows);
+
+  printf("Measuring raw dataset balance\n");
+  size_t cnt_positives = 0;
+  size_t cnt_negatives = 0;
+  auto neg_then_pos_ids = std::unique_ptr<size_t[]>(new size_t[num_rows]);
+  for (size_t i = 0; i < num_rows; ++i) {
+    if (0.0F == y_mem[i]) {
+      neg_then_pos_ids[cnt_negatives] = i; // Fill neg ids from beginning
+      ++cnt_negatives;
+    } else if (255.0F == y_mem[i]) {
+      neg_then_pos_ids[num_rows-1-cnt_positives] = i; // Fill pos ids from end
+      ++cnt_positives;
+    } else {
+      printf("Error: Found invalid label value at index: %ld\n", i);
+      return -1;
+    }
+  }
+  float negative_percent = static_cast<float>(cnt_negatives)/static_cast<float>(num_rows);
+  float positive_percent = static_cast<float>(cnt_positives)/static_cast<float>(num_rows);
+  printf("Negatives: %ld, Positives: %ld, Total: %ld, Balance: %3.2f : %3.2f\n",
+        cnt_negatives, cnt_positives, num_rows, negative_percent, positive_percent);
+  printf("Randomizing negative and positive ids separately\n");
+  std::random_shuffle(neg_then_pos_ids.get(), neg_then_pos_ids.get() + cnt_negatives);
+  std::random_shuffle(neg_then_pos_ids.get() + cnt_negatives, neg_then_pos_ids.get() + num_rows);
+  
+  float balance = 0.5F;
+  printf("Adjusting dataset balance to %3.2f%% pos\n", balance);
+  /* Figure out whether to keep all pos or all neg
+   *
+   * poscnt0
+   * negcnt0
+   * total0
+   * poscnt1
+   * negcnt1
+   * total1
+   * 
+   * total0 = poscnt0 + negcnt0
+   * balance0 = poscnt0/total0
+   * 
+   * total1 = poscnt1 + negcnt1
+   * balance1 = poscnt1/total1
+   * 
+   * balance1 = poscnt1/(poscnt1 + negcnt1)
+   * poscnt1 + negcnt1 = poscnt1/balance1
+   * negcnt1 = poscnt1/balance1 - poscnt1
+   * negcnt1 = poscnt1(1/balance1 - 1)
+   * negcnt1 = poscnt1((1-balance1)/balance1)
+   * poscnt1 = negcnt1(balance1/(1-balance1))
+   */
+  float pos_to_neg_factor = (1-balance)/balance;
+  size_t neg_dataset_size = (balance > positive_percent) ? cnt_positives*pos_to_neg_factor : cnt_negatives;
+  size_t pos_dataset_size = (balance > positive_percent) ? cnt_positives : cnt_negatives/pos_to_neg_factor;
+  printf("Balanced neg cnt: %ld, pos cnt: %ld\n", neg_dataset_size, pos_dataset_size);
+  size_t total_dataset_size = neg_dataset_size + pos_dataset_size;
+  
+  auto x_mem_balanced = std::unique_ptr<float[]>(new float[total_dataset_size*features_per_block]);
+  auto y_mem_balanced = std::unique_ptr<float[]>(new float[total_dataset_size]);
+
+  for (size_t i = 0; i < neg_dataset_size; ++i) {
+    x_mem_balanced[i*features_per_block] = x_mem[neg_then_pos_ids[i]*features_per_block];
+    y_mem_balanced[i] = y_mem[neg_then_pos_ids[i]];
+  }
+
+  for (size_t i = 0; i < pos_dataset_size; ++i) {
+    x_mem_balanced[(i+neg_dataset_size)*features_per_block] = x_mem[neg_then_pos_ids[i+cnt_negatives]*features_per_block];
+    y_mem_balanced[(i+neg_dataset_size)] = y_mem[neg_then_pos_ids[i+cnt_negatives]];
+  }
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
-      x_mem.get(), y_mem.get(), num_rows, num_cols, arg_handler.mtry,
+      x_mem_balanced.get(), y_mem_balanced.get(), total_dataset_size, num_cols, arg_handler.mtry,
       arg_handler.outprefix, arg_handler.ntree, &std::cout, arg_handler.seed,
       arg_handler.nthreads, arg_handler.predict, arg_handler.impmeasure,
       arg_handler.targetpartitionsize, arg_handler.splitweights,
