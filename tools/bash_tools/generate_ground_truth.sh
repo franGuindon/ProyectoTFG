@@ -1,12 +1,27 @@
-PYTHON_BIN=python3
-SCRIPT=ground_truth.py  
-REF_VID=walking_tour_720p.mp4
-PL_VID=lossy_walking_tour_720p.mov
-#START_TIME=0
+if [[ 3 -ne $# ]]; then
+  echo
+  echo "Usage: generate_ground_truth.sh [REFERENCE_VIDEO] [SNIP_SPECIFICATION] [OUTPUT_DIR]"
+  echo "  REFERENCE_VIDEO    : H264 encoded 720p video"
+  echo "  SNIP_SPECIFICATION : Text file specifying how to snip encoded video"
+  echo "  OUTPUT_DIR         : Directory where a subdirectory for each snip will be created,"
+  echo "                       for each snip subdirectory, several files will be created"
+  echo
+  exit 1
+fi
+BASH_TOOLS_PATH=`dirname $0`/
+TOOLS_PATH=$BASH_TOOLS_PATH/../
+PYTHON_TOOLS_PATH=$TOOLS_PATH/python_tools/
 
-for ID_AND_START_TIME in $(python3 parse_readme_into_list.py)
+PYTHON_BIN=python3
+GT_SCRIPT=$PYTHON_TOOLS_PATH/ground_truth.py
+REF_VID=$1
+# PL_VID=lossy_walking_tour_720p.mov
+SNIP_SPEC_PARSER="$PYTHON_TOOLS_PATH/parse_readme_into_list.py"
+
+for ID_AND_START_TIME in `$PYTHON_BIN $SNIP_SPEC_PARSER`
 do
   echo spliting ID_AND_START_TIME
+  continue
   ID=$(echo $ID_AND_START_TIME | cut -d ":" -f 1)
   START_TIME=$(echo $ID_AND_START_TIME | cut -d ":" -f 2)
   echo ID $ID
