@@ -9,3 +9,7 @@ endif
 if activate_trainer
   subdir('trainer')
 endif
+
+if activate_analyzer
+  subdir('analyzer')
+endif
