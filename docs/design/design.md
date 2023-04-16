@@ -5,7 +5,6 @@
 <center>
 
 ``` plantuml
-@startuml
 
 struct Frame {
   + template <typename T>
@@ -37,7 +36,6 @@ class VideofileSink {
   + pushFrame(Frame frame)
 }
 
-@enduml
 ```
 </center>
 
@@ -46,13 +44,11 @@ class VideofileSink {
 <center>
 
 ``` plantuml
-@startuml
 
 participant FeatureExtractor as feat
 participant RandomDecisionForest as rdf
 
 feat -> rdf : 
 
-@enduml
 ```
 </center>
