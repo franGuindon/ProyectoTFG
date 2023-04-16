@@ -3,7 +3,7 @@ if get_option('enable-docs').enabled() and doxygen.found()
  #Configure env variables used in Doxyfile.in
  cdata = configuration_data()
  cdata.set('TOP_SRCDIR', meson.project_source_root())
- cdata.set('DESIGN_DOC_NAME', 'design.md')
+ cdata.set('DESIGN_DOC_NAME', 'design/design.md')
  cdata.set('TOP_BUILDDIR', meson.project_build_root())
  cdata.set('PROJECT', meson.project_name())
  cdata.set('VERSION', meson.project_version())
