@@ -1,6 +1,5 @@
 ## Design
 
-``` plantuml
 @startuml
 
 struct Frame {
@@ -34,9 +33,7 @@ class VideofileSink {
 }
 
 @enduml
-```
 
-``` plantuml
 @startuml
 
 participant FeatureExtractor as feat
@@ -45,4 +42,3 @@ participant RandomDecisionForest as rdf
 feat -> rdf : 
 
 @enduml
-```
