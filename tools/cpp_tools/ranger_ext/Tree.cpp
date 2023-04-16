@@ -224,7 +224,6 @@ void Tree::print(size_t node_id, std::unordered_map<size_t, size_t>& map) {
   }
 
   size_t split_varID = split_varIDs[nodeID];
-  double value = 0;
 
   printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
           nodeID, split_varID, split_values[nodeID]);
@@ -250,7 +249,6 @@ void Tree::print(size_t node_id, size_t maxdepth) {
   }
 
   size_t split_varID = split_varIDs[nodeID];
-  double value = 0;
 
   printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
           nodeID, split_varID, split_values[nodeID]);
