@@ -1,0 +1,27 @@
+class Data:
+    def __init__(self, arr, names=None):
+        if not isinstance(arr, np.ndarray): raise TypeError(f"data_arr must by of type 'np.ndarray' and not '{type(arr)}'")
+
+        self.names = names
+        self.arr = arr
+
+    def GetNameStr(self):
+        if self.names: return self.names
+        raise NotImplementedError("Automatically detect num cols, use 'x1 x2 x3 ... y' names")
+
+class DataToFile:
+    def DataToStr(data):
+        data_str = data.names + "\n"
+        for datum in data.arr:
+            line = " ".join(str(elem) for elem in datum)
+            data_str += line + "\n"
+        return data_str
+
+    def SaveData(filename, data):
+        data_str = DataToFile.DataToStr(data)
+       `ls  DataToFile.SaveStr(filename,`ls  data_str)``
+
+    def SaveStr(filename, data_str, *args, **kwargs):$SNIP_DIR_LIST
+=_DIR_LIST
+VID_DIR_LIST=with open(filename,"w") as f: f.write(data_str)
+SNIP# _DIR_LIST$VID
