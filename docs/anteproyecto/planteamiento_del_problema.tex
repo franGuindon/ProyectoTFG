@@ -1,0 +1,28 @@
+%% ---------------------------------------------------------------------------
+%% intro.tex
+%%
+%% Introduction
+%%
+%% $Id: intro.tex 1477 2010-07-28 21:34:43Z palvarado $
+%% ---------------------------------------------------------------------------
+
+\chapter{Planteamiento del problema}
+\label{chp:planteamiento}
+
+Un objetivo de la corrección de artefactos de video en aplicaciones de video conferencia y streaming en vivo es asegurar una alta QoE para el usuario final. Además, la corrección de artefactos de video cuenta con una etapa de detección de artefactos y otra etapa de restauración de zonas afectadas. El compromiso entre el costo computacional de estos procesos y los requisitos de QoE para el usuario final complica el desarrollo de un sistema de corrección de artefactos de video.
+
+Se deben establecer criterios de calidad para determinar si el proceso de corrección de artefactos tiene un rendimiento adecuado. La calidad percebida por el usuario final depende por lo menos de dos criterios: la velocidad del video final y la calidad de imagen en el video final.
+
+Para determinar un criterio de velocidad de video apropiada, se considera Zoom como ejemplo de una aplicación de video conferencia. Según \cite{ZoomSupport}, Zoom recomienda utilizar la aplicación a una resolución de $1280 \times 720$ pixeles y a 30 cuadros por segundo. Bajo esta recomendación, un obstáculo al que se enfrenta el procesamiento de detección y restauración de artefactos, es de lograr operar sobre cuadros de $1280 \times 720$ pixeles a una velocidad de 30 cuadros por segundo. En términos de tiempo de procesamiento, cada cuadro debe ser procesado en alrededor de 33 ms. Para fines de este documento, se le refiere a esta velocidad de procesamiento como ``tiempo real''.
+
+Para cada cuadro, es necesario detectar las ubicaciones de los artefactos de video y luego realizar el proceso de restauración. Para que el procesamiento total suceda a tiempo real, tanto la etapa de detección como la etapa de restauración deben durar aún menos tiempo que 33 ms por cuadro.
+
+El procesamiento de restauración, que depende del uso de redes neuronales, requiere el uso de aceleración por hardware para lograr procesar en tiempo real \cite{Li2022}. Por lo tanto, se deben tomar en cuenta los recursos disponibles en el equipo sobre el cual se realiza la corrección de artefactos de video.
+
+Si la corrección de los artefactos de video suceden en un mismo equipo, el proceso de detección debe compartir recursos con el proceso de restauración. Tomando en cuenta que el proceso de restauración require de un acelerador, se debe considerar que los recursos disponibles para el proceso de detección son limitados.
+
+La calidad del video final depende tanto de la efectividad del proceso de detección, como de la capacidad del proceso de restauración. La efectividad del proceso de detección se puede medir a través de las métricas de precisión y exhaustividad. Utilizando las definiciones de \cite{ScikitLearn}, precisión es la proporción entre la cantidad de detecciones correctas y la cantidad de detecciones totales. Exhaustividad es la proporción entre la cantidad de detecciones correctas y la cantidad de detecciones que idealmente se deben obtener. Para asegurar una alta calidad de detección de artefactos, se deben considerar los criterios de precisión y exhaustividad del método de detección.
+
+La complejidad algorítmica del método de detección directamente afecta la capacidad de procesamiento que se requiere para realizar la detección. Los recursos disponibles para la detección afectan tanto la velocidad como la capacidad de procesamiento disponible para la detección. Por lo tanto, se debe considerar el compromiso entre recursos disponibles, velocidad de la detección y calidad de la detección.
+
+El trabajo de \cite{Brenes2022} realiza el proceso de restauración de imágenes y ejecuta sobre una Nvidia Jetson TX2. Para ejecutar utiliza el GPU por completo. Este trabajo carece de un detector de artefactos para identificar las zonas de la imagen que se deben restaurar.
