@@ -12,14 +12,42 @@ This mainly consists of:
 - Tools I built along the way.
 - I want to share the dataset as well, but I want to see if I can set up my francis.guindon.cr page using my laptop as server.
 
+## Dependencies
 
-##### ¿Cómo optimizar la experiencia como herramienta de lectura?
+## Building
 
-La idea es que el lector pueda realizar una lectura más detallada del proyecto,
-si así lo desea.
+```
+meson setup build # May include additional build options
+ninja -C build
+```
 
-Una colección de directorios se organiza herárquicamente.
-Se estructuran como árboles.
-Por esta razón tienen la capacidad de organizar pensamientos y decisiones de una
-forma didáctica.
-La fé es que este mensaje se refleje en los productos de mi proyecto también.
+| Build option   | Description
+| :-             | :--
+| --prefix       | Controls project installation path
+| --optimization | Level of optimization to use when compiling
+| -Denable-docs  | Controls build of documentation
+| -Denable-test  | Controls build of tests
+
+## Tools
+
+These tools are meant to interactively pipe with each other or provide small libraries with useful APIs.
+
+### Ranger
+
+FIXME: Add Ranger description
+
+### Ranger Extension
+
+This extension creates a shared library that may be used as dependency. It opens up the ranger API to personal tools. It aditionally extends the ranger functionality for TFG purposes.
+
+### Feature Generator
+
+This tool is capable of parsing and loading the dataset files into an array of features.
+
+### Trainer
+
+This tool is capable of taking features and ground truth labels and training a RDF model using Rangerx.
+
+### Analyzer
+
+This tool is capable of printing information on Ranger and Rangerx models that might be useful for further analysis.
