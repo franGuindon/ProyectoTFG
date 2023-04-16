@@ -2,34 +2,34 @@
 
 @startuml
 
-struct Frame {
-  + template <typename T>
+struct Buffer {
+  + template <typename dtype>
   + T data
-  {field} + size_t size (in bytes? or in T units?)
+  {field} + size_t size (in dtype units)
   + size_t width
   + size_t height
 }
 
 class GroundTruthExtractor {
-  + extractGroundTruth(Frame in, Frame out)
+  + extractGroundTruth(Buffer in, Buffer out)
 }
 
 class FeatureExtractor {
-  + extractFeatures(Frame in, Frame out)
+  + extractFeatures(Buffer in, Buffer out)
 }
 
 class RandomDecisionForest {
-  + extractFeatures(Frame in, Frame out)
+  + extractFeatures(Buffer in, Buffer out)
 }
 
 class VideofileSource {
-  + pullFrame(Frame frame)
-  + pushFrame(Frame frame)
+  + pullFrame(Buffer frame)
+  + pushFrame(Buffer frame)
 }
 
 class VideofileSink {
-  + pullFrame(Frame frame)
-  + pushFrame(Frame frame)
+  + pullFrame(Buffer frame)
+  + pushFrame(Buffer frame)
 }
 
 @enduml

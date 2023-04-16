@@ -28,6 +28,8 @@ version_micro = version_arr[2].to_int()
 
 project_deps = []
 
+projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/include')
+
 cpp_args = ['-DHAVE_CONFIG_H']
 
 developer_mode = get_option('developer-mode')
