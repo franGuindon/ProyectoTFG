@@ -64,3 +64,4 @@ ext_sources = ranger.get_variable('ext_sources')
 
 subdir('artifact_detector')
 subdir('tools')
+subdir('docs')
