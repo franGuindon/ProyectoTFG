@@ -1,0 +1,3 @@
+option('developer-mode', type : 'boolean', value : true, yield : true, description: 'Enable developer mode')
+option('enable-docs', type : 'feature', value : 'enabled', yield : true, description : 'Build documentation with Doxygen')
+option('enable-tests', type : 'feature', value : 'enabled', yield : true, description : 'Build tests')
