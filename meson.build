@@ -1,97 +1,66 @@
 ################################################################################
 # TFG
-# author: Francis Guindon < FIXME : add email >
+# author: Francis Guindon <fbadilla10@gmail.com>
 #
 # This meson.build controls the construction and instalation of my TFG project.
 # The TFG project can be seen as a collection of tools that can be used to
 # accomplish the objectives laid out in my Project Proposal.
 ################################################################################
-project('TFG','cpp', default_options : ['c_std=c14', 'cpp_std=c++14'])
+project(
+  'TFG', ['cpp'],
+  version : '0.1.1',
+  meson_version : '>= 0.58',
+  default_options : ['werror=true',
+                    'c_std=c14',
+                    'cpp_std=c++14']
+)
 
-################################################################################
-# Tools
-#
-# These tools are meant to interactively pipe with each other or
-# provide small libraries with useful APIs
-################################################################################
+# Project name and version
 
-# Switches
-activate_tools = true         # Activate tools directory
-activate_bash_tools = false   # Activate bash tools directory
-activate_cpp_tools = true     # Activate cpp tools directory
-activate_python_tools = false # Activate python tools directory
+project_name = meson.project_name()
+project_version = meson.project_version()
+version_arr = project_version.split('.')
+version_major = version_arr[0].to_int()
+version_minor = version_arr[1].to_int()
+version_micro = version_arr[2].to_int()
 
-################################################################################
-# Ranger
-#
-# Build ranger project
-################################################################################
+# Project dependencies
 
-# Switches
-activate_ranger = true
+project_deps = []
 
-################################################################################
-# Ranger Extension
-#
-# This extension creates a shared library that may be used as dependency.
-# It opens up the ranger API to personal tools.
-# It aditionally extends the ranger functionality for TFG purposes.
-#
-# The Ranger build must be activated to use this option.
-################################################################################
+cpp_args = ['-DHAVE_CONFIG_H']
 
-# Switches
-activate_ranger_ext = true
-
-################################################################################
-# Feature Generator
-#
-# This tool is capable of parsing and loading the dataset files
-# into an array of features
-################################################################################
-
-# Switches
-activate_feature_generator = true
-
-################################################################################
-# Trainer
-#
-# This tool is capable of taking features and ground truth labels and training
-# a RDF model using Rangerx
-################################################################################
-
-# Switches
-activate_trainer = true
-
-################################################################################
-# Analyzer
-#
-# This tool is capable of printing information on Ranger and Rangerx models that
-# might be useful for further analysis
-################################################################################
-
-# Switches
-activate_analyzer = true
-
-################################################################################
-# Switch Cases
-#
-# Some of the switches defined in this file are used here
-################################################################################
-
-# Ranger switch case
-if activate_ranger
-  ranger = subproject('ranger')
+developer_mode = get_option('developer-mode')
+if developer_mode
+  pre_commit = find_program('pre-commit', required : true, native : true)
+  run_command(pre_commit, 'install')
+  run_command(pre_commit, 'install', '--hook-type', 'commit-msg')
 endif
 
-# Ranger ext switch case
-if activate_ranger and activate_ranger_ext
-  ext_incdirs = ranger.get_variable('ext_incdirs')
-  ext_deps = ranger.get_variable('ext_deps')
-  ext_sources = ranger.get_variable('ext_sources')
+if get_option('enable-tests').enabled()
+  test_dep = dependency('cpputest', required: true)
 endif
 
-# Tools switch case
-if activate_tools
-  subdir('tools')
+# Docs
+if get_option('enable-docs').enabled()
+  doxygen = find_program('doxygen', required: true)
+  dot = find_program('dot', required : true)
+  java = find_program('java', required : true)
+  epstopdf = find_program('epstopdf', required : true)
+  plantumlurl = 'https://github.com/plantuml/plantuml/releases/download/v1.2023.5/plantuml-1.2023.5.jar'
+  plantumlpath = meson.current_build_dir() + '/plantuml.jar'
+  run_command('wget', '-O', plantumlpath, plantumlurl)
+  env = environment()
+  env.set('PLANTUML_JAR_PATH', plantumlpath)
 endif
+
+conf_data = configuration_data()
+
+ranger = subproject('ranger')
+
+ext_incdirs = ranger.get_variable('ext_incdirs')
+ext_deps = ranger.get_variable('ext_deps')
+ext_sources = ranger.get_variable('ext_sources')
+
+subdir('artifact_detector')
+subdir('tools')
