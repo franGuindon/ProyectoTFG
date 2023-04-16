@@ -33,8 +33,8 @@ cpp_args = ['-DHAVE_CONFIG_H']
 developer_mode = get_option('developer-mode')
 if developer_mode
   pre_commit = find_program('pre-commit', required : true, native : true)
-  run_command(pre_commit, 'install')
-  run_command(pre_commit, 'install', '--hook-type', 'commit-msg')
+  run_command(pre_commit, 'install', check : true)
+  run_command(pre_commit, 'install', '--hook-type', 'commit-msg', check : true)
 endif
 
 if get_option('enable-tests').enabled()
@@ -49,7 +49,7 @@ if get_option('enable-docs').enabled()
   epstopdf = find_program('epstopdf', required : true)
   plantumlurl = 'https://github.com/plantuml/plantuml/releases/download/v1.2023.5/plantuml-1.2023.5.jar'
   plantumlpath = meson.current_build_dir() + '/plantuml.jar'
-  run_command('wget', '-O', plantumlpath, plantumlurl)
+  run_command('wget', '-O', plantumlpath, plantumlurl, check : true)
   env = environment()
   env.set('PLANTUML_JAR_PATH', plantumlpath)
 endif
