@@ -1,9 +1,8 @@
-# Proyecto
+# Trabajo Final de Graduación
 
-## Intro.
+## Introduction
 
-This git repo tracks all work I wish to publicly share about the development of
-my project.
+This git repo tracks all work I wish to publicly share about the development of my project.
 
 This mainly consists of:
 - Thesis' sources and build (and READMEs to help you construct it in no time).
@@ -11,6 +10,8 @@ This mainly consists of:
 - Bitácoras sources and build (and READMEs).
 - Tools I built along the way.
 - I want to share the dataset as well, but I want to see if I can set up my francis.guindon.cr page using my laptop as server.
+
+* [Design](docs/design/design.md)
 
 ## Dependencies
 
