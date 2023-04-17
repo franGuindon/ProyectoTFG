@@ -77,12 +77,14 @@ int main(int argc, char **argv) {
   arg_handler.verbose = true;
   arg_handler.depvarname = "y";
   arg_handler.ntree = 20;
-  arg_handler.nthreads = 12;
+  arg_handler.nthreads = 32;
   arg_handler.write = true;
   arg_handler.maxdepth = 100;
 
   //----------------------------------------------------------------------------
   // Data load
+
+  uint64_t now = GetCurrentTimeSinceEpochUs();
 
   const size_t block_dimension = 16;
   const size_t frame_width = 1280;
@@ -135,8 +137,12 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  printf("Dataset loading duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+
   //----------------------------------------------------------------------------
   // Data balancing
+
+  now = GetCurrentTimeSinceEpochUs();
 
   printf("Measuring raw dataset balance\n");
   size_t cnt_positives = 0;
@@ -199,8 +205,13 @@ int main(int argc, char **argv) {
         y_mem[neg_then_pos_ids[i + cnt_negatives]];
   }
 
+  printf("Dataset balancing duration: %ld\n",
+         GetCurrentTimeSinceEpochUs() - now);
+
   //----------------------------------------------------------------------------
   // Train forest
+
+  now = GetCurrentTimeSinceEpochUs();
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(
@@ -216,12 +227,20 @@ int main(int argc, char **argv) {
       arg_handler.holdout, arg_handler.predictiontype, arg_handler.randomsplits,
       arg_handler.maxdepth, arg_handler.regcoef, arg_handler.usedepth);
 
+  printf("Rangerx init duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
+
+  now = GetCurrentTimeSinceEpochUs();
+
   printf("Running Rangerx\n");
   forest->run(true, !arg_handler.skipoob);
   if (arg_handler.write) {
     printf("Saving model to file\n");
     forest->saveToFile();
   }
+
+  printf("Rangerx training duration: %ld\n",
+         GetCurrentTimeSinceEpochUs() - now);
+
   printf("Writting output\n");
   forest->writeOutput();
 

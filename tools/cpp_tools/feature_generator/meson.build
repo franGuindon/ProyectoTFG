@@ -4,4 +4,5 @@ executable('feature_generator',
            sources:
           ['feature_generator.cpp','pipeline.cpp','buffer_utils.cpp'],
           cpp_args: ['-mavx'],
-          dependencies : gstdeps)
+          include_directories : [projectinc],
+          dependencies : [gstdeps, libartifactdetector_dep])
