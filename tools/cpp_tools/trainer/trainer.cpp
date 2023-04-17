@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <memory>
+#include <numeric>
 
 #include "ForestClassification.h"
 #include "artifact_detector/include/utility.hpp"
@@ -205,6 +207,27 @@ int main(int argc, char **argv) {
         y_mem[neg_then_pos_ids[i + cnt_negatives]];
   }
 
+  auto x_mem_balanced_randomized = std::unique_ptr<float[]>(
+      new float[total_dataset_size * features_per_block]);
+  auto y_mem_balanced_randomized =
+      std::unique_ptr<float[]>(new float[total_dataset_size]);
+  auto ids_balanced_randomized =
+      std::unique_ptr<size_t[]>(new size_t[total_dataset_size]);
+
+  std::iota(ids_balanced_randomized.get(),
+            ids_balanced_randomized.get() + total_dataset_size, 0);
+  std::random_shuffle(ids_balanced_randomized.get(),
+                      ids_balanced_randomized.get() + total_dataset_size);
+
+  for (size_t i = 0; i < total_dataset_size; ++i) {
+    size_t new_id = ids_balanced_randomized[i];
+    float *dst_ptr = x_mem_balanced_randomized.get() + i * features_per_block;
+    float *src_ptr = x_mem_balanced.get() + new_id * features_per_block;
+    memcpy(reinterpret_cast<void *>(dst_ptr), reinterpret_cast<void *>(src_ptr),
+           sizeof(float) * features_per_block);
+    y_mem_balanced_randomized[i] = y_mem_balanced[new_id];
+  }
+
   printf("Dataset balancing duration: %ld\n",
          GetCurrentTimeSinceEpochUs() - now);
 
@@ -215,10 +238,11 @@ int main(int argc, char **argv) {
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(
-      arg_handler.depvarname, arg_handler.memmode, x_mem_balanced.get(),
-      y_mem_balanced.get(), total_dataset_size, num_cols, arg_handler.mtry,
-      arg_handler.outprefix, arg_handler.ntree, &std::cout, arg_handler.seed,
-      arg_handler.nthreads, arg_handler.predict, arg_handler.impmeasure,
+      arg_handler.depvarname, arg_handler.memmode,
+      x_mem_balanced_randomized.get(), y_mem_balanced_randomized.get(),
+      total_dataset_size, num_cols, arg_handler.mtry, arg_handler.outprefix,
+      arg_handler.ntree, &std::cout, arg_handler.seed, arg_handler.nthreads,
+      arg_handler.predict, arg_handler.impmeasure,
       arg_handler.targetpartitionsize, arg_handler.splitweights,
       arg_handler.alwayssplitvars, arg_handler.statusvarname,
       arg_handler.replace, arg_handler.catvars, arg_handler.savemem,
