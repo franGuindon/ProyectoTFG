@@ -20,6 +20,7 @@ using ranger::MEM_DOUBLE;
 using ranger::MemoryMode;
 using ranger::PredictionType;
 using ranger::SplitRule;
+using ranger::Tree;
 typedef ForestClassification ForestRangerx;
 
 struct Args {
