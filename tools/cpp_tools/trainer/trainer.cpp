@@ -1,11 +1,11 @@
 /* Copyright 2023 Francis Guindon <fbadilla10@gmail.com> */
 
-#include <ForestClassification.h>
-#include <stdio.h>
-
 #include <algorithm>
-#include <fstream>
+#include <cstdio>
 #include <memory>
+
+#include "ForestClassification.h"
+#include "artifact_detector/include/utility.hpp"
 
 using ranger::DEFAULT_ALPHA;
 using ranger::DEFAULT_IMPORTANCE_MODE;
@@ -24,39 +24,6 @@ using ranger::PredictionType;
 using ranger::SplitRule;
 
 typedef ForestClassification ForestRangerx;
-
-template <typename dtype>
-bool load_frame(const std::string &filename, dtype *data, const size_t size) {
-  std::streampos file_size;
-  std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::ate);
-
-  if (!data) {
-    printf("Load frame error: Data pointer is null\n");
-    return false;
-  }
-
-  if (!file.is_open()) {
-    printf("Load frame error: File did not open\n");
-    return false;
-  }
-
-  file_size = file.tellg();
-
-  if (file_size != static_cast<uint128_t>(sizeof(dtype) * size)) {
-    printf(
-        "Load frame error: Expected size (%ld) and file size (%lld) differ\n",
-        sizeof(dtype) * size, static_cast<uint128_t>(file_size));
-    return false;
-  }
-
-  file.seekg(0, std::ios::beg);
-  auto data_char_ptr = reinterpret_cast<char *>(data);
-  file.read(data_char_ptr, sizeof(dtype) * size);
-
-  file.close();
-
-  return true;
-}
 
 struct Args {
   bool verbose = true;
