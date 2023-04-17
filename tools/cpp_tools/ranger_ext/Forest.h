@@ -3,35 +3,36 @@
 
  Copyright (c) [2014-2018] [Marvin N. Wright]
 
- This software may be modified and distributed under the terms of the MIT license.
+ This software may be modified and distributed under the terms of the MIT
+ license.
 
- Please note that the C++ core of ranger is distributed under MIT license and the
- R package "ranger" under GPL3 license.
+ Please note that the C++ core of ranger is distributed under MIT license and
+ the R package "ranger" under GPL3 license.
  #-------------------------------------------------------------------------------*/
 
 #ifndef FOREST_H_
 #define FOREST_H_
 
-#include <vector>
-#include <iostream>
-#include <random>
 #include <ctime>
+#include <iostream>
 #include <memory>
+#include <random>
+#include <vector>
 #ifndef OLD_WIN_R_BUILD
-#include <thread>
 #include <chrono>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <thread>
 #endif
 
-#include "globals.h"
-#include "Tree.h"
 #include "Data.h"
+#include "Tree.h"
+#include "globals.h"
 
 namespace ranger {
 
 class Forest {
-public:
+ public:
   Forest();
 
   Forest(const Forest&) = delete;
@@ -40,53 +41,80 @@ public:
   virtual ~Forest() = default;
 
   // Init from c++ main or Rcpp from R
-  void initCpp(std::string dependent_variable_name, MemoryMode memory_mode, std::string input_file, uint mtry,
-      std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
-      std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
-      std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
-      std::string status_variable_name, bool sample_with_replacement,
-      const std::vector<std::string>& unordered_variable_names, bool memory_saving_splitting, SplitRule splitrule,
-      std::string case_weights_file, bool predict_all, double sample_fraction, double alpha, double minprop,
-      bool holdout, PredictionType prediction_type, uint num_random_splits, uint max_depth,
-      const std::vector<double>& regularization_factor, bool regularization_usedepth);
-  void initR(std::unique_ptr<Data> input_data, uint mtry, uint num_trees, std::ostream* verbose_out, uint seed,
-      uint num_threads, ImportanceMode importance_mode, uint min_node_size,
-      std::vector<std::vector<double>>& split_select_weights,
-      const std::vector<std::string>& always_split_variable_names, bool prediction_mode, bool sample_with_replacement,
-      const std::vector<std::string>& unordered_variable_names, bool memory_saving_splitting, SplitRule splitrule,
-      std::vector<double>& case_weights, std::vector<std::vector<size_t>>& manual_inbag, bool predict_all,
-      bool keep_inbag, std::vector<double>& sample_fraction, double alpha, double minprop, bool holdout,
-      PredictionType prediction_type, uint num_random_splits, bool order_snps, uint max_depth,
-      const std::vector<double>& regularization_factor, bool regularization_usedepth);
-  void init(std::unique_ptr<Data> input_data, uint mtry, std::string output_prefix,
-      uint num_trees, uint seed, uint num_threads, ImportanceMode importance_mode, uint min_node_size,
-      bool prediction_mode, bool sample_with_replacement, const std::vector<std::string>& unordered_variable_names,
-      bool memory_saving_splitting, SplitRule splitrule, bool predict_all, std::vector<double>& sample_fraction,
-      double alpha, double minprop, bool holdout, PredictionType prediction_type, uint num_random_splits,
-      bool order_snps, uint max_depth, const std::vector<double>& regularization_factor, bool regularization_usedepth);
+  void initCpp(std::string dependent_variable_name, MemoryMode memory_mode,
+               std::string input_file, uint mtry, std::string output_prefix,
+               uint num_trees, std::ostream* verbose_out, uint seed,
+               uint num_threads, std::string load_forest_filename,
+               ImportanceMode importance_mode, uint min_node_size,
+               std::string split_select_weights_file,
+               const std::vector<std::string>& always_split_variable_names,
+               std::string status_variable_name, bool sample_with_replacement,
+               const std::vector<std::string>& unordered_variable_names,
+               bool memory_saving_splitting, SplitRule splitrule,
+               std::string case_weights_file, bool predict_all,
+               double sample_fraction, double alpha, double minprop,
+               bool holdout, PredictionType prediction_type,
+               uint num_random_splits, uint max_depth,
+               const std::vector<double>& regularization_factor,
+               bool regularization_usedepth);
+  void initR(std::unique_ptr<Data> input_data, uint mtry, uint num_trees,
+             std::ostream* verbose_out, uint seed, uint num_threads,
+             ImportanceMode importance_mode, uint min_node_size,
+             std::vector<std::vector<double>>& split_select_weights,
+             const std::vector<std::string>& always_split_variable_names,
+             bool prediction_mode, bool sample_with_replacement,
+             const std::vector<std::string>& unordered_variable_names,
+             bool memory_saving_splitting, SplitRule splitrule,
+             std::vector<double>& case_weights,
+             std::vector<std::vector<size_t>>& manual_inbag, bool predict_all,
+             bool keep_inbag, std::vector<double>& sample_fraction,
+             double alpha, double minprop, bool holdout,
+             PredictionType prediction_type, uint num_random_splits,
+             bool order_snps, uint max_depth,
+             const std::vector<double>& regularization_factor,
+             bool regularization_usedepth);
+  void init(std::unique_ptr<Data> input_data, uint mtry,
+            std::string output_prefix, uint num_trees, uint seed,
+            uint num_threads, ImportanceMode importance_mode,
+            uint min_node_size, bool prediction_mode,
+            bool sample_with_replacement,
+            const std::vector<std::string>& unordered_variable_names,
+            bool memory_saving_splitting, SplitRule splitrule, bool predict_all,
+            std::vector<double>& sample_fraction, double alpha, double minprop,
+            bool holdout, PredictionType prediction_type,
+            uint num_random_splits, bool order_snps, uint max_depth,
+            const std::vector<double>& regularization_factor,
+            bool regularization_usedepth);
 
-/** Added by Francis
- * @brief Initialize Forest from data arrays stored in RAM and not from files
- * 
- * @param dependent_variable_name :
- * @param memory_mode             :
- * @param x_mem                   : Array of feature vectors
- * @param y_mem                   : Array of labels
- * @param num_rows                : Number of rows in x_mem, corresponds to
- *                                  the number of feature vectors in array
- * @param num_cols                : Number of cols in x_mem, corresponds to
- *                                  the number of features in feature vector
- * FIXME: Add missing parameters
- */
-  void initCppFromMem(std::string dependent_variable_name, MemoryMode memory_mode, float *x_mem, float *y_mem, size_t num_rows, size_t num_cols, uint mtry,
-      std::string output_prefix, uint num_trees, std::ostream* verbose_out, uint seed, uint num_threads,
-      std::string load_forest_filename, ImportanceMode importance_mode, uint min_node_size,
-      std::string split_select_weights_file, const std::vector<std::string>& always_split_variable_names,
+  /** Added by Francis
+   * @brief Initialize Forest from data arrays stored in RAM and not from files
+   *
+   * @param dependent_variable_name :
+   * @param memory_mode             :
+   * @param x_mem                   : Array of feature vectors
+   * @param y_mem                   : Array of labels
+   * @param num_rows                : Number of rows in x_mem, corresponds to
+   *                                  the number of feature vectors in array
+   * @param num_cols                : Number of cols in x_mem, corresponds to
+   *                                  the number of features in feature vector
+   * FIXME: Add missing parameters
+   */
+  void initCppFromMem(
+      std::string dependent_variable_name, MemoryMode memory_mode, float* x_mem,
+      float* y_mem, size_t num_rows, size_t num_cols, uint mtry,
+      std::string output_prefix, uint num_trees, std::ostream* verbose_out,
+      uint seed, uint num_threads, std::string load_forest_filename,
+      ImportanceMode importance_mode, uint min_node_size,
+      std::string split_select_weights_file,
+      const std::vector<std::string>& always_split_variable_names,
       std::string status_variable_name, bool sample_with_replacement,
-      const std::vector<std::string>& unordered_variable_names, bool memory_saving_splitting, SplitRule splitrule,
-      std::string case_weights_file, bool predict_all, double sample_fraction, double alpha, double minprop,
-      bool holdout, PredictionType prediction_type, uint num_random_splits, uint max_depth,
-      const std::vector<double>& regularization_factor, bool regularization_usedepth);
+      const std::vector<std::string>& unordered_variable_names,
+      bool memory_saving_splitting, SplitRule splitrule,
+      std::string case_weights_file, bool predict_all, double sample_fraction,
+      double alpha, double minprop, bool holdout,
+      PredictionType prediction_type, uint num_random_splits, uint max_depth,
+      const std::vector<double>& regularization_factor,
+      bool regularization_usedepth);
 
   virtual void initInternal() = 0;
 
@@ -131,21 +159,13 @@ public:
   const std::vector<double>& getVariableImportanceCasewise() const {
     return variable_importance_casewise;
   }
-  double getOverallPredictionError() const {
-    return overall_prediction_error;
-  }
+  double getOverallPredictionError() const { return overall_prediction_error; }
   const std::vector<std::vector<std::vector<double>>>& getPredictions() const {
     return predictions;
   }
-  size_t getNumTrees() const {
-    return num_trees;
-  }
-  uint getMtry() const {
-    return mtry;
-  }
-  uint getMinNodeSize() const {
-    return min_node_size;
-  }
+  size_t getNumTrees() const { return num_trees; }
+  uint getMtry() const { return mtry; }
+  uint getMinNodeSize() const { return min_node_size; }
   size_t getNumIndependentVariables() const {
     return num_independent_variables;
   }
@@ -166,10 +186,39 @@ public:
     return data->getSnpOrder();
   }
 
-  void print();
-  void print(size_t tree_id, size_t maxdepth);
+  template <typename... Args>
+  void print(Tree::PrintType print_type, Args... args) {
+    switch (print_type) {
+      case Tree::PrintType::FEATURE_COUNT:
+        for (size_t i = 0; i < num_trees; ++i) {
+          printf("Printing tree %ld\n", i);
+          trees[i]->print_feature_count();
+        }
+        break;
+      case Tree::PrintType::COMPLETE:
+        for (size_t i = 0; i < num_trees; ++i) {
+          printf("Printing tree %ld\n", i);
+          trees[i]->print_complete();
+        }
+        break;
+      case Tree::PrintType::SINGLE_TREE_MAXDEPTH:
+        this->print_single_tree_maxdepth(args...);
+        break;
+      case Tree::PrintType::DEPTH:
+        for (size_t i = 0; i < num_trees; ++i) {
+          printf("Printing tree %ld\n", i);
+          trees[i]->print_depth();
+        }
+        break;
+      default:
+        printf("Error: Invalid print type\n");
+    }
+  }
 
-protected:
+  void print_single_tree_maxdepth();
+  void print_single_tree_maxdepth(size_t tree_id, size_t maxdepth);
+
+ protected:
   void grow();
   virtual void growInternal() = 0;
 
@@ -183,11 +232,15 @@ protected:
 
   void computePermutationImportance();
 
-  // Multithreading methods for growing/prediction/importance, called by each thread
-  void growTreesInThread(uint thread_idx, std::vector<double>* variable_importance);
-  void predictTreesInThread(uint thread_idx, const Data* prediction_data, bool oob_prediction);
+  // Multithreading methods for growing/prediction/importance, called by each
+  // thread
+  void growTreesInThread(uint thread_idx,
+                         std::vector<double>* variable_importance);
+  void predictTreesInThread(uint thread_idx, const Data* prediction_data,
+                            bool oob_prediction);
   void predictInternalInThread(uint thread_idx);
-  void computeTreePermutationImportanceInThread(uint thread_idx, std::vector<double>& importance,
+  void computeTreePermutationImportanceInThread(
+      uint thread_idx, std::vector<double>& importance,
       std::vector<double>& variance, std::vector<double>& importance_casewise);
 
   // Load forest from file
@@ -201,15 +254,20 @@ protected:
    *
    * Currently only supports float memory.
    */
-  std::unique_ptr<Data> loadDataFromMem(float* x_mem, float* y_mem, size_t num_cols, size_t num_rows);
+  std::unique_ptr<Data> loadDataFromMem(float* x_mem, float* y_mem,
+                                        size_t num_rows, size_t num_cols);
 
-  // Set split select weights and variables to be always considered for splitting
-  void setSplitWeightVector(std::vector<std::vector<double>>& split_select_weights);
-  void setAlwaysSplitVariables(const std::vector<std::string>& always_split_variable_names);
+  // Set split select weights and variables to be always considered for
+  // splitting
+  void setSplitWeightVector(
+      std::vector<std::vector<double>>& split_select_weights);
+  void setAlwaysSplitVariables(
+      const std::vector<std::string>& always_split_variable_names);
 
   // Show progress every few seconds
 #ifdef OLD_WIN_R_BUILD
-  void showProgress(std::string operation, clock_t start_time, clock_t& lap_time);
+  void showProgress(std::string operation, clock_t start_time,
+                    clock_t& lap_time);
 #else
   void showProgress(std::string operation, size_t max_progress);
 #endif
@@ -217,7 +275,8 @@ protected:
   // Verbose output stream, cout if verbose==true, logfile if not
   std::ostream* verbose_out;
 
-  std::vector<std::string> dependent_variable_names; // time,status for survival
+  std::vector<std::string>
+      dependent_variable_names;  // time,status for survival
   size_t num_trees;
   uint mtry;
   uint min_node_size;
@@ -255,8 +314,9 @@ protected:
   std::vector<std::vector<std::vector<double>>> predictions;
   double overall_prediction_error;
 
-  // Weight vector for selecting possible split variables, one weight between 0 (never select) and 1 (always select) for each variable
-  // Deterministic variables are always selected
+  // Weight vector for selecting possible split variables, one weight between 0
+  // (never select) and 1 (always select) for each variable Deterministic
+  // variables are always selected
   std::vector<size_t> deterministic_varIDs;
   std::vector<std::vector<double>> split_select_weights;
 
@@ -276,7 +336,7 @@ protected:
   std::vector<double> regularization_factor;
   bool regularization_usedepth;
   std::vector<bool> split_varIDs_used;
-  
+
   // Variable importance for all variables in forest
   std::vector<double> variable_importance;
 
@@ -291,6 +351,6 @@ protected:
 #endif
 };
 
-} // namespace ranger
+}  // namespace ranger
 
 #endif /* FOREST_H_ */
