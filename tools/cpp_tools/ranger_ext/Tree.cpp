@@ -3,48 +3,97 @@
 
  Copyright (c) [2014-2018] [Marvin N. Wright]
 
- This software may be modified and distributed under the terms of the MIT license.
+ This software may be modified and distributed under the terms of the MIT
+ license.
 
- Please note that the C++ core of ranger is distributed under MIT license and the
- R package "ranger" under GPL3 license.
+ Please note that the C++ core of ranger is distributed under MIT license and
+ the R package "ranger" under GPL3 license.
  #-------------------------------------------------------------------------------*/
 
-#include <iterator>
-
 #include "Tree.h"
-#include "utility.h"
 
 #include <stdio.h>
 
+#include <iterator>
+
+#include "utility.h"
+
 namespace ranger {
 
-Tree::Tree() :
-    mtry(0), num_samples(0), num_samples_oob(0), min_node_size(0), deterministic_varIDs(0), split_select_weights(0), case_weights(
-        0), manual_inbag(0), oob_sampleIDs(0), holdout(false), keep_inbag(false), data(0), regularization_factor(0), regularization_usedepth(
-        false), split_varIDs_used(0), variable_importance(0), importance_mode(DEFAULT_IMPORTANCE_MODE), sample_with_replacement(
-        true), sample_fraction(0), memory_saving_splitting(false), splitrule(DEFAULT_SPLITRULE), alpha(DEFAULT_ALPHA), minprop(
-        DEFAULT_MINPROP), num_random_splits(DEFAULT_NUM_RANDOM_SPLITS), max_depth(DEFAULT_MAXDEPTH), depth(0), last_left_nodeID(
-        0) {
-}
+Tree::Tree()
+    : mtry(0),
+      num_samples(0),
+      num_samples_oob(0),
+      min_node_size(0),
+      deterministic_varIDs(0),
+      split_select_weights(0),
+      case_weights(0),
+      manual_inbag(0),
+      oob_sampleIDs(0),
+      holdout(false),
+      keep_inbag(false),
+      data(0),
+      regularization_factor(0),
+      regularization_usedepth(false),
+      split_varIDs_used(0),
+      variable_importance(0),
+      importance_mode(DEFAULT_IMPORTANCE_MODE),
+      sample_with_replacement(true),
+      sample_fraction(0),
+      memory_saving_splitting(false),
+      splitrule(DEFAULT_SPLITRULE),
+      alpha(DEFAULT_ALPHA),
+      minprop(DEFAULT_MINPROP),
+      num_random_splits(DEFAULT_NUM_RANDOM_SPLITS),
+      max_depth(DEFAULT_MAXDEPTH),
+      depth(0),
+      last_left_nodeID(0) {}
 
-Tree::Tree(std::vector<std::vector<size_t>>& child_nodeIDs, std::vector<size_t>& split_varIDs,
-    std::vector<double>& split_values) :
-    mtry(0), num_samples(0), num_samples_oob(0), min_node_size(0), deterministic_varIDs(0), split_select_weights(0), case_weights(
-        0), manual_inbag(0), split_varIDs(split_varIDs), split_values(split_values), child_nodeIDs(child_nodeIDs), oob_sampleIDs(
-        0), holdout(false), keep_inbag(false), data(0), regularization_factor(0), regularization_usedepth(false), split_varIDs_used(
-        0), variable_importance(0), importance_mode(DEFAULT_IMPORTANCE_MODE), sample_with_replacement(true), sample_fraction(
-        0), memory_saving_splitting(false), splitrule(DEFAULT_SPLITRULE), alpha(DEFAULT_ALPHA), minprop(
-        DEFAULT_MINPROP), num_random_splits(DEFAULT_NUM_RANDOM_SPLITS), max_depth(DEFAULT_MAXDEPTH), depth(0), last_left_nodeID(
-        0) {
-}
+Tree::Tree(std::vector<std::vector<size_t>>& child_nodeIDs,
+           std::vector<size_t>& split_varIDs, std::vector<double>& split_values)
+    : mtry(0),
+      num_samples(0),
+      num_samples_oob(0),
+      min_node_size(0),
+      deterministic_varIDs(0),
+      split_select_weights(0),
+      case_weights(0),
+      manual_inbag(0),
+      split_varIDs(split_varIDs),
+      split_values(split_values),
+      child_nodeIDs(child_nodeIDs),
+      oob_sampleIDs(0),
+      holdout(false),
+      keep_inbag(false),
+      data(0),
+      regularization_factor(0),
+      regularization_usedepth(false),
+      split_varIDs_used(0),
+      variable_importance(0),
+      importance_mode(DEFAULT_IMPORTANCE_MODE),
+      sample_with_replacement(true),
+      sample_fraction(0),
+      memory_saving_splitting(false),
+      splitrule(DEFAULT_SPLITRULE),
+      alpha(DEFAULT_ALPHA),
+      minprop(DEFAULT_MINPROP),
+      num_random_splits(DEFAULT_NUM_RANDOM_SPLITS),
+      max_depth(DEFAULT_MAXDEPTH),
+      depth(0),
+      last_left_nodeID(0) {}
 
-void Tree::init(const Data* data, uint mtry, size_t num_samples, uint seed, std::vector<size_t>* deterministic_varIDs,
-    std::vector<double>* split_select_weights, ImportanceMode importance_mode, uint min_node_size,
-    bool sample_with_replacement, bool memory_saving_splitting, SplitRule splitrule, std::vector<double>* case_weights,
-    std::vector<size_t>* manual_inbag, bool keep_inbag, std::vector<double>* sample_fraction, double alpha,
-    double minprop, bool holdout, uint num_random_splits, uint max_depth, std::vector<double>* regularization_factor,
-    bool regularization_usedepth, std::vector<bool>* split_varIDs_used) {
-
+void Tree::init(const Data* data, uint mtry, size_t num_samples, uint seed,
+                std::vector<size_t>* deterministic_varIDs,
+                std::vector<double>* split_select_weights,
+                ImportanceMode importance_mode, uint min_node_size,
+                bool sample_with_replacement, bool memory_saving_splitting,
+                SplitRule splitrule, std::vector<double>* case_weights,
+                std::vector<size_t>* manual_inbag, bool keep_inbag,
+                std::vector<double>* sample_fraction, double alpha,
+                double minprop, bool holdout, uint num_random_splits,
+                uint max_depth, std::vector<double>* regularization_factor,
+                bool regularization_usedepth,
+                std::vector<bool>* split_varIDs_used) {
   this->data = data;
   this->mtry = mtry;
   this->num_samples = num_samples;
@@ -131,7 +180,8 @@ void Tree::grow(std::vector<double>* variable_importance) {
       ++num_open_nodes;
       if (i >= last_left_nodeID) {
         // If new level, increase depth
-        // (left_node saves left-most node in current level, new level reached if that node is splitted)
+        // (left_node saves left-most node in current level, new level reached
+        // if that node is splitted)
         last_left_nodeID = split_varIDs.size() - 2;
         ++depth;
       }
@@ -146,7 +196,6 @@ void Tree::grow(std::vector<double>* variable_importance) {
 }
 
 void Tree::predict(const Data* prediction_data, bool oob_prediction) {
-
   size_t num_samples_predict;
   if (oob_prediction) {
     num_samples_predict = num_samples_oob;
@@ -166,7 +215,6 @@ void Tree::predict(const Data* prediction_data, bool oob_prediction) {
     }
     size_t nodeID = 0;
     while (1) {
-
       // Break if terminal node
       if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
         break;
@@ -203,19 +251,37 @@ void Tree::predict(const Data* prediction_data, bool oob_prediction) {
   }
 }
 
-void Tree::print() {
-  printf("Printing tree\n");
+#define PRINT_FEATURE_USE
 
+void Tree::print_feature_count() {
   std::unordered_map<size_t, size_t> tree_map;
 
-  print(0, tree_map);
+  print_feature_count(0, tree_map);
 
   for (const auto& pair : tree_map) {
     printf("Feature id: %ld, count: %ld\n", pair.first, pair.second);
   }
 }
 
-void Tree::print(size_t node_id, std::unordered_map<size_t, size_t>& map) {
+void Tree::print_feature_count(size_t node_id,
+                               std::unordered_map<size_t, size_t>& map) {
+  size_t nodeID = node_id;
+
+  if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
+    return;
+  }
+
+  size_t split_varID = split_varIDs[nodeID];
+
+  ++map[split_varID];
+
+  print_feature_count(child_nodeIDs[0][nodeID], map);
+  print_feature_count(child_nodeIDs[1][nodeID], map);
+}
+
+void Tree::print_complete() { print_complete(0); }
+
+void Tree::print_complete(size_t node_id) {
   size_t nodeID = node_id;
 
   if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
@@ -225,17 +291,16 @@ void Tree::print(size_t node_id, std::unordered_map<size_t, size_t>& map) {
 
   size_t split_varID = split_varIDs[nodeID];
 
-  printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
-          nodeID, split_varID, split_values[nodeID]);
-  ++map[split_varID];
-  
+  printf("Node %ld: (Feature id: %ld, Split value: %f)\n", nodeID, split_varID,
+         split_values[nodeID]);
+
   printf("Node %ld: Moving to left child node\n", nodeID);
-  print(child_nodeIDs[0][nodeID], map);
+  print_complete(child_nodeIDs[0][nodeID]);
   printf("Node %ld: Moving to right child node\n", nodeID);
-  print(child_nodeIDs[1][nodeID], map);
+  print_complete(child_nodeIDs[1][nodeID]);
 }
 
-void Tree::print(size_t node_id, size_t maxdepth) {
+void Tree::print_single_tree_maxdepth(size_t node_id, size_t maxdepth) {
   size_t nodeID = node_id;
 
   if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
@@ -250,28 +315,45 @@ void Tree::print(size_t node_id, size_t maxdepth) {
 
   size_t split_varID = split_varIDs[nodeID];
 
-  printf("Node %ld: (Feature id: %ld, Split value: %f)\n",
-          nodeID, split_varID, split_values[nodeID]);
-  
+  printf("Node %ld: (Feature id: %ld, Split value: %f)\n", nodeID, split_varID,
+         split_values[nodeID]);
+
   printf("Node %ld: Moving to left child node\n", nodeID);
-  print(child_nodeIDs[0][nodeID], maxdepth - 1);
+  print_single_tree_maxdepth(child_nodeIDs[0][nodeID], maxdepth - 1);
   printf("Node %ld: Moving to right child node\n", nodeID);
-  print(child_nodeIDs[1][nodeID], maxdepth - 1);
+  print_single_tree_maxdepth(child_nodeIDs[1][nodeID], maxdepth - 1);
 }
 
-void Tree::computePermutationImportance(std::vector<double>& forest_importance, std::vector<double>& forest_variance,
-    std::vector<double>& forest_importance_casewise) {
+void Tree::print_depth() { print_depth(0, 0); }
 
+void Tree::print_depth(size_t node_id, size_t curr_depth) {
+  size_t nodeID = node_id;
+
+  if (child_nodeIDs[0][nodeID] == 0 && child_nodeIDs[1][nodeID] == 0) {
+    printf("Leaf depth: %ld\n", curr_depth);
+    return;
+  }
+
+  print_depth(child_nodeIDs[0][nodeID], curr_depth + 1);
+  print_depth(child_nodeIDs[1][nodeID], curr_depth + 1);
+}
+
+void Tree::computePermutationImportance(
+    std::vector<double>& forest_importance,
+    std::vector<double>& forest_variance,
+    std::vector<double>& forest_importance_casewise) {
   size_t num_independent_variables = data->getNumCols();
 
-  // Compute normal prediction accuracy for each tree. Predictions already computed..
+  // Compute normal prediction accuracy for each tree. Predictions already
+  // computed..
   double accuracy_normal;
   std::vector<double> prederr_normal_casewise;
   std::vector<double> prederr_shuf_casewise;
   if (importance_mode == IMP_PERM_CASEWISE) {
     prederr_normal_casewise.resize(num_samples_oob, 0);
     prederr_shuf_casewise.resize(num_samples_oob, 0);
-    accuracy_normal = computePredictionAccuracyInternal(&prederr_normal_casewise);
+    accuracy_normal =
+        computePredictionAccuracyInternal(&prederr_normal_casewise);
   } else {
     accuracy_normal = computePredictionAccuracyInternal(NULL);
   }
@@ -284,9 +366,8 @@ void Tree::computePermutationImportance(std::vector<double>& forest_importance, 
 
   // Randomly permute for all independent variables
   for (size_t i = 0; i < num_independent_variables; ++i) {
-
     // Check whether the i-th variable is used in the
-	  // tree:
+    // tree:
     bool isused = false;
     for (size_t j = 0; j < split_varIDs.size(); ++j) {
       if (split_varIDs[j] == i) {
@@ -294,30 +375,35 @@ void Tree::computePermutationImportance(std::vector<double>& forest_importance, 
         break;
       }
     }
-     
-	 // Only do permutations if the variable is used in the tree, otherwise variable importance is 0
+
+    // Only do permutations if the variable is used in the tree, otherwise
+    // variable importance is 0
     if (isused) {
-      // Permute and compute prediction accuracy again for this permutation and save difference
+      // Permute and compute prediction accuracy again for this permutation and
+      // save difference
       permuteAndPredictOobSamples(i, permutations);
       double accuracy_permuted;
       if (importance_mode == IMP_PERM_CASEWISE) {
-        accuracy_permuted = computePredictionAccuracyInternal(&prederr_shuf_casewise);
+        accuracy_permuted =
+            computePredictionAccuracyInternal(&prederr_shuf_casewise);
         for (size_t j = 0; j < num_samples_oob; ++j) {
           size_t pos = i * num_samples + oob_sampleIDs[j];
-          forest_importance_casewise[pos] += prederr_shuf_casewise[j] - prederr_normal_casewise[j];
+          forest_importance_casewise[pos] +=
+              prederr_shuf_casewise[j] - prederr_normal_casewise[j];
         }
       } else {
         accuracy_permuted = computePredictionAccuracyInternal(NULL);
       }
-  
+
       double accuracy_difference = accuracy_normal - accuracy_permuted;
       forest_importance[i] += accuracy_difference;
-  
+
       // Compute variance
       if (importance_mode == IMP_PERM_BREIMAN) {
         forest_variance[i] += accuracy_difference * accuracy_difference;
       } else if (importance_mode == IMP_PERM_LIAW) {
-        forest_variance[i] += accuracy_difference * accuracy_difference * num_samples_oob;
+        forest_variance[i] +=
+            accuracy_difference * accuracy_difference * num_samples_oob;
       }
     }
   }
@@ -325,7 +411,6 @@ void Tree::computePermutationImportance(std::vector<double>& forest_importance, 
 
 // #nocov start
 void Tree::appendToFile(std::ofstream& file) {
-
   // Save general fields
   saveVector2D(child_nodeIDs, file);
   saveVector1D(split_varIDs, file);
@@ -337,7 +422,6 @@ void Tree::appendToFile(std::ofstream& file) {
 // #nocov end
 
 void Tree::createPossibleSplitVarSubset(std::vector<size_t>& result) {
-
   size_t num_vars = data->getNumCols();
 
   // For corrected Gini importance add dummy variables
@@ -350,18 +434,20 @@ void Tree::createPossibleSplitVarSubset(std::vector<size_t>& result) {
     if (deterministic_varIDs->empty()) {
       drawWithoutReplacement(result, random_number_generator, num_vars, mtry);
     } else {
-      drawWithoutReplacementSkip(result, random_number_generator, num_vars, (*deterministic_varIDs), mtry);
+      drawWithoutReplacementSkip(result, random_number_generator, num_vars,
+                                 (*deterministic_varIDs), mtry);
     }
   } else {
-    drawWithoutReplacementWeighted(result, random_number_generator, num_vars, mtry, *split_select_weights);
+    drawWithoutReplacementWeighted(result, random_number_generator, num_vars,
+                                   mtry, *split_select_weights);
   }
 
   // Always use deterministic variables
-  std::copy(deterministic_varIDs->begin(), deterministic_varIDs->end(), std::inserter(result, result.end()));
+  std::copy(deterministic_varIDs->begin(), deterministic_varIDs->end(),
+            std::inserter(result, result.end()));
 }
 
 bool Tree::splitNode(size_t nodeID) {
-
   // Select random subset of variables to possibly split at
   std::vector<size_t> possible_split_varIDs;
   createPossibleSplitVarSubset(possible_split_varIDs);
@@ -445,12 +531,11 @@ void Tree::createEmptyNode() {
   createEmptyNodeInternal();
 }
 
-size_t Tree::dropDownSamplePermuted(size_t permuted_varID, size_t sampleID, size_t permuted_sampleID) {
-
+size_t Tree::dropDownSamplePermuted(size_t permuted_varID, size_t sampleID,
+                                    size_t permuted_sampleID) {
   // Start in root and drop down
   size_t nodeID = 0;
   while (child_nodeIDs[0][nodeID] != 0 || child_nodeIDs[1][nodeID] != 0) {
-
     // Permute if variable is permutation variable
     size_t split_varID = split_varIDs[nodeID];
     size_t sampleID_final = sampleID;
@@ -481,28 +566,28 @@ size_t Tree::dropDownSamplePermuted(size_t permuted_varID, size_t sampleID, size
         nodeID = child_nodeIDs[1][nodeID];
       }
     }
-
   }
   return nodeID;
 }
 
-void Tree::permuteAndPredictOobSamples(size_t permuted_varID, std::vector<size_t>& permutations) {
-
+void Tree::permuteAndPredictOobSamples(size_t permuted_varID,
+                                       std::vector<size_t>& permutations) {
   // Permute OOB sample
-  //std::vector<size_t> permutations(oob_sampleIDs);
-  std::shuffle(permutations.begin(), permutations.end(), random_number_generator);
+  // std::vector<size_t> permutations(oob_sampleIDs);
+  std::shuffle(permutations.begin(), permutations.end(),
+               random_number_generator);
 
   // For each sample, drop down the tree and add prediction
   for (size_t i = 0; i < num_samples_oob; ++i) {
-    size_t nodeID = dropDownSamplePermuted(permuted_varID, oob_sampleIDs[i], permutations[i]);
+    size_t nodeID = dropDownSamplePermuted(permuted_varID, oob_sampleIDs[i],
+                                           permutations[i]);
     prediction_terminal_nodeIDs[i] = nodeID;
   }
 }
 
 void Tree::bootstrap() {
-
   // Use fraction (default 63.21%) of the samples
-  size_t num_samples_inbag = (size_t) num_samples * (*sample_fraction)[0];
+  size_t num_samples_inbag = (size_t)num_samples * (*sample_fraction)[0];
 
   // Reserve space, reserve a little more to be save)
   sampleIDs.reserve(num_samples_inbag);
@@ -513,7 +598,8 @@ void Tree::bootstrap() {
   // Start with all samples OOB
   inbag_counts.resize(num_samples, 0);
 
-  // Draw num_samples samples with replacement (num_samples_inbag out of n) as inbag and mark as not OOB
+  // Draw num_samples samples with replacement (num_samples_inbag out of n) as
+  // inbag and mark as not OOB
   for (size_t s = 0; s < num_samples_inbag; ++s) {
     size_t draw = unif_dist(random_number_generator);
     sampleIDs.push_back(draw);
@@ -535,20 +621,21 @@ void Tree::bootstrap() {
 }
 
 void Tree::bootstrapWeighted() {
-
   // Use fraction (default 63.21%) of the samples
-  size_t num_samples_inbag = (size_t) num_samples * (*sample_fraction)[0];
+  size_t num_samples_inbag = (size_t)num_samples * (*sample_fraction)[0];
 
   // Reserve space, reserve a little more to be save)
   sampleIDs.reserve(num_samples_inbag);
   oob_sampleIDs.reserve(num_samples * (exp(-(*sample_fraction)[0]) + 0.1));
 
-  std::discrete_distribution<> weighted_dist(case_weights->begin(), case_weights->end());
+  std::discrete_distribution<> weighted_dist(case_weights->begin(),
+                                             case_weights->end());
 
   // Start with all samples OOB
   inbag_counts.resize(num_samples, 0);
 
-  // Draw num_samples samples with replacement (n out of n) as inbag and mark as not OOB
+  // Draw num_samples samples with replacement (n out of n) as inbag and mark as
+  // not OOB
   for (size_t s = 0; s < num_samples_inbag; ++s) {
     size_t draw = weighted_dist(random_number_generator);
     sampleIDs.push_back(draw);
@@ -578,10 +665,10 @@ void Tree::bootstrapWeighted() {
 }
 
 void Tree::bootstrapWithoutReplacement() {
-
   // Use fraction (default 63.21%) of the samples
-  size_t num_samples_inbag = (size_t) num_samples * (*sample_fraction)[0];
-  shuffleAndSplit(sampleIDs, oob_sampleIDs, num_samples, num_samples_inbag, random_number_generator);
+  size_t num_samples_inbag = (size_t)num_samples * (*sample_fraction)[0];
+  shuffleAndSplit(sampleIDs, oob_sampleIDs, num_samples, num_samples_inbag,
+                  random_number_generator);
   num_samples_oob = oob_sampleIDs.size();
 
   if (keep_inbag) {
@@ -594,10 +681,11 @@ void Tree::bootstrapWithoutReplacement() {
 }
 
 void Tree::bootstrapWithoutReplacementWeighted() {
-
   // Use fraction (default 63.21%) of the samples
-  size_t num_samples_inbag = (size_t) num_samples * (*sample_fraction)[0];
-  drawWithoutReplacementWeighted(sampleIDs, random_number_generator, num_samples - 1, num_samples_inbag, *case_weights);
+  size_t num_samples_inbag = (size_t)num_samples * (*sample_fraction)[0];
+  drawWithoutReplacementWeighted(sampleIDs, random_number_generator,
+                                 num_samples - 1, num_samples_inbag,
+                                 *case_weights);
 
   // All observation are 0 or 1 times inbag
   inbag_counts.resize(num_samples, 0);
@@ -628,11 +716,13 @@ void Tree::bootstrapWithoutReplacementWeighted() {
 }
 
 void Tree::bootstrapClassWise() {
-  // Empty on purpose (virtual function only implemented in classification and probability)
+  // Empty on purpose (virtual function only implemented in classification and
+  // probability)
 }
 
 void Tree::bootstrapWithoutReplacementClassWise() {
-  // Empty on purpose (virtual function only implemented in classification and probability)
+  // Empty on purpose (virtual function only implemented in classification and
+  // probability)
 }
 
 void Tree::setManualInbag() {
@@ -661,4 +751,4 @@ void Tree::setManualInbag() {
   }
 }
 
-} // namespace ranger
+}  // namespace ranger
