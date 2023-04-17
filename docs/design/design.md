@@ -10,6 +10,11 @@ struct Buffer {
   + size_t height
 }
 
+class Trainer {
+  + loadDataset
+  + train()
+}
+
 class GroundTruthExtractor {
   + extractGroundTruth(Buffer in, Buffer out)
 }
