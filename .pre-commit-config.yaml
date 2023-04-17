@@ -5,7 +5,7 @@ repos:
     -   id: clang-format
         args: [--style=file]
     -   id: cpplint
-        args: [--filter=-build/include_order]
+        args: [--filter=-build/include_order, --exclude=tools/cpp_tools/ranger_ext]
     -   id: cppcheck
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
