@@ -76,10 +76,10 @@ int main(int argc, char **argv) {
   arg_handler.outprefix = argv[1];
   arg_handler.verbose = true;
   arg_handler.depvarname = "y";
-  arg_handler.ntree = 20;
+  arg_handler.ntree = 32;
   arg_handler.nthreads = 32;
   arg_handler.write = true;
-  arg_handler.maxdepth = 100;
+  arg_handler.maxdepth = 20;
 
   //----------------------------------------------------------------------------
   // Data load
