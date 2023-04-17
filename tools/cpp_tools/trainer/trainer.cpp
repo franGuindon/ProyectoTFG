@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  printf("Dataset loading duration: %d\n", GetCurrentTimeSinceEpochUs() - now);
+  printf("Dataset loading duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
   //----------------------------------------------------------------------------
   // Data balancing
@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
         y_mem[neg_then_pos_ids[i + cnt_negatives]];
   }
 
-  printf("Dataset balancing duration: %d\n",
+  printf("Dataset balancing duration: %ld\n",
          GetCurrentTimeSinceEpochUs() - now);
 
   //----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
       arg_handler.holdout, arg_handler.predictiontype, arg_handler.randomsplits,
       arg_handler.maxdepth, arg_handler.regcoef, arg_handler.usedepth);
 
-  printf("Rangerx init duration: %d\n", GetCurrentTimeSinceEpochUs() - now);
+  printf("Rangerx init duration: %ld\n", GetCurrentTimeSinceEpochUs() - now);
 
   now = GetCurrentTimeSinceEpochUs();
 
@@ -238,7 +238,8 @@ int main(int argc, char **argv) {
     forest->saveToFile();
   }
 
-  printf("Rangerx training duration: %d\n", GetCurrentTimeSinceEpochUs() - now);
+  printf("Rangerx training duration: %ld\n",
+         GetCurrentTimeSinceEpochUs() - now);
 
   printf("Writting output\n");
   forest->writeOutput();
