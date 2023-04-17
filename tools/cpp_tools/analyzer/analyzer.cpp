@@ -1,8 +1,25 @@
-#include <memory>
+/* Copyright 2023 Francis Guindon <fbadilla10@gmail.com> */
+
 #include <ForestClassification.h>
 #include <stdio.h>
 
-using namespace ranger;
+#include <memory>
+
+using ranger::DEFAULT_ALPHA;
+using ranger::DEFAULT_IMPORTANCE_MODE;
+using ranger::DEFAULT_MAXDEPTH;
+using ranger::DEFAULT_MINPROP;
+using ranger::DEFAULT_NUM_RANDOM_SPLITS;
+using ranger::DEFAULT_NUM_THREADS;
+using ranger::DEFAULT_NUM_TREE;
+using ranger::DEFAULT_PREDICTIONTYPE;
+using ranger::DEFAULT_SPLITRULE;
+using ranger::ForestClassification;
+using ranger::ImportanceMode;
+using ranger::MEM_DOUBLE;
+using ranger::MemoryMode;
+using ranger::PredictionType;
+using ranger::SplitRule;
 typedef ForestClassification ForestRangerx;
 
 struct Args {
@@ -41,11 +58,23 @@ struct Args {
 };
 
 int main(int argc, char** argv) {
-  if (argc != 4) {
-    printf("Usage: analyzer [MODEL_FILE] [TREE_ID] [MAXDEPTH]\n");
+  if (argc != 3) {
+    if (argc == 5 && argv[2][0] == '2' && argv[2][1] == 0x00) {
+      goto skip_help;
+    }
+
+    printf("Usage: analyzer [MODEL_FILE] [PRINT_TYPE] \n");
+    printf("  PRINT_TYPE:\n");
+    printf("           0: Feature count\n");
+    printf("           1: Complete\n");
+    printf(
+        "           2: Single tree up to maxdepth (Requires additional args: "
+        "[TREE_ID] [MAXDEPTH])\n");
+    printf("           3: Depth (for each leaf node)\n");
     return 1;
   }
 
+skip_help:
   auto forest = std::make_unique<ForestRangerx>();
 
   Args arg_handler{};
@@ -60,15 +89,16 @@ int main(int argc, char** argv) {
   const size_t features_per_block = 132;
   const size_t num_rows = 1;
   const size_t num_cols = features_per_block;
-  const size_t mem_size = num_rows*num_cols;
+  const size_t mem_size = num_rows * num_cols;
   auto x_mem = std::unique_ptr<float[]>(new float[mem_size]);
   auto y_mem = std::unique_ptr<float[]>(new float[num_rows]);
-  
+
   printf("Initializing Rangerx\n");
-  forest->initCppFromMem(arg_handler.depvarname, arg_handler.memmode,
-      x_mem.get(), y_mem.get(), num_rows, num_cols, arg_handler.mtry,
-      arg_handler.outprefix, arg_handler.ntree, &std::cout, arg_handler.seed,
-      arg_handler.nthreads, arg_handler.predict, arg_handler.impmeasure,
+  forest->initCppFromMem(
+      arg_handler.depvarname, arg_handler.memmode, x_mem.get(), y_mem.get(),
+      num_rows, num_cols, arg_handler.mtry, arg_handler.outprefix,
+      arg_handler.ntree, &std::cout, arg_handler.seed, arg_handler.nthreads,
+      arg_handler.predict, arg_handler.impmeasure,
       arg_handler.targetpartitionsize, arg_handler.splitweights,
       arg_handler.alwayssplitvars, arg_handler.statusvarname,
       arg_handler.replace, arg_handler.catvars, arg_handler.savemem,
@@ -76,8 +106,12 @@ int main(int argc, char** argv) {
       arg_handler.fraction, arg_handler.alpha, arg_handler.minprop,
       arg_handler.holdout, arg_handler.predictiontype, arg_handler.randomsplits,
       arg_handler.maxdepth, arg_handler.regcoef, arg_handler.usedepth);
-  
-  forest->print(std::stoi(argv[2]), std::stoi(argv[3]));
 
+  if (argc == 3) {
+    forest->print(static_cast<Tree::PrintType>(std::stoi(argv[2])));
+  } else if (argc == 5) {
+    forest->print(static_cast<Tree::PrintType>(std::stoi(argv[2])),
+                  std::stoi(argv[3]), std::stoi(argv[4]));
+  }
   return 0;
 }
