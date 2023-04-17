@@ -3,6 +3,7 @@ lib_src = [
   'videofilesink.cpp',
   'videofilesource.cpp',
   'trainer.cpp',
+  'utility.cpp',
 ]
 
 libartifactdetector = shared_library('artifact_detector',
