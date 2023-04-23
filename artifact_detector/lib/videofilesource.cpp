@@ -2,7 +2,11 @@
 
 #include "include/videofilesource.hpp"
 
-VideofileSource::VideofileSource(std::string filename) : file_{filename} {
+VideofileSource::VideofileSource(std::string filename)
+    : file_{filename},
+      gst_pipeline_{nullptr},
+      gst_buffer_{nullptr},
+      gst_error_{nullptr} {
   ReturnValue ret;
   ret = openFile();
   if (ReturnCode::Success != ret.code) {

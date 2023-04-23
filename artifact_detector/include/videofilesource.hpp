@@ -49,7 +49,11 @@ class VideofileSource {
   /* Video filename */
   std::string file_;
   /* Video pipeline */
-  GstElement* pipeline_;
+  GstElement* gst_pipeline_;
+  /* Frame buffer */
+  GstBuffer* gst_buffer_;
+  /* For gstreamer error management */
+  GError* gst_error_;
 };
 
 #endif  // ARTIFACT_DETECTOR_INCLUDE_VIDEOFILESOURCE_HPP_
