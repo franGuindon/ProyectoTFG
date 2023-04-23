@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "include/utility.hpp"
 #include "include/videofilesource.hpp"
 
 int main(int argc, char** argv) {
@@ -20,6 +21,7 @@ int main(int argc, char** argv) {
   std::string input_videofile = argv[1];
   std::unique_ptr<VideofileSource> input_video;
   Buffer<uint8_t> frame = {0};
+  ReturnValue ret;
 
   /* Object construction */
   try {
@@ -28,7 +30,22 @@ int main(int argc, char** argv) {
     printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
   }
 
-  input_video->pullFrame(&frame);
+  for (size_t i = 0; i < 1; ++i) {
+    ret = input_video->pullFrame(&frame);
+    if (ReturnCode::Success != ret.code) {
+      printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
+    }
+
+    printf("Pulled frame: %p %ldx%ld (%ld)\n", frame.data, frame.width,
+           frame.height, frame.pts);
+    save_frame("test_frame.1920.1080.i420", frame.data,
+               frame.height * frame.width);
+
+    ret = input_video->pushFrame(&frame);
+    if (ReturnCode::Success != ret.code) {
+      printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
+    }
+  }
 
   return 0;
 }
