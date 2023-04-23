@@ -16,3 +16,5 @@ libartifactdetector = shared_library('artifact_detector',
 )
 
 libartifactdetector_dep = declare_dependency(link_with: libartifactdetector)
+
+project_deps += libartifactdetector_dep
