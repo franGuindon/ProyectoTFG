@@ -3,6 +3,8 @@
 #ifndef ARTIFACT_DETECTOR_INCLUDE_VIDEOFILESOURCE_HPP_
 #define ARTIFACT_DETECTOR_INCLUDE_VIDEOFILESOURCE_HPP_
 
+#include <gst/gst.h>
+
 #include <string>
 
 #include "include/types.hpp"
@@ -23,6 +25,12 @@ class VideofileSource {
    */
   explicit VideofileSource(std::string filename);
   /**
+   * @brief Opens the file such that frames can be pulled from it
+   *
+   * @return ReturnValue : Operation status
+   */
+  ReturnValue openFile();
+  /**
    * @brief Load a frame from the file
    *
    * @param frame       : Buffer to hold frame information
@@ -36,6 +44,12 @@ class VideofileSource {
    * @return ReturnType : Operation status
    */
   ReturnValue pushFrame(Buffer<uint8_t>* frame);
+
+ private:
+  /* Video filename */
+  std::string file_;
+  /* Video pipeline */
+  GstElement* pipeline_;
 };
 
 #endif  // ARTIFACT_DETECTOR_INCLUDE_VIDEOFILESOURCE_HPP_
