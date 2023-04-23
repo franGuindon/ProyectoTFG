@@ -6,7 +6,7 @@ executable('feature_extractor_tool',
   feature_extractor_tool_src,
   cpp_args : cpp_args,
   include_directories : [projectinc],
-  dependencies : [libartifactdetector_dep],
+  dependencies : [project_deps],
   install : false,
 )
 
@@ -18,7 +18,7 @@ executable('trainer_tool',
   trainer_tool_src,
   cpp_args : cpp_args,
   include_directories : [projectinc],
-  dependencies : [libartifactdetector_dep],
+  dependencies : [project_deps],
   install : false,
 )
 
@@ -31,7 +31,7 @@ executable('argparse_tool',
   argparse_tool_src,
   cpp_args : cpp_args,
   include_directories : [projectinc],
-  dependencies : [libartifactdetector_dep],
+  dependencies : [project_deps],
   install : false,
 )
 
@@ -43,7 +43,7 @@ executable('predictor_tool',
   predictor_tool_src,
   cpp_args : cpp_args,
   include_directories : [projectinc],
-  dependencies : [libartifactdetector_dep],
+  dependencies : [project_deps],
   install : false,
 )
 
@@ -55,7 +55,7 @@ executable('videofile_source_example',
   videofile_source_example_src,
   cpp_args : cpp_args,
   include_directories : [projectinc],
-  dependencies : [libartifactdetector_dep],
+  dependencies : [project_deps],
   install : false,
 )
 
