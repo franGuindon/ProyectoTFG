@@ -53,6 +53,8 @@ struct Buffer {
   size_t width;
   /** Height of the data memory block */
   size_t height;
+  /** Buffer timestamp */
+  uint64_t pts;
 };
 
 #endif  // ARTIFACT_DETECTOR_INCLUDE_TYPES_HPP_
