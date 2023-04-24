@@ -18,6 +18,7 @@ using ranger::DEFAULT_NUM_THREADS;
 using ranger::DEFAULT_NUM_TREE;
 using ranger::DEFAULT_PREDICTIONTYPE;
 using ranger::DEFAULT_SPLITRULE;
+using ranger::EXTRATREES;
 using ranger::ForestClassification;
 using ranger::ImportanceMode;
 using ranger::MEM_DOUBLE;
