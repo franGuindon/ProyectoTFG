@@ -59,3 +59,14 @@ executable('videofile_source_example',
   install : false,
 )
 
+test_data_generation_tool_src = [
+  'test_data_generation_tool.cpp',
+]
+
+executable('test_data_generation_tool',
+  test_data_generation_tool_src,
+  cpp_args : cpp_args,
+  include_directories : [projectinc],
+  dependencies : [project_deps],
+  install : false,
+)
