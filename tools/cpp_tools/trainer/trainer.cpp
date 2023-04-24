@@ -81,7 +81,9 @@ int main(int argc, char **argv) {
   arg_handler.ntree = 32;
   arg_handler.nthreads = 32;
   arg_handler.write = true;
-  arg_handler.maxdepth = 20;
+  arg_handler.maxdepth = 7;
+  arg_handler.splitrule = EXTRATREES;
+  arg_handler.randomsplits = 50;
 
   //----------------------------------------------------------------------------
   // Data load

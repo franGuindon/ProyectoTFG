@@ -25,8 +25,13 @@ version_minor = version_arr[1].to_int()
 version_micro = version_arr[2].to_int()
 
 # Project dependencies
-
 project_deps = []
+
+gst_dep = dependency('gstreamer-1.0')
+gstapp_dep = dependency('gstreamer-app-1.0')
+
+project_deps += gst_dep
+project_deps += gstapp_dep
 
 projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/include')
 

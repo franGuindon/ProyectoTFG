@@ -17,6 +17,7 @@
 #include <string>
 
 #include "artifact_detector/include/utility.hpp"
+#include "artifact_detector/include/videofilesource.hpp"
 #include "tools/cpp_tools/feature_generator/buffer_utils.h"
 #include "tools/cpp_tools/feature_generator/pipeline.h"
 
@@ -537,6 +538,57 @@ bool generate_frame_features(const uint8_t *data, const size_t width,
   return true;
 }
 
+bool generate_dataset_(std::string video_path, std::string labels_path,
+                       std::vector<float> *features,
+                       std::vector<float> labels) {
+  std::unique_ptr<VideofileSource> input_video;
+
+  try {
+    input_video = std::make_unique<VideofileSource>(video_path);
+  } catch (ReturnValue &ret) {
+    printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
+  }
+
+  int processed_frames = 0;
+  const int total_frames = 200;
+  Buffer<uint8_t> frame = {0};
+  ReturnValue ret;
+
+  /* Loop to process frames */
+  printf("Starting processing loop\n");
+  while (processed_frames < total_frames) {
+    printf("Pulling frame: %d\n", processed_frames);
+
+    ret = input_video->pullFrame(&frame);
+    if (ReturnCode::Success != ret.code) {
+      printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
+    }
+
+    printf("Generating feature\n");
+#ifdef PROF_BY_FRAME
+    uint64_t now = GetCurrentTimeSinceEpochUs();
+#endif
+    if (!generate_frame_features(frame.data, frame.width, frame.height,
+                                 features)) {
+      /** FIXME: Perhaps ensure no memory leaks before throwing error */
+      throw std::runtime_error("Feature generation failed");
+    }
+#ifdef PROF_BY_FRAME
+    printf("Frame feature extraction duration: %ld\n",
+           GetCurrentTimeSinceEpochUs() - now);
+#endif
+
+    ret = input_video->pushFrame(&frame);
+    if (ReturnCode::Success != ret.code) {
+      printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
+    }
+
+    ++processed_frames;
+  }
+
+  return true;
+}
+
 /**
  * @brief Generate dataset memory for a given videopath and label_path
  *
@@ -643,7 +695,7 @@ int run_generator(int argc, char **argv, std::ostream &verbose_out) {
   std::vector<float> features;
   std::vector<float> labels;
 
-  if (!generate_dataset(argv[1], argv[2], &features, labels)) {
+  if (!generate_dataset_(argv[1], argv[2], &features, labels)) {
     printf("Data generation failed\n");
     return 1;
   }

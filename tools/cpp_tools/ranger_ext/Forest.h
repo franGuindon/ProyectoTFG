@@ -188,11 +188,17 @@ class Forest {
 
   template <typename... Args>
   void print(Tree::PrintType print_type, Args... args) {
+    std::unordered_map<size_t, size_t> forest_map;
     switch (print_type) {
       case Tree::PrintType::FEATURE_COUNT:
         for (size_t i = 0; i < num_trees; ++i) {
           printf("Printing tree %ld\n", i);
           trees[i]->print_feature_count();
+          trees[i]->print_feature_count(0, forest_map);
+        }
+        printf("Total tree:");
+        for (const auto& pair : forest_map) {
+          printf("Feature id: %ld, count: %ld\n", pair.first, pair.second);
         }
         break;
       case Tree::PrintType::COMPLETE:
