@@ -7,6 +7,7 @@
 #include <numeric>
 
 #include "ForestClassification.h"
+#include "artifact_detector/include/datasetloader.hpp"
 #include "artifact_detector/include/utility.hpp"
 
 using ranger::DEFAULT_ALPHA;
@@ -64,6 +65,17 @@ struct Args {
 };
 
 int main(int argc, char **argv) {
+  if (argc != 3) {
+    printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
+    return 1;
+  }
+  std::string output_prefix = argv[1];
+  std::string dataset_path = argv[2];
+
+  auto dataset = std::make_unique<DatasetLoader>(dataset_path);
+
+  return 0;
+
   if (argc < 4 || argc % 2 != 0) {
     printf("Usage: trainer [OUTPUT_PREFIX] [FEATURE_FILE] [LABEL_FILE] ... \n");
     printf("  An arbitrary number of feature - label file pairs may be used\n");
