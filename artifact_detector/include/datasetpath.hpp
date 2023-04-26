@@ -3,9 +3,6 @@
 #ifndef ARTIFACT_DETECTOR_INCLUDE_DATASETPATH_HPP_
 #define ARTIFACT_DETECTOR_INCLUDE_DATASETPATH_HPP_
 
-#include <gst/app/gstappsink.h>
-#include <gst/gst.h>
-
 #include <string>
 
 #include "include/types.hpp"
