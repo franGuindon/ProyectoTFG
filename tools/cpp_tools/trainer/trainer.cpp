@@ -1,5 +1,6 @@
 /* Copyright 2023 Francis Guindon <fbadilla10@gmail.com> */
 
+#define DEBUG_LEVEL 3
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -8,6 +9,7 @@
 
 #include "ForestClassification.h"
 #include "artifact_detector/include/datasetloader.hpp"
+#include "artifact_detector/include/logging.hpp"
 #include "artifact_detector/include/utility.hpp"
 
 using ranger::DEFAULT_ALPHA;
@@ -72,7 +74,13 @@ int main(int argc, char **argv) {
   std::string output_prefix = argv[1];
   std::string dataset_path = argv[2];
 
-  auto dataset = std::make_unique<DatasetLoader>(dataset_path);
+  INFO("Constructing dataset");
+  std::unique_ptr<DatasetLoader> dataset;
+  try {
+    dataset = std::make_unique<DatasetLoader>(dataset_path);
+  } catch (ReturnValue &ret) {
+    ERROR("%s", ret.str().c_str());
+  }
 
   return 0;
 
