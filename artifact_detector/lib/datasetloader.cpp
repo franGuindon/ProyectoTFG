@@ -2,7 +2,9 @@
 
 #include "include/datasetloader.hpp"
 
+#include <algorithm>
 #include <cstdio>
+#include <cstring>
 
 #include "include/utility.hpp"
 
@@ -11,7 +13,10 @@ DatasetLoader::DatasetLoader(std::string dataset_path)
       ret_{ReturnCode::Success, "Videofilesrc initialized correctly"},
       consts_{},
       raw_feature_mem_{},
-      raw_label_mem_{} {
+      raw_label_mem_{},
+      aligned_label_mem_{},
+      balanced_feature_mem_{},
+      balanced_label_mem_{} {
   HANDLE_WITH_THROW(allocate(),
                     ReturnValue(ReturnCode::MemoryError,
                                 "Could not allocate dataset memory"));
@@ -39,7 +44,6 @@ ReturnValue DatasetLoader::allocate() {
       ReturnValue(ReturnCode::MemoryError, "Could not allocate raw label mem"));
 
   aligned_label_mem_.size = consts_.total_aligned_label_mem_size;
-
   HANDLE_WITH(aligned_label_mem_.allocate(),
               ReturnValue(ReturnCode::MemoryError,
                           "Could not allocate aligned label mem"));
@@ -103,6 +107,82 @@ ReturnValue DatasetLoader::generateRandomizedBalancedDataset() {
   return ret_;
 }
 
-ReturnValue DatasetLoader::generateBalancedDataset() { return ret_; }
+ReturnValue DatasetLoader::generateBalancedDataset() {
+  INFO("Measuring raw dataset balance");
+  size_t cnt_positives = 0;
+  size_t cnt_negatives = 0;
+  auto neg_then_pos_ids =
+      std::unique_ptr<size_t[]>(new size_t[consts_.total_label_mem_size]);
+  for (size_t i = 0; i < consts_.total_label_mem_size; ++i) {
+    float label = aligned_label_mem_.data[i];
+    if (0.0F == label) {
+      neg_then_pos_ids[cnt_negatives] = i;  // Fill neg ids from beginning
+      ++cnt_negatives;
+    } else if (255.0F == label) {
+      neg_then_pos_ids[consts_.total_label_mem_size - 1 - cnt_positives] =
+          i;  // Fill pos ids from end
+      ++cnt_positives;
+    } else {
+      ERROR("Found invalid label value (%d) at index: %ld\n",
+            *reinterpret_cast<int *>(&aligned_label_mem_.data[i]), i);
+      return {ReturnCode::MemoryError, "Class separation failed"};
+    }
+  }
+  float negative_percent = static_cast<float>(cnt_negatives) /
+                           static_cast<float>(consts_.total_label_mem_size);
+  float positive_percent = static_cast<float>(cnt_positives) /
+                           static_cast<float>(consts_.total_label_mem_size);
+  printf("Negatives: %ld, Positives: %ld, Total: %ld, Balance: %3.2f : %3.2f\n",
+         cnt_negatives, cnt_positives, consts_.total_label_mem_size,
+         negative_percent, positive_percent);
+  printf("Randomizing negative and positive ids separately\n");
+  std::random_shuffle(neg_then_pos_ids.get(),
+                      neg_then_pos_ids.get() + cnt_negatives);
+  std::random_shuffle(neg_then_pos_ids.get() + cnt_negatives,
+                      neg_then_pos_ids.get() + consts_.total_label_mem_size);
+
+  float balance = 0.5F;
+  printf("Adjusting dataset balance to %3.2f%% pos\n", balance);
+  float pos_to_neg_factor = (1 - balance) / balance;
+  size_t neg_dataset_size = (balance > positive_percent)
+                                ? cnt_positives * pos_to_neg_factor
+                                : cnt_negatives;
+  size_t pos_dataset_size = (balance > positive_percent)
+                                ? cnt_positives
+                                : cnt_negatives / pos_to_neg_factor;
+  printf("Balanced neg cnt: %ld, pos cnt: %ld\n", neg_dataset_size,
+         pos_dataset_size);
+  size_t total_dataset_size = neg_dataset_size + pos_dataset_size;
+
+  auto x_mem_balanced = std::unique_ptr<float[]>(
+      new float[total_dataset_size * consts_.feature_vector_size]);
+  auto y_mem_balanced = std::unique_ptr<float[]>(new float[total_dataset_size]);
+
+  for (size_t i = 0; i < neg_dataset_size; ++i) {
+    void *raw_feature = reinterpret_cast<void *>(
+        raw_feature_mem_.data +
+        neg_then_pos_ids[i] * consts_.feature_vector_size);
+    void *balanced_feature = reinterpret_cast<void *>(
+        balanced_feature_mem_.data + i * consts_.feature_vector_size);
+    memcpy(balanced_feature, raw_feature,
+           sizeof(float) * consts_.feature_vector_size);
+    balanced_label_mem_.data[i] = aligned_label_mem_.data[neg_then_pos_ids[i]];
+  }
+
+  for (size_t i = 0; i < pos_dataset_size; ++i) {
+    void *raw_feature = reinterpret_cast<void *>(
+        raw_feature_mem_.data +
+        neg_then_pos_ids[i + cnt_negatives] * consts_.feature_vector_size);
+    void *balanced_feature = reinterpret_cast<void *>(
+        balanced_feature_mem_.data +
+        (i + neg_dataset_size) * consts_.feature_vector_size);
+    memcpy(balanced_feature, raw_feature,
+           sizeof(float) * consts_.feature_vector_size);
+    balanced_label_mem_.data[i + neg_dataset_size] =
+        aligned_label_mem_.data[neg_then_pos_ids[i + cnt_negatives]];
+  }
+
+  return ret_;
+}
 
 ReturnValue DatasetLoader::randomizeBalancedDataset() { return ret_; }
