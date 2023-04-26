@@ -7,5 +7,5 @@
 #include "include/utility.hpp"
 
 DatasetLoader::DatasetLoader(std::string dataset_path)
-    : file_{filename},
+    : dataset_path_{dataset_path},
       ret_{ReturnCode::Success, "Videofilesrc initialized correctly"} {}
