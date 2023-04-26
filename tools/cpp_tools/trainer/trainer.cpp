@@ -67,22 +67,22 @@ struct Args {
 };
 
 int main(int argc, char **argv) {
-  if (argc != 3) {
-    printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
-    return 1;
-  }
-  std::string output_prefix = argv[1];
-  std::string dataset_path = argv[2];
+  // if (argc != 3) {
+  //   printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
+  //   return 1;
+  // }
+  // std::string output_prefix = argv[1];
+  // std::string dataset_path = argv[2];
 
-  INFO("Constructing dataset");
-  std::unique_ptr<DatasetLoader> dataset;
-  try {
-    dataset = std::make_unique<DatasetLoader>(dataset_path);
-  } catch (ReturnValue &ret) {
-    ERROR("%s", ret.str().c_str());
-  }
+  // INFO("Constructing dataset");
+  // std::unique_ptr<DatasetLoader> dataset;
+  // try {
+  //   dataset = std::make_unique<DatasetLoader>(dataset_path);
+  // } catch (ReturnValue &ret) {
+  //   ERROR("%s", ret.str().c_str());
+  // }
 
-  return 0;
+  // return 0;
 
   if (argc < 4 || argc % 2 != 0) {
     printf("Usage: trainer [OUTPUT_PREFIX] [FEATURE_FILE] [LABEL_FILE] ... \n");
@@ -218,14 +218,20 @@ int main(int argc, char **argv) {
   auto y_mem_balanced = std::unique_ptr<float[]>(new float[total_dataset_size]);
 
   for (size_t i = 0; i < neg_dataset_size; ++i) {
-    x_mem_balanced[i * features_per_block] =
-        x_mem[neg_then_pos_ids[i] * features_per_block];
+    void *raw_feature = reinterpret_cast<void *>(
+        x_mem.get() + neg_then_pos_ids[i] * features_per_block);
+    void *balanced_feature =
+        reinterpret_cast<void *>(x_mem_balanced.get() + i * features_per_block);
+    memcpy(balanced_feature, raw_feature, sizeof(float) * features_per_block);
     y_mem_balanced[i] = y_mem[neg_then_pos_ids[i]];
   }
 
   for (size_t i = 0; i < pos_dataset_size; ++i) {
-    x_mem_balanced[(i + neg_dataset_size) * features_per_block] =
-        x_mem[neg_then_pos_ids[i + cnt_negatives] * features_per_block];
+    void *raw_feature = reinterpret_cast<void *>(
+        x_mem.get() + neg_then_pos_ids[i + cnt_negatives] * features_per_block);
+    void *balanced_feature = reinterpret_cast<void *>(
+        x_mem_balanced.get() + (i + neg_dataset_size) * features_per_block);
+    mempcpy(balanced_feature, raw_feature, features_per_block);
     y_mem_balanced[(i + neg_dataset_size)] =
         y_mem[neg_then_pos_ids[i + cnt_negatives]];
   }
