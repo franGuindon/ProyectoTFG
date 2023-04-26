@@ -24,7 +24,7 @@ class DatasetLoader {
   /**
    * @brief Destroy the DatasetLoader instance
    */
-  ~DatasetLoader();
+  ~DatasetLoader() {}
   /**
    * @brief Opens the file such that frames can be pulled from it
    *
