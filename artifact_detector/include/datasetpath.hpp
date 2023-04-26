@@ -32,7 +32,7 @@ class DatasetPath {
   /**
    * @brief Destroy the DatasetPath instance
    */
-  ~DatasetPath();
+  ~DatasetPath() {}
   ReturnValue getPathType();
   ReturnValue parseSnipDir();
   ReturnValue parseVidDir();
