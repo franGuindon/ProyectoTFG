@@ -17,7 +17,9 @@ enum class ReturnCode {
   /** Indicates an error in the operation parameters */
   ParameterError = 2,
   /** Indicates an error in file management */
-  FileError = 3
+  FileError = 3,
+  /** Indicates that a method can't be used since it is not implemented */
+  NotImplementedError = 4
 };
 
 /**
