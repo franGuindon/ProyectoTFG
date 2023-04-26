@@ -3,12 +3,15 @@
 #ifndef ARTIFACT_DETECTOR_INCLUDE_UTILITY_HPP_
 #define ARTIFACT_DETECTOR_INCLUDE_UTILITY_HPP_
 
+/** Include logging and error handling macros */
 #include <stdio.h>
 
 #include <chrono>  // NOLINT
 #include <fstream>
 #include <memory>
 #include <string>
+
+#include "include/macros.hpp"
 
 constexpr uint32_t kMicrosPerSecond = 1000000;
 using MicroSeconds = std::chrono::microseconds;
