@@ -114,6 +114,10 @@ class DatasetLoader {
   Buffer<uint8_t> raw_label_mem_;
   /** Aligned label memory */
   Buffer<float> aligned_label_mem_;
+  /** Balanced feature memory */
+  Buffer<float> balanced_feature_mem_;
+  /** Balanced label memory */
+  Buffer<float> balanced_label_mem_;
 };
 
 #endif  // ARTIFACT_DETECTOR_INCLUDE_DATASETLOADER_HPP_
