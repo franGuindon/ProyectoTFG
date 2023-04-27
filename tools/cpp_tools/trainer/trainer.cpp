@@ -67,22 +67,22 @@ struct Args {
 };
 
 int main(int argc, char **argv) {
-  if (argc != 3) {
-    printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
-    return 1;
-  }
-  std::string output_prefix = argv[1];
-  std::string dataset_path = argv[2];
+  // if (argc != 3) {
+  //   printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
+  //   return 1;
+  // }
+  // std::string output_prefix = argv[1];
+  // std::string dataset_path = argv[2];
 
-  INFO("Constructing dataset");
-  std::unique_ptr<DatasetLoader> dataset;
-  try {
-    dataset = std::make_unique<DatasetLoader>(dataset_path);
-  } catch (ReturnValue &ret) {
-    ERROR("%s", ret.str().c_str());
-  }
+  // INFO("Constructing dataset");
+  // std::unique_ptr<DatasetLoader> dataset;
+  // try {
+  //   dataset = std::make_unique<DatasetLoader>(dataset_path);
+  // } catch (ReturnValue &ret) {
+  //   ERROR("%s", ret.str().c_str());
+  // }
 
-  return 0;
+  // return 0;
 
   if (argc < 4 || argc % 2 != 0) {
     printf("Usage: trainer [OUTPUT_PREFIX] [FEATURE_FILE] [LABEL_FILE] ... \n");
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
   arg_handler.ntree = 32;
   arg_handler.nthreads = 32;
   arg_handler.write = true;
-  arg_handler.maxdepth = 7;
+  arg_handler.maxdepth = 10;
   arg_handler.splitrule = EXTRATREES;
   arg_handler.randomsplits = 50;
 
@@ -261,14 +261,38 @@ int main(int argc, char **argv) {
          GetCurrentTimeSinceEpochUs() - now);
 
   //----------------------------------------------------------------------------
+  // Generate black and white dataset matching labels
+  // printf("Generating black and white dataset from label memory\n");
+  printf("Converting feature memory from row major to column major\n");
+
+  auto x_mem_balanced_randomized_colmajor = std::unique_ptr<float[]>(
+      new float[total_dataset_size * features_per_block]);
+
+  float *labels = y_mem_balanced_randomized.get();
+  float *features = x_mem_balanced_randomized.get();
+  float *features_cm = x_mem_balanced_randomized_colmajor.get();
+
+  for (size_t i = 0; i < total_dataset_size; ++i) {
+    float label = labels[i];
+    if (0.0F != label && 255.0F != label) {
+      printf("Error: Invalid labels[%ld] = %f\n", i, label);
+      return 1;
+    }
+
+    for (size_t j = 0; j < features_per_block; ++j) {
+      features_cm[j * total_dataset_size + i] =
+          features[i * features_per_block + j];
+    }
+  }
+
+  //----------------------------------------------------------------------------
   // Train forest
 
   now = GetCurrentTimeSinceEpochUs();
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(
-      arg_handler.depvarname, arg_handler.memmode,
-      x_mem_balanced_randomized.get(), y_mem_balanced_randomized.get(),
+      arg_handler.depvarname, arg_handler.memmode, features_cm, labels,
       total_dataset_size, num_cols, arg_handler.mtry, arg_handler.outprefix,
       arg_handler.ntree, &std::cout, arg_handler.seed, arg_handler.nthreads,
       arg_handler.predict, arg_handler.impmeasure,
