@@ -280,8 +280,13 @@ int main(int argc, char **argv) {
     }
 
     for (size_t j = 0; j < features_per_block; ++j) {
-      features_cm[j * total_dataset_size + i] =
-          features[i * features_per_block + j];
+      float feature = features[i * features_per_block + j];
+      if (feature != label) {
+        printf("Error: (Feature[%ld,%ld]=%f) != (Label[%ld]=%f)\n", i, j,
+               feature, i, label);
+        return 1;
+      }
+      features_cm[j * total_dataset_size + i] = feature;
     }
   }
 
