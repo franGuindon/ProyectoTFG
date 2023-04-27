@@ -75,9 +75,9 @@ ReturnValue DatasetLoader::loadRawDataset() {
 }
 
 ReturnValue check_valid(const uint8_t *label) {
-  const uint8_t class_0 = 0x00;
-  const uint8_t class_1 = 0xFF;
-  if (class_0 != *label && class_1 != *label) {
+  // const uint8_t class_0 = 0x00;
+  // const uint8_t class_1 = 0xFF;
+  if (0x00 != *label && 0xFF != *label) {
     return ReturnValue(ReturnCode::MemoryError,
                        "Label: '" + std::to_string(*label) + "' invalid");
   }
