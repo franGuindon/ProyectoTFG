@@ -77,16 +77,6 @@ ReturnValue DatasetLoader::loadRawDataset() {
 ReturnValue check_valid(const uint8_t *label) {
   const uint8_t class_0 = 0x00;
   const uint8_t class_1 = 0xFF;
-
-  // const uint32_t i32_label = *label;
-  printf("int: '%hd', char: '%c'\n", *label, *label);
-
-  printf("bool: '%d', expr: '0x00 == 0'\n", 0x00 == 0);
-
-  /** Found bug, comparing addresses will clearly be different.
-   * Compare values instead
-   */
-
   if (class_0 != *label && class_1 != *label) {
     return ReturnValue(ReturnCode::MemoryError,
                        "Label: '" + std::to_string(*label) + "' invalid");
