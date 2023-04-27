@@ -74,15 +74,42 @@ ReturnValue DatasetLoader::loadRawDataset() {
   return ret_;
 }
 
+ReturnValue check_valid(const uint8_t *label) {
+  const uint8_t class_0 = 0x00;
+  const uint8_t class_1 = 0xFF;
+
+  // const uint32_t i32_label = *label;
+  printf("int: '%hd', char: '%c'\n", *label, *label);
+
+  printf("bool: '%d', expr: '0x00 == 0'\n", 0x00 == 0);
+
+  /** Found bug, comparing addresses will clearly be different.
+   * Compare values instead
+   */
+
+  if (class_0 != *label && class_1 != *label) {
+    return ReturnValue(ReturnCode::MemoryError,
+                       "Label: '" + std::to_string(*label) + "' invalid");
+  }
+
+  return ReturnValue(ReturnCode::Success,
+                     "Label: '" + std::to_string(*label) + "' is valid");
+}
+
 ReturnValue DatasetLoader::alignLabels(const uint8_t *raw,
                                        float *const aligned) {
   float *out_ptr = aligned;
   for (size_t i = 0; i < consts_.num_frames_per_snip; ++i) {
+    // int ii = i;
+
     for (size_t j = 1; j < consts_.blocks_per_col - 1; ++j) {
       for (size_t k = 1; k < consts_.blocks_per_row - 1; ++k) {
         size_t offset =
             i * consts_.blocks_per_frame + j * consts_.blocks_per_row + k;
-        *out_ptr = static_cast<float>(raw[offset]);
+        const uint8_t *label = raw + offset;
+        HANDLE_WITH(check_valid(label),
+                    ReturnValue(ReturnCode::MemoryError, "Label is not valid"));
+        *out_ptr = static_cast<float>(*label);
         out_ptr++;
       }
     }
