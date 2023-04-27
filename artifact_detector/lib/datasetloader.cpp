@@ -75,8 +75,6 @@ ReturnValue DatasetLoader::loadRawDataset() {
 }
 
 ReturnValue check_valid(const uint8_t *label) {
-  // const uint8_t class_0 = 0x00;
-  // const uint8_t class_1 = 0xFF;
   if (0x00 != *label && 0xFF != *label) {
     return ReturnValue(ReturnCode::MemoryError,
                        "Label: '" + std::to_string(*label) + "' invalid");
@@ -141,7 +139,7 @@ ReturnValue DatasetLoader::generateBalancedDataset() {
       ++cnt_positives;
     } else {
       ERROR("Found invalid label value (%d) at index: %ld\n",
-            *reinterpret_cast<int *>(&aligned_label_mem_.data[i]), i);
+            static_cast<int>(aligned_label_mem_.data[i]), i);
       return {ReturnCode::MemoryError, "Class separation failed"};
     }
   }
