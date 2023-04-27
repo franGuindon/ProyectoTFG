@@ -138,6 +138,7 @@ ReturnValue DatasetLoader::generateBalancedDataset() {
           i;  // Fill pos ids from end
       ++cnt_positives;
     } else {
+      /** Perhaps bug is in alignmend uint8_t to float conversion */
       ERROR("Found invalid label value (%d) at index: %ld\n",
             static_cast<int>(aligned_label_mem_.data[i]), i);
       return {ReturnCode::MemoryError, "Class separation failed"};
