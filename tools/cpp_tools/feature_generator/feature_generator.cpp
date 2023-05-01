@@ -228,38 +228,38 @@ inline bool get_horizontal_border_sums(const uint32_t *sat, const size_t offset,
  * @brief Generate features for a single block
  *
  * Some definitons:
- * vblock : Vertically filtered (16 px)x(16 px) block region
- * hblock : Horizontally filtered (16 px)x(16 px) block region
- * vtop : Vertically filtered top border of block
- * vleft : Vertically filtered left border of block
- * vbot : Vertically filtered bottom border of block
- * vright : Vertically filtered right border of block
- * htop : Horizontally filtered top border of block
- * hleft : Horizontally filtered left border of block
- * hbot : Horizontally filtered bottom border of block
- * hright : Horizontally filtered right border of block
+ * - vblock : Vertically filtered (16 px)x(16 px) block region
+ * - hblock : Horizontally filtered (16 px)x(16 px) block region
+ * - vtop : Vertically filtered top border of block
+ * - vleft : Vertically filtered left border of block
+ * - vbot : Vertically filtered bottom border of block
+ * - vright : Vertically filtered right border of block
+ * - htop : Horizontally filtered top border of block
+ * - nhleft : Horizontally filtered left border of block
+ * - nhbot : Horizontally filtered bottom border of block
+ * - hright : Horizontally filtered right border of block
  *
- * Feature order: There are 132 features per block (indices range from 0-131):
- * 0: vblock mean
- * 1: vblock var
- * 2: hblock mean
- * 3: hblock var
- * 4-19: vtop stats
- *   4-7: vtop means
- *     4:  2 px width
- *     5:  4 px width
- *     6:  8 px width
- *     7: 16 px width
- *   8-11: vtop vars
- *   12-15: differences between vtop means and vblock mean
- *   16-19: differences between vtop vars and vblock mean
- * 20-35: vleft stats
- * 36-51: vbot stats
- * 52-67: vright stats
- * 68-83: htop stats
- * 84-99: hleft stats
- * 100-115: hbot stats
- * 116-131: hright stats
+ * - Feature order: There are 132 features per block (indices range from 0-131):
+ * - 0: vblock mean
+ * - 1: vblock var
+ * - 2: hblock mean
+ * - 3: hblock var
+ * - 4-19: vtop stats
+ *   - 4-7: vtop means
+ *     - 4:  2 px width
+ *     - 5:  4 px width
+ *     - 6:  8 px width
+ *     - 7: 16 px width
+ *   - 8-11: vtop vars
+ *   - 12-15: differences between vtop means and vblock mean
+ *   - 16-19: differences between vtop vars and vblock mean
+ * - 20-35: vleft stats
+ * - 36-51: vbot stats
+ * - 52-67: vright stats
+ * - 68-83: htop stats
+ * - 84-99: hleft stats
+ * - 100-115: hbot stats
+ * - 116-131: hright stats
  *
  * @param vsat         : SAT for vertically filtered frame
  * @param vsat2        : Squared SAT for vertically filtered frame
