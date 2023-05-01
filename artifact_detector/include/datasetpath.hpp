@@ -47,7 +47,8 @@ class DatasetPath {
   }
 
  private:
-  const std::vector<std::string> filename_table_ = {"features.bytes", ""};
+  const std::vector<std::string> filename_table_ = {"features.bytes",
+                                                    "black_white_test.bytes"};
   /* Dataset path */
   std::string dataset_path_;
   /* For internal error management */
