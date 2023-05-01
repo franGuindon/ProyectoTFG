@@ -105,6 +105,7 @@ int main(int argc, char **argv) {
   arg_handler.maxdepth = 10;
   arg_handler.splitrule = EXTRATREES;
   arg_handler.randomsplits = 50;
+  arg_handler.mtry = 132;
 
   //----------------------------------------------------------------------------
   // Data load
