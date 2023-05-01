@@ -2,6 +2,10 @@
 
 #include "include/utility.hpp"
 
+/**
+ * @brief Kept here, in casy any given implementation gets too big in header
+ */
+
 uint64_t GetCurrentTimeSinceEpochUs() {
   auto now = std::chrono::system_clock::now();
   auto now_us = std::chrono::time_point_cast<MicroSeconds>(now);
