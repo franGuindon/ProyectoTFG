@@ -1,12 +1,12 @@
 /* Copyright 2023 Francis Guindon <fbadilla10@gmail.com> */
 
-#define DEBUG_LEVEL 3
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include <numeric>
 
+#define DEBUG_LEVEL 3
 #include "ForestClassification.h"
 #include "artifact_detector/include/datasetloader.hpp"
 #include "artifact_detector/include/logging.hpp"
