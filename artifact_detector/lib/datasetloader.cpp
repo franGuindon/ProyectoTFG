@@ -8,8 +8,8 @@
 
 #include "include/utility.hpp"
 
-DatasetLoader::DatasetLoader(std::string dataset_path)
-    : dataset_path_{dataset_path},
+DatasetLoader::DatasetLoader(std::string dataset_path, DatasetType type)
+    : dataset_path_{dataset_path, type},
       ret_{ReturnCode::Success, "Videofilesrc initialized correctly"},
       consts_{},
       raw_feature_mem_{},
@@ -34,16 +34,22 @@ ReturnValue DatasetLoader::allocate() {
   consts_.setNumFiles(dataset_path_.feature_files().size());
 
   raw_feature_mem_.size = consts_.total_feature_mem_size;
+  raw_feature_mem_.height = consts_.num_examples_per_file * consts_.num_files;
+  raw_feature_mem_.width = consts_.feature_vector_size;
   HANDLE_WITH(raw_feature_mem_.allocate(),
               ReturnValue(ReturnCode::MemoryError,
                           "Could not allocate raw feature mem"));
 
   raw_label_mem_.size = consts_.total_label_mem_size;
+  raw_label_mem_.height = consts_.label_file_size * consts_.num_files;
+  raw_label_mem_.width = 1;
   HANDLE_WITH(
       raw_label_mem_.allocate(),
       ReturnValue(ReturnCode::MemoryError, "Could not allocate raw label mem"));
 
   aligned_label_mem_.size = consts_.total_aligned_label_mem_size;
+  aligned_label_mem_.height = consts_.num_examples_per_file * consts_.num_files;
+  aligned_label_mem_.width = 1;
   HANDLE_WITH(aligned_label_mem_.allocate(),
               ReturnValue(ReturnCode::MemoryError,
                           "Could not allocate aligned label mem"));
@@ -51,14 +57,35 @@ ReturnValue DatasetLoader::allocate() {
   return ret_;
 }
 
+ReturnValue check_aligned_black_white(Buffer<float> &features,
+                                      Buffer<float> &labels) {
+  if (features.height != labels.height) {
+    return {ReturnCode::MemoryError, "Feature and label buffer size mismatch"};
+  }
+  for (size_t i = 0; i < features.size; ++i) {
+    float label = labels.data[i];
+    for (size_t j = 0; j < features.width; ++j) {
+      float feature = features.data[i * features.width + j];
+      if (feature != label) {
+        return {ReturnCode::MemoryError,
+                format("Feature[%ld, %ld] = %f and Label[%ld] = %f mismatch", i,
+                       j, feature, j, label)};
+      }
+    }
+  }
+  return {ReturnCode::Success, "Feature is valid black white dataset"};
+}
+
 ReturnValue DatasetLoader::loadRawDataset() {
   for (size_t i = 0; i < consts_.num_files; ++i) {
     std::string feature_path = dataset_path_.feature_files()[i];
     std::string label_path = dataset_path_.label_files()[i];
+
     float *feature_ptr = raw_feature_mem_.data + i * consts_.feature_file_size;
     uint8_t *label_ptr = raw_label_mem_.data + i * consts_.label_file_size;
     float *aligned_label_ptr =
         aligned_label_mem_.data + i * consts_.num_examples_per_file;
+
     printf("Loading feature file: %s\n", feature_path.c_str());
     load_frame(feature_path, feature_ptr, consts_.feature_file_size);
     printf("Loading label file: %s\n", label_path.c_str());
@@ -71,38 +98,57 @@ ReturnValue DatasetLoader::loadRawDataset() {
             "Load raw dataset failed while aligning labels to feature order"));
   }
 
+  HANDLE_WITH(check_aligned_black_white(raw_feature_mem_, aligned_label_mem_),
+              ReturnValue(ReturnCode::MemoryError,
+                          "Dataset is an invalid black and white dataset, "
+                          "labels and features mismatch"));
+
   return ret_;
 }
 
 ReturnValue check_valid(const uint8_t *label) {
   if (0x00 != *label && 0xFF != *label) {
-    return ReturnValue(ReturnCode::MemoryError,
-                       "Label: '" + std::to_string(*label) + "' invalid");
+    return ReturnValue(
+        ReturnCode::MemoryError,
+        "Label: '" + std::to_string(*label) + "' invalid uint8_t value");
   }
 
   return ReturnValue(ReturnCode::Success,
                      "Label: '" + std::to_string(*label) + "' is valid");
 }
 
-ReturnValue DatasetLoader::alignLabels(const uint8_t *raw,
-                                       float *const aligned) {
-  float *out_ptr = aligned;
-  for (size_t i = 0; i < consts_.num_frames_per_snip; ++i) {
-    // int ii = i;
+ReturnValue check_valid(const float *label) {
+  if (0x00 != *label && 0xFF != *label) {
+    return ReturnValue(
+        ReturnCode::MemoryError,
+        "Label: '" + std::to_string(*label) + "' invalid float value");
+  }
 
+  return ReturnValue(ReturnCode::Success,
+                     "Label: '" + std::to_string(*label) + "' is valid");
+}
+
+ReturnValue DatasetLoader::alignLabels(const uint8_t *raw_file_data,
+                                       float *const aligned_file_data) {
+  const uint8_t *in_ptr = raw_file_data;
+  float *out_ptr = aligned_file_data;
+  for (size_t i = 0; i < consts_.num_frames_per_snip; ++i) {
     for (size_t j = 1; j < consts_.blocks_per_col - 1; ++j) {
       for (size_t k = 1; k < consts_.blocks_per_row - 1; ++k) {
         size_t offset =
             i * consts_.blocks_per_frame + j * consts_.blocks_per_row + k;
-        const uint8_t *label = raw + offset;
+        const uint8_t *label = in_ptr + offset;
         HANDLE_WITH(check_valid(label),
                     ReturnValue(ReturnCode::MemoryError, "Label is not valid"));
         *out_ptr = static_cast<float>(*label);
+        HANDLE_WITH(
+            check_valid(label),
+            ReturnValue(ReturnCode::MemoryError, "Aligned label is not valid"));
         out_ptr++;
       }
     }
   }
-  if (aligned + consts_.num_examples_per_file != out_ptr) {
+  if (aligned_file_data + consts_.num_examples_per_file != out_ptr) {
     return {ReturnCode::MemoryError,
             "Iteration count and Aligned feature size mismatch"};
   }
@@ -129,18 +175,17 @@ ReturnValue DatasetLoader::generateBalancedDataset() {
   auto neg_then_pos_ids =
       std::unique_ptr<size_t[]>(new size_t[consts_.total_label_mem_size]);
   for (size_t i = 0; i < consts_.total_label_mem_size; ++i) {
-    float label = aligned_label_mem_.data[i];
-    if (0.0F == label) {
+    uint8_t label = static_cast<uint8_t>(aligned_label_mem_.data[i]);
+    if (0x00U == label) {
       neg_then_pos_ids[cnt_negatives] = i;  // Fill neg ids from beginning
       ++cnt_negatives;
-    } else if (255.0F == label) {
+    } else if (0xFFU == label) {
       neg_then_pos_ids[consts_.total_label_mem_size - 1 - cnt_positives] =
           i;  // Fill pos ids from end
       ++cnt_positives;
     } else {
       /** Perhaps bug is in alignmend uint8_t to float conversion */
-      ERROR("Found invalid label value (%d) at index: %ld\n",
-            static_cast<int>(aligned_label_mem_.data[i]), i);
+      ERROR("Found invalid label value (%d) at index: %ld\n", label, i);
       return {ReturnCode::MemoryError, "Class separation failed"};
     }
   }
