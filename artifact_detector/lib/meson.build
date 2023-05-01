@@ -4,6 +4,8 @@ lib_src = [
   'videofilesource.cpp',
   'trainer.cpp',
   'utility.cpp',
+  'datasetloader.cpp',
+  'datasetpath.cpp',
 ]
 
 libartifactdetector = shared_library('artifact_detector',

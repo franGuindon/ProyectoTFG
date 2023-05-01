@@ -6,7 +6,10 @@
 #include <memory>
 #include <numeric>
 
+#define DEBUG_LEVEL 3
 #include "ForestClassification.h"
+#include "artifact_detector/include/datasetloader.hpp"
+#include "artifact_detector/include/logging.hpp"
 #include "artifact_detector/include/utility.hpp"
 
 using ranger::DEFAULT_ALPHA;
@@ -64,6 +67,23 @@ struct Args {
 };
 
 int main(int argc, char **argv) {
+  // if (argc != 3) {
+  //   printf("Usage: trainer [OUTPUT_PREFIX] [DATASET_PATH] \n");
+  //   return 1;
+  // }
+  // std::string output_prefix = argv[1];
+  // std::string dataset_path = argv[2];
+
+  // INFO("Constructing dataset");
+  // std::unique_ptr<DatasetLoader> dataset;
+  // try {
+  //   dataset = std::make_unique<DatasetLoader>(dataset_path);
+  // } catch (ReturnValue &ret) {
+  //   ERROR("%s", ret.str().c_str());
+  // }
+
+  // return 0;
+
   if (argc < 4 || argc % 2 != 0) {
     printf("Usage: trainer [OUTPUT_PREFIX] [FEATURE_FILE] [LABEL_FILE] ... \n");
     printf("  An arbitrary number of feature - label file pairs may be used\n");
@@ -82,7 +102,7 @@ int main(int argc, char **argv) {
   arg_handler.ntree = 32;
   arg_handler.nthreads = 32;
   arg_handler.write = true;
-  arg_handler.maxdepth = 7;
+  arg_handler.maxdepth = 10;
   arg_handler.splitrule = EXTRATREES;
   arg_handler.randomsplits = 50;
 
@@ -198,14 +218,20 @@ int main(int argc, char **argv) {
   auto y_mem_balanced = std::unique_ptr<float[]>(new float[total_dataset_size]);
 
   for (size_t i = 0; i < neg_dataset_size; ++i) {
-    x_mem_balanced[i * features_per_block] =
-        x_mem[neg_then_pos_ids[i] * features_per_block];
+    void *raw_feature = reinterpret_cast<void *>(
+        x_mem.get() + neg_then_pos_ids[i] * features_per_block);
+    void *balanced_feature =
+        reinterpret_cast<void *>(x_mem_balanced.get() + i * features_per_block);
+    memcpy(balanced_feature, raw_feature, sizeof(float) * features_per_block);
     y_mem_balanced[i] = y_mem[neg_then_pos_ids[i]];
   }
 
   for (size_t i = 0; i < pos_dataset_size; ++i) {
-    x_mem_balanced[(i + neg_dataset_size) * features_per_block] =
-        x_mem[neg_then_pos_ids[i + cnt_negatives] * features_per_block];
+    void *raw_feature = reinterpret_cast<void *>(
+        x_mem.get() + neg_then_pos_ids[i + cnt_negatives] * features_per_block);
+    void *balanced_feature = reinterpret_cast<void *>(
+        x_mem_balanced.get() + (i + neg_dataset_size) * features_per_block);
+    mempcpy(balanced_feature, raw_feature, features_per_block);
     y_mem_balanced[(i + neg_dataset_size)] =
         y_mem[neg_then_pos_ids[i + cnt_negatives]];
   }
@@ -235,14 +261,45 @@ int main(int argc, char **argv) {
          GetCurrentTimeSinceEpochUs() - now);
 
   //----------------------------------------------------------------------------
+  // Generate black and white dataset matching labels
+  // printf("Generating black and white dataset from label memory\n");
+  printf("Converting feature memory from row major to column major\n");
+
+  auto x_mem_balanced_randomized_colmajor = std::unique_ptr<float[]>(
+      new float[total_dataset_size * features_per_block]);
+
+  float *labels = y_mem_balanced_randomized.get();
+  float *features = x_mem_balanced_randomized.get();
+  float *features_cm = x_mem_balanced_randomized_colmajor.get();
+
+  for (size_t i = 0; i < total_dataset_size; ++i) {
+    float label = labels[i];
+    if (0.0F != label && 255.0F != label) {
+      printf("Error: Invalid labels[%ld] = %f\n", i, label);
+      return 1;
+    }
+
+    for (size_t j = 0; j < features_per_block; ++j) {
+      float feature = features[i * features_per_block + j];
+
+      /* Check if valid white and black dataset */
+      // if (feature != label) {
+      //   printf("Error: (Feature[%ld,%ld]=%f) != (Label[%ld]=%f)\n", i, j,
+      //          feature, i, label);
+      //   return 1;
+      // }
+      features_cm[j * total_dataset_size + i] = feature;
+    }
+  }
+
+  //----------------------------------------------------------------------------
   // Train forest
 
   now = GetCurrentTimeSinceEpochUs();
 
   printf("Initializing Rangerx\n");
   forest->initCppFromMem(
-      arg_handler.depvarname, arg_handler.memmode,
-      x_mem_balanced_randomized.get(), y_mem_balanced_randomized.get(),
+      arg_handler.depvarname, arg_handler.memmode, features_cm, labels,
       total_dataset_size, num_cols, arg_handler.mtry, arg_handler.outprefix,
       arg_handler.ntree, &std::cout, arg_handler.seed, arg_handler.nthreads,
       arg_handler.predict, arg_handler.impmeasure,
