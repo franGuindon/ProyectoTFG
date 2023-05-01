@@ -11,7 +11,9 @@
 /** FIXME: Missing doc */
 enum class DatasetType {
   /** FIXME: Missing doc */
-  kRawDataset = 0
+  kRawDataset = 0,
+  /** FIXME: Missing doc */
+  kBlackWhite = 1
 };
 
 /**
@@ -24,9 +26,10 @@ class DatasetPath {
   /**
    * @brief Construct a DatasetPath
    *
-   * @param filename  : Name of dataset dir to use
+   * @param dataset_path : Name of dataset dir to use
+   * @param type         : Type of dataset to load
    */
-  explicit DatasetPath(std::string dataset_path);
+  DatasetPath(std::string dataset_path, DatasetType type);
   /**
    * @brief Destroy the DatasetPath instance
    */
@@ -44,6 +47,7 @@ class DatasetPath {
   }
 
  private:
+  const std::vector<std::string> filename_table_ = {"features.bytes", ""};
   /* Dataset path */
   std::string dataset_path_;
   /* For internal error management */
