@@ -1,16 +1,26 @@
-# Trabajo Final de Graduación
+# Graduation Project - Trabajo Final de Graduación - TFG
 
 ## Introduction
+
+The
+
+## Repository
 
 This git repo tracks all work I wish to publicly share about the development of my project.
 
 This mainly consists of:
-- Thesis' sources and build (and READMEs to help you construct it in no time).
-- Anteproyecto's sources and build (and READMEs).
-- Bitácoras sources and build (and READMEs).
-- Tools I built along the way.
-- I want to share the dataset as well, but I want to see if I can set up my francis.guindon.cr page using my laptop as server.
+- Informe  de TFG (Thesis) sources and build
+    (and READMEs to help you construct it in no time).
+- Anteproyecto (Project Design): sources and build (and READMEs).
+- Bitácoras (Worklogs): sources and build (and READMEs).
+- Tools I built along the way:
+  - Dataset construction
+  - Random Decision Forest (RDF)
+  - Analysis tools
 
+## Project design
+
+* [Anteproyecto](docs/anteproyecto/README.md)
 * [Design](docs/design/design.md)
 
 ## Dependencies
