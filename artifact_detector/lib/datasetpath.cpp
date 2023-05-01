@@ -9,10 +9,10 @@
 
 #include "include/utility.hpp"
 
-DatasetPath::DatasetPath(std::string dataset_path)
+DatasetPath::DatasetPath(std::string dataset_path, DatasetType type)
     : dataset_path_{dataset_path},
       ret_{ReturnCode::Success, "Videofilesrc initialized correctly"},
-      type_{DatasetType::kRawDataset},
+      type_{type},
       dataset_vid_dirs_{},
       dataset_snip_dirs_{},
       dataset_feature_files_{},
