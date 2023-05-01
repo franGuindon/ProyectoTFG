@@ -51,8 +51,9 @@ class DatasetLoader {
    * @brief Construct a DatasetLoader
    *
    * @param filename  : Name of dataset dir to use
+   * @param type      : Name of dataset type to use
    */
-  explicit DatasetLoader(std::string dataset_path);
+  explicit DatasetLoader(std::string dataset_path, DatasetType type);
   /**
    * @brief Destroy the DatasetLoader instance
    */
