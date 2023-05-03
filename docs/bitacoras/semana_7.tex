@@ -1,0 +1,378 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 7}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      22/3/23 & 1 h & Reunión de avance 7 & Metas son: Perfilar herramientas, Iniciar introducción de tesis, Continuar con extracción de features \\
+      22/3/23 & 4 h & Extracción de features & Se solucionó pulga en cálculo de filtrado \\
+      23/3/23 & 4 h & & Se completó caso sencillo de extracción de características para un solo borde \\
+      24/3/23 & 4 h & & Se optimizó caso sencillo usando macros y loop unrolling \\
+      25/3/23 & 4 h & & Se solucionó pulgas en cálculos de extracción de características comparando con resultados de python \\
+      27/3/23 & 4 h & & Se empezó a modularizar código en varias funciones para facilitar mantenimiento \\
+      28/3/23 & 2 h & Perfilado & Se perfiló código de python y c++ para permitir comparar \\
+      28/3/23 & 2 h & Tesis & Se creó un esquema de la introducción \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Notes from meeting}
+
+  Sugerencias del profe:
+  \begin{enumerate}
+    \item 
+  \end{enumerate}
+
+  Metas de la semana:
+  \begin{enumerate}
+    \item Empezar a escribir introducción (ver plantilla) (ver checklist en directorio)
+    \item Protocolar perfil de duración de partes (feature extractor, model, etc...) (
+      Analizar cambio
+    )
+  \end{enumerate}
+
+\begin{lstlisting}
+  Notas Reunion:
+  - Como se hace deteccion?
+  - Empezar a escribir introduccion (ver plantilla) (ver checklist en directorio)
+  - Protocolar perfil de duracion de partes (feature extractor, model, etc...)
+    (Analizar cambio)
+  - como se hace deteccion actual?
+  - introduccion hablar de baseline
+    - modelo de disptec
+  en la intro no se mete tecnico, solo dice que existe
+  intro diagrama bloques overview
+  sistema:
+  "aqui esta sistema completo, aqui se ubica sistema mio"
+  justificar duracion baseline
+  REALMENTE TOMAR EN CUENTA OBSERVACIONES
+  capitulo 3
+  como se genera set de datos
+  12 - abril entrenamiento terminado
+  PROCURE TENERLO ANTES
+  OpenMP ---
+
+  Wednesday:
+  I have fixed the filtering abs diff.
+  I have advanced work in border stats calc
+
+  /* FIXME: Refactor question to logging
+  * What would total feature file size be?
+  * pixels in frame = 1280*720 = 921600
+  * blocks in frame = (1280//16)*(720//16) = 3600
+  * feature categories per block (borders, diffs, propers)
+  * filterings per block = 2
+  * borders per filtering = 4
+  * rois per border = 4
+  * metrics per roi = 2
+  * border metrics per block = 2*4*4*2 = 64
+  * propers are metrics for block = 2
+  * diffs are borders minus propers = 64
+  * total 64 + 2 + 64 = 130
+  * 4 bytes per feature (floats)
+  * bytes per block = 130 * 4 = 520
+  * bytes per frame = 3600 * 520 = 1872000 = 1.872 MB
+  * frames per snippet 200
+  * bytes per snippet = 1872000*200 = 374400000 = 374.4 MB
+  * snippets per video 19
+  * bytes per video = 374400000*19 = 7113600000 = 7.11 GB
+  * videos = 1
+  * total dataset feature file size = 7.11 GB
+  * This
+  */
+  /* Filter test */
+
+  /* Log */
+  /* FIXME: refactor log into unit*/
+  /* I trust these filtered results
+   * I must now calculate features.
+   * Rectanges at 1,2,4,8 pixels away from each border
+   * 
+   */
+
+  Thursday:
+  I have completed first border calc
+
+  Friday:
+  I am considering to refactor the border calc into macros.
+  I think I'll be able to make it more maintainable that way.
+  Right now it would be harder to maintain.
+  Are macros the right abstraction?
+  They are famously able to create code with unexpected results.
+  However, If I only use them without altering state, perhaps
+  They can be useful.
+
+  /* Are recursive macros useful for writting maintainable and
+   * efficient loop unrolling?
+   *
+   * Unrolling decreases branching, which impairs the instr. pipeline
+   * However, unrolling increases the instr load.
+   *
+   * Parallelization perhaps should be considered as well.
+   */
+
+   /* Studying code in: https://stackoverflow.com/questions/12447557/can-we-have-recursive-macros
+    *
+    * Seem like a collection of fun macros.
+    * Perhaps they might help improve performance.
+    * I should be able to implement it both ways and use profiling to measure
+    * Duration.
+    */
+
+  /* Studying code in: https://stackoverflow.com/questions/12447557/can-we-have-recursive-macros */
+  /* I want to free style the macros */
+  // #define CAT(a, ...) PRIMITIVE_CAT(a, __VA_ARGS__)
+  // #define PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
+  
+  // #define CHECK_N(x, n, ...) n
+  // #define CHECK(...) CHECK_N(__VA_ARGS__, 0,) /* One or two args may be used, it seems to me that this would always return the second arg*/
+
+  // #define NOT(x) CHECK(PRIMITIVE_CAT(NOT_, x))
+  // #define NOT_0 ~, 1,
+
+  // #define COMPL(b) PRIMITIVE_CAT(COMPL_, b)
+  // #define COMPL_1 0
+  // #define COMPL_0 1
+
+  // #define BOOL(x) COMPL(NOT(x))
+
+  // #define IIF(c) PRIMITIVE_CAT(IFF_, c)
+  // #define IIF_1(c)(t, ...) t
+  // #define IIF_0(c)(t, ...) __VA_ARGS__
+
+  // #define IF(c) IIF(BOOL(C))
+
+  // #define EAT(...)
+  // #define EXPAND(...) __VA_ARGS__
+  // #define WHEN(c) IF(c)(EXPAND, EAT)
+  // #define SUM_BLOCK_ROWS_AT_PIC(dst, src, step, id0, ...) \
+  //     WHEN(COUNT)
+
+
+  // WHEN()
+
+  I'm going to try to use other macro tecnique at beginning of forum link.
+
+  // #define EXPAND(...) __VA_ARGS__
+  
+  // #define EMPTY()
+  // #define DEFER(...) __VA_ARGS__ EMPTY()
+  
+  // #define pr_id() pr
+  // #define pr(n) ((n==1)? 1 : DEFER(pr_id)()(n-1))
+  
+
+
+  /* pr(5)
+    * expands to ((5==1)? 1 : DEFER(pr_id)()(5-1))
+    * ---------------------------------------------
+    * would expand to ((5==1)? 1 : pr_id EMPTY()()(5-1))
+    * would expand to ((5==1)? 1 : pr_id ()(5-1))
+    * would expand to ((5==1)? 1 : pr(5-1))
+    * Wouldn't it be marked blue here?
+    * 
+    * EXPAND(pr(5))
+    * expands to pr(5)
+    */
+
+    /* I wish to define PIC in this context as Ptr Index Coordinates
+    * Pointer Index Coordinates are used to identify row to sum
+    */
+  /** @brief SUM_BLOCK_ROWS_AT_PIC
+    * 
+    * 
+    */
+  Status:
+  I tested filtered results against python filtered results.
+  I implented macros to aid maintainability while hopefully not causing a performance penalty
+  I might want to learn more about recursive macros
+  This might allow the creation of a parameter 
+
+  Saturday:
+  Status:
+  I started to compare python results with c++ results
+  Features seemed to give different values.
+  I started to print whole sections of memory regions and corresponding numpy buffers,
+  These gave different values.
+  I searched for implementation errors.
+
+  Sunday:
+  /* Thought:
+   *
+   * I may use my computer use history
+   * as a record of line of thoughtn
+   * 
+   * Example:
+   * I just decided to take the laptop upon my lap.
+   * This meant that they keyboard layout (KBLO) physically changed
+   * This means I changed my software (SW) KBLO
+   * Can use of laptop predict keyboard layout?
+   * It is one of four factors that predicts keyboard layout
+   * 1. Whether I'm using ...
+   * Quick interrupting thought:
+   *  Spotify should have a record playlist button
+   *  I want to try to build one
+   *  I want my laptop to run a daemond that allows
+   *  customization of every window while keeping the old one
+   *  First in simple ways,
+   *  I'll see if I can make one that places a button where
+   *  it thinks it's most suited to the button's function
+   *  Then the button's function will become interfacing
+   *  Through the allowed HW permissions
+   *  In linux may apps are open source
+   *  That is one way to enhance HW permissions
+   *  I can think of one hack that could possibly sample
+   *  mouse location, use an abstracted (through resizing)
+   *  Can I abstract cpp_tools to a gstreamer element?
+   *  Could this facilitate conversion of memory blocks to files?
+   *  Cheaper Implementation Alternative:
+   *  (Gstreamer elements are useful for clients,
+   *   which could turn this project into a series of
+   *   image processing tools that facilitates the design of
+   *   these kinds of experiments,
+   *   image an element that recieves 2 streams of buffers,
+   *   1. the feature data
+   *   2. the label data
+   *   3. processes data into trained tree
+      Then another element could read trained tree and execute it
+      (I already have the element that can execute a trained tree from a file)
+      This will be usefull when working whith gstreamer
+      How good idea to create threads from Gstreamer element?
+      I could at least make sure the executing element works
+   */
+
+   Ok, current tasks:
+   Modularize code a bunch
+   Use template classes?
+   I'll try normal class first
+   And if I can identify whether the function call is slow
+   I'll then try template class
+   
+   1. Class Design:
+   First, I'll, explain the proyect in terms of a block diagram:
+
+   1.1. Final product design
+   1.1.1. TFG product
+   - Goal: Train Forest
+     Mode: Using C++ API
+      - Goal: Read lossy frames
+        Input  Mode: Video File
+        Mode: File read mode:
+        - Read using gstreamer API (already implemented)
+        - Read using C++ API (not priority)
+      - Goal: Create detection mask output
+      
+        Output Mode: Video File
+
+   - Goal: Feature extraction
+     Mode: Original design
+    
+   Mode :
+
+
+   -2 
+   1.1.2. Disptec product
+   -1 Block Image source
+    Mode network
+    python
+   -2
+  
+  Tuesday:
+  - Goal: Modularize into functions
+  - Factorized filtering into function
+  
+  Call stack:
+  generate_dataset:
+    inputs: video_path, labels_path
+    outputs: feature_mem, label_mem
+    brief: Iterates over 200 vid frames and for each calls:
+      generate_frame_feautures:
+        inputs: frame_mem, frame_width, frame_height
+        outputs: feature_mem
+        brief: Runs filter_frame. Iterates over macroblocks and runs:
+          generate_block_features:
+            inputs: frame_mem, block_offset, frame_width, frame_height
+            outputs: feature_mem
+            brief: Calls vertical border func. for u and d
+                   Calls horizon. border func. for l and r
+                   Calls block func.
+                   Calcs diffs
+          
+
+
+
+          filter_frame:
+            inputs: frame_mem, frame_width, frame_height
+            outputs: yframe_mem, xframe_mem
+        
+  Quick profiling:
+  
+  Python feature generation:
+  - Filtering per 200 frames: 4.717424 s
+  - Filtering per frame:      0.023587 s =   23.587    ms
+  - Features per macroblock:  0.001076 s =    1.076335 ms
+  - Features per frame:       3.610027 s = 3610.027    ms
+  - Total per frame:          3.633614 s = 3633.614    ms
+
+  C++ feature generation:
+  - Filtering per frame:      0.007642 s =    7.642    ms
+  - Features per macroblock:  0.000068 s =    0.068    ms 
+  - Features per frame:       0.228072 s =  228.072    ms
+
+
+\end{lstlisting}
+
+
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

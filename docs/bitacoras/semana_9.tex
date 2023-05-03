@@ -1,0 +1,320 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 9}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      12/4/23 & 0.5 h & Reunión de avance 8 & Metas son: Balancear datos de entrenamiento, entrenar con datos completos en Amdahl \\
+      14/4/23 & 4 h & Balanceo de datos & Agregar lógica de balanceo de datos \\
+      15/4/23 & 1 h & & Solucionar una pulga con balanceo de datos \\
+      15/4/23 & 5.5 h & Entrenamiento & Recrear el dataset en Amdahl y entrenar con todos los snips por separado \\
+      16/4/23 & 2 h & & Actualizar herramienta para entrenar para que pueda manejar todos los datos a la vez \\
+      16/4/23 & 2 h & & Entrenando varios experimentos sobre los datos completos \\
+      17/4/23 & 2 h & & Actualizando funciones para análisis de bosques \\
+      17/4/23 & 2 h & & Entrenando nuevos experimentos para probar balance de árboles \\
+      18/4/23 & 2 h & & Analizando cómo Ranger escoge características y umbrales en los nodos \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+\begin{lstlisting}
+Wednesday:
+
+Meeting:
+- Look into Opencv SAT: \url{https://docs.opencv.org/3.4/d7/d1b/group__imgproc__misc.html#ga97b87bec26908237e8ba0f6e96d23e28}
+- (Low priority) Verify labels and features correspond
+- Balance data (High priority)
+- Idea: Self implemented SAT is justified (as opposed to using opencv) because we can use loop unrolling with filtering to use cache hits more efficiently
+- Test dataset balancing ratios
+- Number of experiments per node - Figure out how ranger does it and which parameter to adjust
+- What randomizations is Ranger using
+
+Friday:
+# Tasks:
+- Balancing data
+
+# Status:
+- 7:34 PM Start
+- Commited git work
+- Retrain a forest to review command:
+tools/cpp_tools/trainer/trainer ../dataset/0/00/features.bytes ../dataset/0/00/block.bytes
+cat rangerx.confusion
+python3 ../tools/python_tools/parse_ranger_confusion_matrix.py rangerx.confusion
+- Add output argument
+- Add count of data balance
+- Added balancing logic
+- I have bug that fills too much RAM and kills program
+- I'll leave that for tomorrow
+- 10:50 PM End
+
+Saturday:
+# Tasks:
+- Fix data balancing
+
+# Status
+- 8:00 AM Start
+- Fixed data balancing (Wrong Forest->initCpp dataset size argument)
+- Created script to train all snippets separately
+- Completed separate training
+- Working on dataset building scripts
+- Managed to build dataset from fresh repo clone
+
+Sunday:
+- Managed to refactor tfg code greatly
+- Managed to update trainer to be able to use complete dataset
+- Managed to train on all data
+
+Monday:
+- Analyzing results:
+\end{lstlisting}
+
+\begin{lstlisting}
+Dataset loading duration: 7345256
+Measuring raw dataset balance
+Negatives: 9027886, Positives: 3717314, Total: 670800, Balance: 0.71 : 0.29
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.50% pos
+Balanced neg cnt: 3717314, pos cnt: 3717314
+Dataset balancing duration: 6687628
+Initializing Rangerx
+Loading from memory: 0x7f2a0f44b010 0x7f2a0d7ee010
+Rangerx init duration: 73854243
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 5%. Estimated remaining time: 12 hours, 46 minutes, 1 seconds.
+Growing trees.. Progress: 55%. Estimated remaining time: 33 minutes, 25 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file models/loss0.1_vid0_ntree20_maxdepth100_balanced.forest.
+Rangerx training duration: 2501720274
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   20
+Sample size:                       7434628
+Number of independent variables:   132
+Mtry:                              11
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      0.500361
+
+Saved confusion matrix to file models/loss0.1_vid0_ntree20_maxdepth100_balanced.confusion.
+\end{lstlisting}
+Confusion matrix:
+\begin{lstlisting}
+Overall OOB prediction error (Fraction missclassified): 0.500361
+
+Class specific prediction errors:
+                0     255
+predicted 0     969245 971928 
+predicted 255     2747688 2745004
+\end{lstlisting}
+
+Metrics
+\begin{lstlisting}
+Precision: 0.50
+Recall:    0.74
+\end{lstlisting}
+
+I noticed the tree is not very balanced.
+
+I retrained using 32 trees, 20 maxdepth:
+
+\begin{lstlisting}
+  Dataset loading duration: 7632754
+  Measuring raw dataset balance
+  Negatives: 9027886, Positives: 3717314, Total: 670800, Balance: 0.71 : 0.29
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.50% pos
+  Balanced neg cnt: 3717314, pos cnt: 3717314
+  Dataset balancing duration: 6831589
+  Initializing Rangerx
+  Loading from memory: 0x7f066e455010 0x7f066c7f8010
+  Rangerx init duration: 74144700
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 3%. Estimated remaining time: 4 hours, 21 minutes, 26 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file models/loss0.1_vid0_ntree32_maxdepth20_balanced.forest.
+  Rangerx training duration: 551824036
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       7434628
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      0.50044  
+\end{lstlisting}
+
+The metrics really did not change:
+\begin{lstlisting}
+Precision: 0.50
+Recall:    0.74
+\end{lstlisting}
+
+The balanced dataset being handed over to ranger is separated by class.
+This might have an effect in the balance of the trained trees.
+
+Tuesday:
+\subsubsection{How does Ranger train?}
+To create and train a Ranger forest, there are tree steps:
+\begin{enumerate}
+  \item Forest construction
+  \item Initialization method
+  \item Run method
+\end{enumerate}
+
+The constructor takes no arguments. During construction, internal members are set to default values.
+
+The initialization method is more complex. It takes many arguments. However it will be addressed in so far as it helps explain the run method.
+
+The run method takes a verbose boolean and a compute oob error boolean. It is responsible for training or predicting, depending on one of the intialization arguments.
+
+\subsubsection{The run method}
+
+\begin{enumerate}
+  \item First, Ranger checks the \lstinline|prediction_mode| member.
+  \item If Ranger is predicting, it runs the \lstinline|predict()| method.
+  \item If Ranger is not predicting, it runs the \lstinline|grow()| method.
+  \item Ranger might also run the \lstinline|computePredictionError()| and the \lstinline|computePermutationImportance()| method.
+\end{enumerate}
+
+\subsubsection{The grow method}
+
+\begin{enumerate}
+  \item First, Ranger runs the \lstinline|equalSplit()| to setup the \lstinline|thread_ranges| variable.
+  \item It then calls the \lstinline|growInternal()| method. The internal methods are implemented by the specific Forest subclass being used (\lstinline|ForestClassification| in this case).
+  \item Ranger then runs a loop over the number of trees in the forest.
+  \item In the loop, it runs some logic to set up the random seed for the tree.
+  \item It then runs some logic to set up the \lstinline|tree_split_select_weights| variable.
+  \item It then runs some logic to set up the \lstinline|tree_manual_inbag| variable.
+  \item It then runs the tree's \lstinline|init| method, which takes several arguments.
+  \item After the loop, the \lstinline|variable_importance| vector is resized to \lstinline|num_independent_variables|
+  \item Then, \lstinline|num_thread| threads are allocated.
+  \item Then, the \lstinline|variable_importance_threads| is created;
+  \item Then, Ranger loops over \lstinline|num_threads|.
+  \item In each iteration it runs the \lstinline|growTreesInThread| method with the thread id (iteration counter) and the corresponding \lstinline|variable_importance_threads| vector as arguments.
+  \item Then, Ranger loops over the threads to join them.
+  \item Then, Ranger sums the variable importance values per thread.
+  \item Then, Ranger divides each variable importance value by the number of trees.
+\end{enumerate}
+
+\subsubsection{The growInternal method}
+
+\begin{enumerate}
+  \item The growInternal method constructs each tree.
+  \item Each tree takes several arguments \lstinline|class_values, response_classIDs, sampleIDs_per_class, class_weights|
+\end{enumerate}
+
+\subsubsection{The growTreesInThread method}
+
+\begin{enumerate}
+  \item The tree \lstinline|grow| method is called for every tree assigned to the given thread.
+  \item The tree \lstinline|grow| method takes the variable importance as argument.
+\end{enumerate}
+
+\subsubsection{The tree grow method}
+
+\begin{enumerate}
+  \item \lstinline|allocateMethod| is called.
+  \item Then, Ranger runs the bootstrapping logic.
+  \item Then, Ranger runs the node splitting logic.
+\end{enumerate}
+
+\subsubsection{The node splitting logic}
+
+\begin{enumerate}
+  \item A \lstinline|num_open_nodes| variable keeps track of the number of non terminal nodes.
+  \item \lstinline|num_open_nodes| is initialized to 1 (corresponding to the root node).
+  \item The algorithm stops when \lstinline|num_open_nodes > 0|. In other words, the algorithm stops when all nodes are either inner nodes or terminal nodes.
+  \item Each iteration runs runs the \lstinline|splitNode()| method.
+  \item This method takes an iteration counter as argument, corresponding to the node id.
+  \item This method returns a boolean indicating if the node is terminal.
+  \item If the node is terminal, the \lstinline|num_open_nodes| variable is decremented.
+  \item If the node is not terminal, the \lstinline|num_open_nodes| variable is incremented. Additionally, if the node id is reaches the leftmost node, the depth counter is increased and the leftmost node id is set to the next layer.
+\end{enumerate}
+
+\subsubsection{The splitNode method}
+
+\begin{enumerate}
+  \item First, Ranger runs the \lstinline|createPossibleSplitVarSubset()| method.
+  \item This method takes a vector of indices as argument, \lstinline|possible_split_var_subset|.
+  \item Then, Ranger calls the \lstinline|splitNodeInternal()| method.
+  \item This method takes the node id and the possible values dataset as arguments.
+  \item This method return a boolean indicating if the node is terminal, which is then returned by the \lstinline|splitNode| method.
+  \item Then, the \lstinline|split_varID| and \lstinline|split_value| for the node are defined. This is interesting because perhaps the split values are not being chosen randomly.
+  \item 
+\end{enumerate}
+
+% \subsubsection{The createPossibleSplitVarSubset method}
+
+% \begin{enumerate}
+%   \item 
+% \end{enumerate}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
