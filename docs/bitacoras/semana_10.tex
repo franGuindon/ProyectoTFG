@@ -15,7 +15,6 @@
 \addbibresource{../tesis/literatura.bib}
 \input{../tesis/code_blocks.tex}
 
-
 \begin{document}
  \graphicspath{{./}{../tesis/fig/}}
   Tecnológico de Costa Rica
@@ -41,7 +40,12 @@
       \hline
       Fecha & Duración & Actividad & Descripción \\
       \hline
-      19/4/23 & 0.5 h & Reunión de avance 10 & Metas son:  \\
+      26/4/23 & 0.5 h & Reunión de avance 10 & Metas son: Probar serie de experimentos para verificar datos \\
+      26/4/23 & 2 h & Arreglando herramienta de entreno & Buscando error en cómo se entregan datos a ranger \\
+      30/4/23 & 6 h & & Se encontró y corrigió en error (se entregaban datos en row major y ranger los recibe en column major) \\
+      1/5/23 & 5 h &  Entrenando bosque & Se entrenó denuevo y se obtuvo buenas estadísticas. Se entrenó en Amdahl \\
+      2/4/23 & 5.5 h & Tesis & Se avanzó con la escritura de la introducción \\
+      3/4/23 & 2 h & Prueba de bosque & Se avanzó con capturar segundo video de prueba \\
       \hline
       \textbf{Total} & 21 h \\
       \hline
@@ -181,7 +185,7 @@ The run method takes a verbose boolean and a compute oob error boolean. It is re
 \begin{enumerate}
   \item Results from training with black and white dataset
 \begin{lstlisting}
-fguindon@amdahl:~/TFG\$ python3 ProyectoTFG/tools/python_tools/parse_ranger_confusion_matrix.py models/loss0.1 vid0 black white test ntree32 maxdepth7 splitruleEXTRATREES randomsplit50 balanced randomized.confusion 
+python3 ProyectoTFG/tools/python_tools/parse_ranger_confusion_matrix.py models/loss0.1 vid0 black white test ntree32 maxdepth7 splitruleEXTRATREES randomsplit50 balanced randomized.confusion 
 Precision: 0.50
 Recall:    0.73
 \end{lstlisting}
@@ -273,7 +277,7 @@ Testing debugged method in amdahl
   \item Changing mtry to 132. This should mean the Forest now requires every node to test every feature for the best split.
   \item Confusion matrix:
   \begin{lstlisting}
-    \$ cat 
+    cat 
     models/05_01_2023_07\:47\:07_
     loss0.1_vid0_debugged_
     ntree32_maxdepth10_splitruleEXTRATREES_randomsplit50_mtry_132
@@ -387,6 +391,68 @@ Feature id: 14, count: 2
   \end{lstlisting}
 \end{enumerate}
 
+\subsection*{Tuesday/Wednesday}
+
+Goals:
+\begin{enumerate}
+  \item Finish Intro.
+  \item Train with another video
+  \item Test model0 with another video
+  \item Test model* with other videos
+  \item Train model with 2 videos
+  \item Test that on other videos
+\end{enumerate}
+
+Summary:
+\begin{enumerate}
+  \item Advancing with thesis
+  \item Updating git a bit
+  \item Generating webcam captures
+  \begin{lstlisting}
+$\mbox{\textdollar}$ GST_DEBUG=WARNING gst-launch-1.0 -v v4l2src ! xvimagesink
+    Setting pipeline to PAUSED ...
+    Pipeline is live and does not need PREROLL ...
+    0:00:00.098898291 50982 0x55c5f3cdd180 WARN                 basesrc gstbasesrc.c:3072:gst_base_src_loop:<v4l2src0> error: Internal data stream error.
+    0:00:00.098955929 50982 0x55c5f3cdd180 
+    WARN                 basesrc gstbasesrc.c:3072:gst_base_src_loop:<v4l2src0> error: streaming stopped, reason not-negotiated (-4)
+    Setting pipeline to PLAYING ...
+    0:00:00.099187668 50982 0x55c5f3cdc460 WARN                 v4l2src gstv4l2src.c:695:gst_v4l2src_query:<v4l2src0> Can't give latency since framerate isn't fixated !
+    ERROR: from element /GstPipeline:pipeline0/GstV4l2Src:v4l2src0: Internal data stream error.
+    Additional debug info:
+    gstbasesrc.c(3072): gst_base_src_loop (): /GstPipeline:pipeline0/GstV4l2Src:v4l2src0:
+    streaming stopped, reason not-negotiated (-4)
+    Execution ended after 0:00:00.000113851
+    Setting pipeline to NULL ...
+    Freeing pipeline ...
+  \end{lstlisting}
+  \item Hipothesis: This error is caused because v4l2src and xvimagesink don't have compatible formats
+  \item A quick inspect shows that v4l2src is compatible with xvimagesink:
+  \begin{lstlisting} % $\mbox{\textdollar}$
+
+    $\mbox{\textdollar}$ gst-inspect-1.0 v4l2src
+      video/x-raw
+        format: { (string)RGB16, (string)BGR, (string)RGB, (string)GRAY8, (string)
+          GRAY16_LE, (string)GRAY16_BE, (string)YVU9, (string)YV12, (string)YUY2,
+          (string)YVYU, (string)UYVY, (string)Y42B, (string)Y41B, (string)YUV9,
+          (string)NV12_64Z32, (string)NV24, (string)NV61, (string)NV16, (string)
+          NV21, (string)NV12, (string)I420, (string)BGRA, (string)BGRx, (string )
+          ARGB, (string)xRGB, (string)BGR15, (string)RGB15 }
+    $\mbox{\textdollar}$ gst-inspect-1.0 xvimagesink  
+      video/x-raw
+        framerate: [ 0/1, 2147483647/1 ]
+        width: [ 1, 2147483647 ]
+        height: [ 1, 2147483647 ]
+      \end{lstlisting}
+  \item Found useful pipeline:
+  \begin{lstlisting} % $\mbox{\textdollar}$
+
+    $\mbox{\textdollar}$ GST_DEBUG=WARNING gst-launch-1.0 -ve v4l2src name=cam_src num-buffers=200 ! videoconvert ! tee name=t ! queue ! videoscale ! video/x-raw,format=RGB ! queue max-size-buffers=30 ! videoconvert ! ximagesink sync=false name=img_origin t. ! queue max-size-buffers=30 ! 'video/x-raw,framerate=10/1,format=RGB,height=720,width=1280' ! videoconvert ! 'video/x-raw,framerate=10/1,format=I420,height=720,width=1280' ! multifilesink location= /media/francis/Seagate\ Basic/temp200frames/%d.i420
+  \end{lstlisting}
+  \item Taking advantage of my new 2 TB external drive, I saved 200 raw i420 frames from the webcam
+  \item 
+\end{enumerate}
+
+
 \subsection*{Ayuda Alexa}
 
 Suma de ecuaciones:
@@ -444,13 +510,6 @@ Se podría escribir en vectorial y creo que de ahí se puede sacar la intersecci
     \)
 \normalsize\end{center}
 
-\textbf{May they be those of us, this make'th of hell}
-
-\textbf{or those of us, who babylon it calls}
-
-\textbf{But they'll be those who see not wrong}
-
-\textbf{}
 
 
 
