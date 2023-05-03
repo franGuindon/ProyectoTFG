@@ -1,0 +1,466 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 10}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      19/4/23 & 0.5 h & Reunión de avance 10 & Metas son:  \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+\subsection*{Wednesday:}
+\begin{lstlisting}
+Meeting:
+- Document algorithm (try bingchat to generate text from outline)
+- Experiments to try:
+- Unit test for dataset
+- Perhaps try dummy dataset with black macroblocks and white background
+- Perhaps try black macroblocks in image
+- Try 9 raw macroblock features
+- Add date to result files (at beginning of filename)
+\end{lstlisting}
+
+\subsubsection{How does Ranger train?}
+To create and train a Ranger forest, there are tree steps:
+\begin{enumerate}
+  \item Forest construction
+  \item Initialization method
+  \item Run method
+\end{enumerate}
+
+The constructor takes no arguments. During construction, internal members are set to default values.
+
+The initialization method is more complex. It takes many arguments. However it will be addressed in so far as it helps explain the run method.
+
+The run method takes a verbose boolean and a compute oob error boolean. It is responsible for training or predicting, depending on one of the intialization arguments.
+
+\subsubsection{The run method}
+
+\begin{enumerate}
+  \item First, Ranger checks the \lstinline|prediction_mode| member.
+  \item If Ranger is predicting, it runs the \lstinline|predict()| method.
+  \item If Ranger is not predicting, it runs the \lstinline|grow()| method.
+  \item Ranger might also run the \lstinline|computePredictionError()| and the \lstinline|computePermutationImportance()| method.
+\end{enumerate}
+
+\subsubsection{The grow method}
+
+\begin{enumerate}
+  \item First, Ranger runs the \lstinline|equalSplit()| to setup the \lstinline|thread_ranges| variable.
+  \item It then calls the \lstinline|growInternal()| method. The internal methods are implemented by the specific Forest subclass being used (\lstinline|ForestClassification| in this case).
+  \item Ranger then runs a loop over the number of trees in the forest.
+  \item In the loop, it runs some logic to set up the random seed for the tree.
+  \item It then runs some logic to set up the \lstinline|tree_split_select_weights| variable.
+  \item It then runs some logic to set up the \lstinline|tree_manual_inbag| variable.
+  \item It then runs the tree's \lstinline|init| method, which takes several arguments.
+  \item After the loop, the \lstinline|variable_importance| vector is resized to \lstinline|num_independent_variables|
+  \item Then, \lstinline|num_thread| threads are allocated.
+  \item Then, the \lstinline|variable_importance_threads| is created;
+  \item Then, Ranger loops over \lstinline|num_threads|.
+  \item In each iteration it runs the \lstinline|growTreesInThread| method with the thread id (iteration counter) and the corresponding \lstinline|variable_importance_threads| vector as arguments.
+  \item Then, Ranger loops over the threads to join them.
+  \item Then, Ranger sums the variable importance values per thread.
+  \item Then, Ranger divides each variable importance value by the number of trees.
+\end{enumerate}
+
+\subsubsection{The growInternal method}
+
+\begin{enumerate}
+  \item The growInternal method constructs each tree.
+  \item Each tree takes several arguments \lstinline|class_values, response_classIDs, sampleIDs_per_class, class_weights|
+\end{enumerate}
+
+\subsubsection{The growTreesInThread method}
+
+\begin{enumerate}
+  \item The tree \lstinline|grow| method is called for every tree assigned to the given thread.
+  \item The tree \lstinline|grow| method takes the variable importance as argument.
+\end{enumerate}
+
+\subsubsection{The tree grow method}
+
+\begin{enumerate}
+  \item \lstinline|allocateMethod| is called.
+  \item Then, Ranger runs the bootstrapping logic.
+  \item Then, Ranger runs the node splitting logic.
+\end{enumerate}
+
+\subsubsection{The node splitting logic}
+
+\begin{enumerate}
+  \item A \lstinline|num_open_nodes| variable keeps track of the number of non terminal nodes.
+  \item \lstinline|num_open_nodes| is initialized to 1 (corresponding to the root node).
+  \item The algorithm stops when \lstinline|num_open_nodes > 0|. In other words, the algorithm stops when all nodes are either inner nodes or terminal nodes.
+  \item Each iteration runs runs the \lstinline|splitNode()| method.
+  \item This method takes an iteration counter as argument, corresponding to the node id.
+  \item This method returns a boolean indicating if the node is terminal.
+  \item If the node is terminal, the \lstinline|num_open_nodes| variable is decremented.
+  \item If the node is not terminal, the \lstinline|num_open_nodes| variable is incremented. Additionally, if the node id is reaches the leftmost node, the depth counter is increased and the leftmost node id is set to the next layer.
+\end{enumerate}
+
+\subsubsection{The splitNode method}
+
+\begin{enumerate}
+  \item First, Ranger runs the \lstinline|createPossibleSplitVarSubset()| method.
+  \item This method takes a vector of indices as argument, \lstinline|possible_split_var_subset|.
+  \item Then, Ranger calls the \lstinline|splitNodeInternal()| method.
+  \item This method takes the node id and the possible values dataset as arguments.
+  \item This method return a boolean indicating if the node is terminal, which is then returned by the \lstinline|splitNode| method.
+  \item Then, the \lstinline|split_varID| and \lstinline|split_value| for the node are defined. This is interesting because perhaps the split values are not being chosen randomly.
+  \item 
+\end{enumerate}
+
+% \subsubsection{The createPossibleSplitVarSubset method}
+
+% \begin{enumerate}
+%   \item 
+% \end{enumerate}
+
+\subsection*{Sunday}
+
+\subsubsection{Goals}
+\begin{enumerate}
+  \item Refactor gstreamer videofilesrc and videofilesink
+  \item Generate black and white dataset
+  \item Train with black and white dataset
+\end{enumerate}
+
+\subsubsection{Results}
+\begin{enumerate}
+  \item Results from training with black and white dataset
+\begin{lstlisting}
+fguindon@amdahl:~/TFG\$ python3 ProyectoTFG/tools/python_tools/parse_ranger_confusion_matrix.py models/loss0.1 vid0 black white test ntree32 maxdepth7 splitruleEXTRATREES randomsplit50 balanced randomized.confusion 
+Precision: 0.50
+Recall:    0.73
+\end{lstlisting}
+\end{enumerate}
+
+\subsection*{Monday}
+
+\subsubsection{Goals}
+\begin{enumerate}
+  \item Debug trainer
+\end{enumerate}
+
+\section{Debugging trainer}
+
+\subsection*{Trainer script structure:}
+\begin{enumerate}
+  \item Argument parser
+  \item Forest construction
+  \item Forest parameters
+  \item Raw dataset loading
+  \begin{enumerate}
+    \item Dataset loading timer start
+    \item Dataset memory size calculations
+    \item Dataset memory allocation
+    \item Dataset features loading %(quite simple)
+          and dataset labels loading %(quite complex, needs improvement)    
+    \begin{enumerate}
+      \item Loop over argument pairs
+      \item Loop calculates argument memory offsets
+      \item Loop calculates feature memory offsets
+      \item Loop calculates label memory offsets
+      \item Loop loads raw feature file and raw label file
+      \item Loop processes label file into label file in feature order
+    \end{enumerate}
+    \item Test for labels loading offset mismatch
+    \item Print Dataset Loading Duration
+  \end{enumerate}
+  \item Generating randomized balanced dataset
+  \begin{enumerate}
+    \item Data balancing timer start
+    \item Balancing dataset
+    \begin{enumerate}
+      \item Dataset balance measure
+      \item Randomizing class datasets separately
+      \item Balanced dataset calculation  
+    \end{enumerate}
+    \item Randomizing balanced dataset
+    \begin{enumerate}
+      \item Randomized balanced dataset memory size calculation
+      \item Randomized balanced dataset memory allocation
+      \item Initializing ids in ascending order
+      \item Shuffling ids
+      \item Loop processes balanced dataset into randomized balanced dataset
+      \begin{enumerate}
+        \item Iterate i over balanced dataset size
+        \item Randomized id calculation
+        \item Feature array at randomized balanced dataset memory calculation
+        \item Feature array at balanced dataset memory calculation
+        \item Copy feature from balanced dataset memory to randomized balanced dataset memory
+        \item Copy label from balanced dataset memory to randomized balanced dataset memory
+      \end{enumerate}
+    \end{enumerate}
+    \item Print dataset balancing duration
+  \end{enumerate}  
+  \item Initializing forest with dataset and arguments
+  \begin{enumerate}
+    \item Forest init timer start
+    \item Forest init call
+    \item Print Forest init duration
+  \end{enumerate}
+  \item Growing forest
+  \begin{enumerate}
+    \item Forest grow timer start
+    \item Forest grow call
+    \item Print Forest grow duration
+  \end{enumerate}
+  \item Printing results
+\end{enumerate}
+
+\subsection*{Sunday}
+Testing debugged method in amdahl
+\begin{enumerate}
+  \item 
+\end{enumerate}
+
+\subsection*{Monday}
+\begin{enumerate}
+  \item Testing Amdahl with complete dataset and recent bugfixes in features
+  \item Changing mtry to 132. This should mean the Forest now requires every node to test every feature for the best split.
+  \item Confusion matrix:
+  \begin{lstlisting}
+    \$ cat 
+    models/05_01_2023_07\:47\:07_
+    loss0.1_vid0_debugged_
+    ntree32_maxdepth10_splitruleEXTRATREES_randomsplit50_mtry_132
+    _balanced0.5pos_randomized.confusion 
+
+    Overall OOB prediction error (Fraction missclassified): 0.000742338
+
+    Class specific prediction errors:
+                    255     0
+    predicted 255     3717304 5512  
+    predicted 0     7     3711800
+  \end{lstlisting}
+  \item Precision and Recall:
+  \begin{lstlisting}
+    Precision: 1.00
+    Recall:    1.00
+  \end{lstlisting}
+  \item Feature use:
+  \begin{lstlisting}
+Total tree:
+Feature id: 120, count: 1
+Feature id: 43, count: 1
+Feature id: 8, count: 1
+Feature id: 77, count: 1
+Feature id: 51, count: 1
+Feature id: 89, count: 1
+Feature id: 30, count: 3
+Feature id: 15, count: 1
+Feature id: 92, count: 1
+Feature id: 94, count: 1
+Feature id: 101, count: 1
+Feature id: 73, count: 1
+Feature id: 62, count: 1
+Feature id: 64, count: 2
+Feature id: 74, count: 1
+Feature id: 13, count: 1
+Feature id: 12, count: 1
+Feature id: 116, count: 2
+Feature id: 115, count: 3
+Feature id: 91, count: 4
+Feature id: 84, count: 3
+Feature id: 109, count: 1
+Feature id: 79, count: 10
+Feature id: 123, count: 3
+Feature id: 37, count: 1
+Feature id: 65, count: 1
+Feature id: 67, count: 2
+Feature id: 78, count: 2
+Feature id: 122, count: 1
+Feature id: 4, count: 3
+Feature id: 63, count: 18
+Feature id: 102, count: 3
+Feature id: 52, count: 5
+Feature id: 111, count: 13
+Feature id: 22, count: 8
+Feature id: 34, count: 10
+Feature id: 103, count: 21
+Feature id: 44, count: 1
+Feature id: 87, count: 23
+Feature id: 28, count: 4
+Feature id: 99, count: 3
+Feature id: 40, count: 2
+Feature id: 70, count: 7
+Feature id: 11, count: 2
+Feature id: 117, count: 3
+Feature id: 59, count: 5
+Feature id: 118, count: 4
+Feature id: 97, count: 1
+Feature id: 38, count: 5
+Feature id: 39, count: 19
+Feature id: 98, count: 1
+Feature id: 55, count: 22
+Feature id: 85, count: 7
+Feature id: 7, count: 17
+Feature id: 125, count: 2
+Feature id: 75, count: 6
+Feature id: 46, count: 2
+Feature id: 71, count: 28
+Feature id: 129, count: 1
+Feature id: 2, count: 27
+Feature id: 130, count: 1
+Feature id: 3, count: 1
+Feature id: 119, count: 12
+Feature id: 60, count: 1
+Feature id: 21, count: 8
+Feature id: 0, count: 9
+Feature id: 127, count: 2
+Feature id: 68, count: 1
+Feature id: 6, count: 7
+Feature id: 35, count: 29
+Feature id: 83, count: 11
+Feature id: 53, count: 4
+Feature id: 5, count: 8
+Feature id: 45, count: 2
+Feature id: 33, count: 6
+Feature id: 76, count: 2
+Feature id: 69, count: 6
+Feature id: 23, count: 13
+Feature id: 57, count: 1
+Feature id: 95, count: 6
+Feature id: 36, count: 7
+Feature id: 107, count: 4
+Feature id: 86, count: 8
+Feature id: 47, count: 2
+Feature id: 20, count: 4
+Feature id: 29, count: 1
+Feature id: 113, count: 1
+Feature id: 54, count: 3
+Feature id: 31, count: 4
+Feature id: 14, count: 2
+  \end{lstlisting}
+\end{enumerate}
+
+\subsection*{Ayuda Alexa}
+
+Suma de ecuaciones:
+\begin{align*}
+  3x -  y - z &= 1 \\
+  -x + 2y + z &= 2 \\
+  \cline{1-2} \\
+  2x + y + 0 &= 3 \\
+  y &= 3 - 2x
+\end{align*}
+
+\begin{enumerate}
+  \item La primera razón para hacer suma de ecuaciones es para cancelar una de las variables (en este caso, la idea fue cancelar a $z$).
+  \item La segunda razón es para generar una nueva ecuación que aporta nueva información
+  \item Esa nueva ecuación nos da una relación entre $y$ y $x$ que no involucra a $z$
+  \item Eso significa que si encontramos el valor de alguna de las dos, luego podemos encontrar el valor de la otra
+\end{enumerate}
+
+Escalamiento de primera ecuación (con la intención de que el siguiente paso sea una suma de esta nueva ecuación con la segunda y que se pueda cancelar $y$):
+\begin{align*}
+  2(3x -  y - z &= 1) \\
+  2(3x -  y - z) &= 2(1) \\
+  2(3x) -  2(y) - 2(z) &= 2 \\
+  6x -  2y - 2z &= 2
+\end{align*}
+
+Suma de ecuaciones para cancelar a $y$:
+\begin{align*}
+  6x -  2y - 2z &= 2 \\
+  -x + 2y + z &= 2 \\
+  \cline{1-2} \\
+  5x + 0 - z &= 4 \\
+  5x - 4 &= z
+\end{align*}
+
+Aquí podemos hacer un experimento:
+¿Será que si escoge un valor de $z$ cualquiera $...$, pueda sacar un $x$ válido (con el descubrimiento pasado), y luego un $y$ válido (con el descubrimiento antepasado), $...$ entonces logre alcanzar un punto $(x, y, z)$ válido de intersección de rectas (esas se pueden ``plug-in'' en las rectas para asegurarse de que sí es un punto válido)?
+
+
+...
+
+Se podría escribir en vectorial y creo que de ahí se puede sacar la intersección
+
+\def\theorem{1cm}
+\begin{center}\vspace{\theorem}\big(Theorem 1. System as matrix equation\big)
+  \large\(
+    \begin{bmatrix}
+      3x-y-z = 1 \\
+      -x+2y+z = 2
+    \end{bmatrix}
+    %
+    = \begin{bmatrix} 3\\ -1 \end{bmatrix} x
+    + \begin{bmatrix} 3\\ -1 \end{bmatrix} y
+    + \begin{bmatrix} 3\\ -1 \end{bmatrix} z
+    \)
+\normalsize\end{center}
+
+\textbf{May they be those of us, this make'th of hell}
+
+\textbf{or those of us, who babylon it calls}
+
+\textbf{But they'll be those who see not wrong}
+
+\textbf{}
+
+
+
+
+
+% \begin{matrix}
+%   1 & 1 & 1 \\
+% \end{matrix} $&=$ \begin{matrix}
+%   1 & 1 & 1 \\
+% \end{matrix}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

@@ -1,0 +1,423 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 8}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      29/3/23 & 0.5 h & Reunión de avance 8 & Metas son: Continuar con extracción de features \\
+      29/3/23 & 3 h & Extracción características & Se implemetó cálculo de SAT \\
+      3/3/23 & 3 h & & Se implementó script de python para hacer testing de resultados de cpp \\
+      6/3/23 & 3 h & & Se completó el cálculo de features para un solo bloque \\
+      7/3/23 & 3 h & & Se terminó de probar y generar features para todos los datos \\
+      8/3/23 & 3 h & Entrenamiento & Se creó herramienta para entrenar bosques \\
+      9/3/23 & 3 h & & Se hizo una serie de pruebas de entrenamiento para intentar mejorar los resultados \\
+      10/3/23 & 1 h & & Se agregó una función para imprimir contenidos de bosques entrenados \\
+      11/3/23 & 1.5 h & & Se analizó estructura de bosques entrenados para notar características de profundidad y estructura \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+\begin{lstlisting}
+Wednesday:
+  Meeting notes:
+  - Integral image - SAT (Summed-Area Table) : Possible optimization for sums and feature extraction
+
+  Goal:
+  - implement SAT function
+  - implement python tool to help verify c++ results
+
+  Status:
+  - Finished implementing SAT function
+  - Used maximum compilation optimization
+  Current duration values (microseconds):
+  Filtering duration: 792
+  Vertical SAT and SAT2 duration: 2965
+  Horizontal SAT and SAT2 duration: 2817
+
+Monday:
+  Tasks:
+  - Complete testing of filtering with testing
+  - Complete SAT implementation with testing
+
+  Status:
+  - I checked filtering both on python and c++
+  - I found c++ bug in the way that pointer increments where done in loop
+  - I am currently checking SAT calculation by comparing python and c++ results
+  - Completed SAT check
+
+Thursday:
+  Tasks:
+  - Complete feature file generation
+
+  Status:
+  - Implemented new get_vertical_border_sums
+  - Fixed compilation issues
+  - Implemented new get_horizontal_border_sums
+  - Tested with python results
+  - Fixed bottom and right border problems
+
+Friday:
+  Tasks:
+  - Complete feature file generation
+
+  Status:
+  - Generated feature file for single block
+  - Tested single block features with python
+  - Generated feature file for single block row
+  - Tested singel block row features with python
+  - Found differences in block 17
+  - Tested sat sum vs np sum in python
+  - Python sat sum agrees with cpp sat sum
+  - Python sat sum disagrees with sum
+  - Why?
+  - Perhaps overflow?
+  - Using python astype does not seem to make a difference
+  - Which is correct?
+  - Perhaps I can try both methods with a smaller area and find point at which
+    results differ
+  - Result: It is an overflow in python:
+      Filtered results where being used to calculate stats
+      Filtered results had np.uint8 type
+      Solution: Read filtered results in np.uint8 type, reinterpret as np.uint32 type
+  - Testing complete frame feature set
+  - Python and cpp results agree
+  - Durations (microseconds):
+      Filtering duration: 925
+      Vertical SAT and SAT2 duration: 5330
+      Horizontal SAT and SAT2 duration: 5637
+      Feature STATS extraction duration: 3841
+  - Total feature extraction duration per frame:
+      Frame feature extraction duration: 19629
+  - It seems that feature extraction tends to decrease when done for several frames
+    at once. Theory: This could be because optimization decides to reuse previously allocated memory.
+    Optimization for gstreamer element (kinda obvious, though): Allocate all data at beginning
+  - Completed succesful generation of all feature files
+
+Saturday:
+Some tasks I would like to work on:
+- Complete feature file testing
+- Complete training tool
+- Refactor feature generation into class structure
+- Refactor gstreamer management for frame loading into class structure
+- Complete Chapter 1 of Thesis
+
+  Priority task:
+  - Complete training tool
+
+  Status:
+  - Yesterday I generated all feature files
+  - I have tested single frame features extensivelly by comparing value by value
+    with Python results. I am confident in these results since my Python and my
+    Cpp tool use different calculation methods and still arrive at identical
+    results. I would like to somehow extend my python tool to test complete
+    feature files. However, perhaps I should pause this task and focus instead
+    in training tool.
+  - I want to work on organizing the git structure a bit.
+  - First I cloned my repo in the Release directory.
+  - I built the project, but I believe many tools are missing.
+  - I wish to attempt to recreate complete dataset:
+    - Video snippets
+    - Simulated packet loss snippets (lossy snips)
+    - Difference between lossy snips and original snips
+    - Discretized differences by blocks (both as snips and as byte files)
+    - Feature files
+  - I moved all my commits to a feature branch
+  - I reset my master branch to the Initial commit
+  - I created a Develop branch and added an empty commit:
+    The empty commit was a more or less ok solution to keeping the develop root
+    at the initial commit. It is probably not the best way, but it works.
+  - I merged my current work into the develop branch
+  - I created a feature to add the dataset creation tools
+  - I created a release script to simplify testing process
+  - I added bash script to build ground truths
+  - I added python script to parse README file with info on where to build snips
+  - I will pause this feature and start a feature for the training tool
+  - I managed to create a simple trainer that can load a single feature file
+    as well as the corresponding labels. This corresponds to 1 snippet.
+    This is about 1 GB of data.
+    Training takes several minutes.
+    Results of initial trainings:
+    
+    bash: tools/cpp_tools/trainer/trainer ../dataset/0/00/features.bytes ../dataset/0/00/block.bytes 
+    Loading feature file
+    Loading label file
+    Building label memory
+    670800 670800
+    Initializing Rangerx
+    Loading from memory: 0x7f51c2cf1010 0x7f51c29b1010
+    Running Rangerx
+    Growing trees ..
+    Growing trees.. Progress: 10%. Estimated remaining time: 15 minutes, 9 seconds.
+    Computing prediction error ..
+    Saving model to file
+    Saved forest to file rangerx.forest.
+    Writting output
+    
+    Tree type:                         Classification
+    Dependent variable name:           y
+    Number of trees:                   10
+    Sample size:                       670800
+    Number of independent variables:   132
+    Mtry:                              11
+    Target node size:                  1
+    Variable importance mode:          0
+    Memory mode:                       0
+    Seed:                              0
+    Number of threads:                 12
+    
+    Overall OOB prediction error:      0.227485
+    
+    Saved confusion matrix to file rangerx.confusion.
+    
+    bash: ls
+    build.ninja  compile_commands.json  meson-info  meson-logs  meson-private  rangerx.confusion  rangerx.forest  subprojects  tools
+    
+    bash: cat rangerx.confusion 
+    Overall OOB prediction error (Fraction missclassified): 0.227485
+    
+    Class specific prediction errors:
+                    0     255
+    predicted 0     44679996115 
+    predicted 255     54929 66129 
+
+Sunday:
+  - I fixed the confusion matrix print:
+
+  Loading feature file
+  Loading label file
+  Building label memory
+  670800 670800
+  Initializing Rangerx
+  Loading from memory: 0x7fcb92383010 0x7fcb92043010
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 10%. Estimated remaining time: 15 minutes, 0 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file rangerx.forest.
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   10
+  Sample size:                       670800
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 12
+  
+  Overall OOB prediction error:      0.229189
+  
+  Saved confusion matrix to file rangerx.confusion.
+
+confusion matrix:
+
+Overall OOB prediction error (Fraction missclassified): 0.229189
+
+Class specific prediction errors:
+                0     255
+predicted 0     446283 96816 
+predicted 255     55329 65413
+
+  - From these values, I can get some initial values for precision and recall:
+
+  - Sample size: 670800
+  - True positives: 65413
+  - False positives: 55329
+  - Precision: 65413/(65413 + 55329) = 0.54
+
+  - False negatives: 96816
+  - Recall: 65413/(65413 + 96816) = 0.40
+
+  - This is training with the first snippet of data and without balancing.
+
+I will try training with all the sets:
+
+Video 0 Snip 1:
+Overall OOB prediction error (Fraction missclassified): 0.351771
+
+Class specific prediction errors:
+                0     255
+predicted 0     289744 126971 
+predicted 255     106550 140578 
+
+  - Precision: 140578/(140578 + 106550) = 0.57
+  - Recall: 140578/(140578 + 126971) = 0.53
+
+Video 0 Snip 2:
+Overall OOB prediction error (Fraction missclassified): 0.28627
+
+Class specific prediction errors:
+                0     255
+predicted 0     363445 108698 
+predicted 255     81375 110447
+
+  - Precision: 0.58
+  - Recall: 0.50
+
+- I updated tree maxdepth to 10:
+Video 0 Snip 0:
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/build (feature/support_complete_data_training=)$ tools/cpp_tools/trainer/trainer ../dataset/0/00/features.bytes ../dataset/0/00/block.bytes 
+Loading feature file
+Loading label file
+Building label memory
+Initializing Rangerx
+Loading from memory: 0x7fa047a44010 0x7fa047704010
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 65%. Estimated remaining time: 22 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file rangerx.forest.
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   20
+Sample size:                       670800
+Number of independent variables:   132
+Mtry:                              11
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 12
+
+Overall OOB prediction error:      0.244261
+
+Saved confusion matrix to file rangerx.confusion.
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/build (feature/support_complete_data_training=)$ cat rangerx.confusion 
+Overall OOB prediction error (Fraction missclassified): 0.244261
+
+Class specific prediction errors:
+                0     255
+predicted 0     506787 163765 
+predicted 255     72    122   
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/tools/python_tools (feature/support_complete_data_training=)$ python3 parse_ranger_confusion_matrix.py ../../build/rangerx.confusion 
+Precision: 0.63
+Recall:    0.00
+
+- Now trying maxdepth 100
+Video 0 Snip 0:
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/build (feature/support_complete_data_training=)$ tools/cpp_tools/trainer/trainer ../dataset/0/00/features.bytes ../dataset/0/00/block.bytes 
+Loading feature file
+Loading label file
+Building label memory
+Initializing Rangerx
+Loading from memory: 0x7fe5e71a1010 0x7fe5e6e61010
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 5%. Estimated remaining time: 39 minutes, 16 seconds.
+Growing trees.. Progress: 65%. Estimated remaining time: 1 minute, 54 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file rangerx.forest.
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   20
+Sample size:                       670800
+Number of independent variables:   132
+Mtry:                              11
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 12
+
+Overall OOB prediction error:      0.190811
+
+Saved confusion matrix to file rangerx.confusion.
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/build (feature/support_complete_data_training=)$ cat rangerx.confusion 
+Overall OOB prediction error (Fraction missclassified): 0.190811
+
+Class specific prediction errors:
+                0     255
+predicted 0     481307 102439 
+predicted 255     25546 61451
+Precision: 0.71
+Recall:    0.37
+
+Monday:
+  Some tasks I would like to work on:
+  - Complete feature file testing
+  - Complete training tool
+  - Refactor feature generation into class structure
+  - Refactor gstreamer management for frame loading into class structure
+  - Complete Chapter 1 of Thesis
+
+  Priority tasks:
+  - Adding a method to view tree structures
+
+Tuesday:
+  Status:
+  - Follow predict function traceback:
+
+Data:
+  Forest.cpp: Tree::child_nodeIds
+
+Traceback:
+  Forest.cpp: Forest::predict
+    Forest.cpp: Forest::predictTreesInThread
+      Tree.cpp: Tree::predict
+
+\end{lstlisting}
+
+
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
