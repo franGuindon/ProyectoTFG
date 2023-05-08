@@ -452,69 +452,6 @@ $\mbox{\textdollar}$ GST_DEBUG=WARNING gst-launch-1.0 -v v4l2src ! xvimagesink
   \item 
 \end{enumerate}
 
-
-\subsection*{Ayuda Alexa}
-
-Suma de ecuaciones:
-\begin{align*}
-  3x -  y - z &= 1 \\
-  -x + 2y + z &= 2 \\
-  \cline{1-2} \\
-  2x + y + 0 &= 3 \\
-  y &= 3 - 2x
-\end{align*}
-
-\begin{enumerate}
-  \item La primera razón para hacer suma de ecuaciones es para cancelar una de las variables (en este caso, la idea fue cancelar a $z$).
-  \item La segunda razón es para generar una nueva ecuación que aporta nueva información
-  \item Esa nueva ecuación nos da una relación entre $y$ y $x$ que no involucra a $z$
-  \item Eso significa que si encontramos el valor de alguna de las dos, luego podemos encontrar el valor de la otra
-\end{enumerate}
-
-Escalamiento de primera ecuación (con la intención de que el siguiente paso sea una suma de esta nueva ecuación con la segunda y que se pueda cancelar $y$):
-\begin{align*}
-  2(3x -  y - z &= 1) \\
-  2(3x -  y - z) &= 2(1) \\
-  2(3x) -  2(y) - 2(z) &= 2 \\
-  6x -  2y - 2z &= 2
-\end{align*}
-
-Suma de ecuaciones para cancelar a $y$:
-\begin{align*}
-  6x -  2y - 2z &= 2 \\
-  -x + 2y + z &= 2 \\
-  \cline{1-2} \\
-  5x + 0 - z &= 4 \\
-  5x - 4 &= z
-\end{align*}
-
-Aquí podemos hacer un experimento:
-¿Será que si escoge un valor de $z$ cualquiera $...$, pueda sacar un $x$ válido (con el descubrimiento pasado), y luego un $y$ válido (con el descubrimiento antepasado), $...$ entonces logre alcanzar un punto $(x, y, z)$ válido de intersección de rectas (esas se pueden ``plug-in'' en las rectas para asegurarse de que sí es un punto válido)?
-
-
-...
-
-Se podría escribir en vectorial y creo que de ahí se puede sacar la intersección
-
-\def\theorem{1cm}
-\begin{center}\vspace{\theorem}\big(Theorem 1. System as matrix equation\big)
-  \large\(
-    \begin{bmatrix}
-      3x-y-z = 1 \\
-      -x+2y+z = 2
-    \end{bmatrix}
-    %
-    = \begin{bmatrix} 3\\ -1 \end{bmatrix} x
-    + \begin{bmatrix} 3\\ -1 \end{bmatrix} y
-    + \begin{bmatrix} 3\\ -1 \end{bmatrix} z
-    \)
-\normalsize\end{center}
-
-
-
-
-
-
 % \begin{matrix}
 %   1 & 1 & 1 \\
 % \end{matrix} $&=$ \begin{matrix}
