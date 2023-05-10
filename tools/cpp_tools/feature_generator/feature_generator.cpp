@@ -695,7 +695,7 @@ int run_generator(int argc, char **argv, std::ostream &verbose_out) {
   std::vector<float> features;
   std::vector<float> labels;
 
-  if (!generate_dataset_(argv[1], argv[2], &features, labels)) {
+  if (!generate_dataset(argv[1], argv[2], &features, labels)) {
     printf("Data generation failed\n");
     return 1;
   }
