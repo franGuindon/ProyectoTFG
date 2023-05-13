@@ -223,6 +223,7 @@ class Forest {
 
   void print_single_tree_maxdepth();
   void print_single_tree_maxdepth(size_t tree_id, size_t maxdepth);
+  void get_predictions(float* pred_mem, size_t size);
 
  protected:
   void grow();
