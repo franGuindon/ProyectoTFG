@@ -8,5 +8,5 @@
 
 executable('analyzer',
           sources             : [ 'analyzer.cpp' ],
-          include_directories : ranger_ext_incdirs,
-          dependencies        : rangerx_dep)
+          include_directories : [ranger_ext_incdirs, projectinc],
+          dependencies        : [rangerx_dep, libartifactdetector_dep])
