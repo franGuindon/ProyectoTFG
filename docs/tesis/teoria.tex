@@ -1,0 +1,120 @@
+\chapter{Theoretical Framework}
+\label{ch:marco}
+
+\section{Theoretical Framework Outline}
+
+\begin{enumerate}
+\item Video artifacts
+  \begin{enumerate}
+  \item h264 encoding
+    \begin{enumerate}
+    \item Who created it?
+    \item What is the goal?
+    \item What are the characteristics of h264 encoding
+      \begin{enumerate}
+      \item What are macroblocks?
+      \item Why are we using macroblocks to delimit the binary masks
+      \end{enumerate}
+    \end{enumerate}
+  \item video transmission
+  \item compression artifacts
+  \item packet loss artifacts
+  \end{enumerate}
+\item Random Decision Forests
+  \begin{enumerate}
+  \item Classical Machine Learning
+  \item Feature extraction
+    \begin{enumerate}
+    \item Why is it done and why is it important?
+    \item How is feature extraction done?
+    \item What to keep in mind for feature extraction?
+    \end{enumerate}
+  \item Metrics
+    \begin{enumerate}
+    \item OOB
+    \item Confusion Matrix
+    \item Precision and Recall
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+\section{Definición de marco de trabajo a utilizar}
+
+\section{Definición de características de entrenamiento a seleccionar}
+
+Tipos de artefactos en MPEG-2 según \cite{Greengrass2009}.
+
+- definición de artefacto de video
+
+Slice Error:
+- when network drops at least one IP packet within an I-, P- or B- frame
+- causes strips of the video to appear distorted
+
+Blocking or Pixelization:
+- when loss happens within a reference frame (either an I- or a P- frame)
+
+Ghosting:
+- Loss in I-frames near scene changes. Parts of the previous sceen still appear.
+- New P- and B- frames continue to spread the ghosting effect
+
+Freeze Frame:
+- loosing a stream of MPEG frames will freeze the current frame for a while
+
+Loss in I-Frames:
+Loss in I-Frames affect a complete GoP and is only recovered until the next I-frame.
+Loss in the beginning of an I-Frame that looses header information results in pixelization throughout the whole GoP. Same effect as loosing the whole I-frame.
+Loss within I-frame looses slices and affect the whole GoP.
+Since 2 B-frames before I frame reference it in 15:2, they are also affected.
+Thus, loss in I-frames affect 17 frames assuming a 15:2 group of pictures (GoP)
+Longer GoP means longer artefacts if they occur in I-frames, but they allow
+higher compression, which allows to transmit higher-quality video with a given
+bit rate.
+
+Loss in P-Frames:
+Since P-frames reference previous frames, loss affects from P-frame onward in a GoP.
+Loosing the P-frame header is as significant as lossing the whole P-frame, and affects the remainder of the GoP.
+Loss withing P-frame results in slice errors that continue through GoP.
+
+Tipos de artefactos en MPEG / H26x según \cite{Glavota2016}.
+
+Dos categorías: Artefactos rectangulares y artefactos irregulares, causados por propagación de error.
+
+Non-concealed Artifact (NCA): Un artefacto rectangular donde la región perdida aparece en negro y tiene bordes rectangules bien definidos.
+
+Low spatial activity artifact (LSAA): Un artefacto rectangular que no es negro y difiere de sus alrededores y tiene algo de actividad espacial.
+High spatial activity artifact (HSAA): El artefacto contiene detalle y bordes internos.
+Temporally-concealed artifacts (TCA): Un rango de artefactos donde los valores de los macrobloques contiene valores repetidos de cuadros anteriores.
+
+Propagation artifacts (PA): Los errores irregulares suceden por la propagación de errores rectangulares en cuadros predictivos. Estos pueden tener formas distorcionadas y valores de pixel que cambian significativamente
+
+Filtro pasa altas con coefficientes [1, -1] aplicado tanto en componentes de luminancia como en componentes de chrominancia en direcciones horizontales y verticales,
+
+Los bordes de NCA y LSAA y hasta HSAA dan valores altos de gradiente.
+Los TCA y PA dependen de muchas variables y son complicados de predecir.
+
+Selección de características:
+
+Filtro pasa altas para detección de bordes:
+- Filtro [1, -1]
+- Filtro [1/2, 0, -1/2] (diferencias centrales)
+- Filtro de Sobel [1, 0, -1; 2 0 -2; 1 0 -1], \cite{Korhonen2018}
+- Filtro de Prewitt [1, 0, -1, 1, 0, -1, 1, 0, -1]
+- Filtro de Roberts cross [1 0, 0 -1]
+...
+- Filtro de Canny (caro)
+- Filtro de Deriche (caro)
+- Filtro differencial (asume suavizamiento gaussiano, caro)
+
+Sugerencias de \cite{Glavota2016, Korhonen2018} es que se puede medir el promedio y desviación estandar de la detección de bordes a nivel de macrobloque.
+
+Posiblemente vamos a querer realizar este cálculo a un nivel mayor que el de un solo macrobloque para incluir algo de contexto.
+
+Promedio y Varianza de macrobloque y vecinos
+Promedio y Varianza de bloques
+Promedios y Varianza de bordicidad ([1, -1])
+
+Histograma de imagen
+Definir probabilidad a partir del cual se considera error
+
+% \import{~/Documents/2023_S1/Proyecto/tools/cpp_tools/trainer/}{training_theory}
+
