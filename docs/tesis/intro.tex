@@ -12,11 +12,21 @@
 \section{Video artifacts in live video streaming}
 \label{sec:intro_artifacts}
 
-Modern day streaming services are fundamental instruments in modern industries, institutions, and every day life. For instance, live video conferencing and streaming services became the principal mediums of communication for a large sector of national and global society during the recent COVID-19 pandemic.
+Modern streaming services are fundamental instruments in today's industries, institutions, and every day life. Live video conferencing and streaming services became the principal mediums of communication for a large sector of national and global society during the recent COVID-19 pandemic, thus exemplifying the crucial role that these services now have. Current advances in network speed and digital technology have enabled these services to become commonplace in professional, academic, and recreational contexts. Therefore, there has been increased interest in ensuring a high quality of experience (QoE) for these services.
 
-The recent COVID-19 pandemic exemplified the role of video conferencing and live streaming services in today's society. Current advances in network speed and digital technology have enabled these services to become commonplace in professional, academic, and recreational contexts. Therefore, there has been increased interest in ensuring a high quality of experience (QoE) for these services.
+One of the main issues affecting the QoE of video conferencing and live streaming services are video artifacts, as mentioned in \cite{Vranjes2018, Korhonen2018}. In \cite{Greengrass2009}, video artifacts, or simply artifacts, are defined as distortions in the images displayed to the user with respect to the original captured images. According to \cite{Vranjes2018}, artifacts are primarily caused by errors or loss of data in the transmission of the video over the network, or by losses caused during video compression.
 
-One of the main issues affecting the QoE of video conferencing and live streaming services is video artifacts, as mentioned in \cite{Vranjes2018, Korhonen2018}. In \cite{Greengrass2009}, video artifacts, or simply artifacts, are defined as distortions in the images displayed to the user with respect to the original captured images. According to \cite{Vranjes2018}, artifacts are primarily caused by errors or loss of data in the transmission of the video over the network, or by losses caused during video compression. Figure \ref{fig:1.1} compares two versions of the same image. Figure \ref{fig:1.1.a} contains no video artifacts and Figure \ref{fig:1.1.b} contains video artifacts due to packet loss.
+Figure \ref{fig:lossy_system} illustrates the basic structure of a lossy video system. In order to send video through a network, the video gets encoded into network packets, then sent through a transmission channel where the losses occur, then decoded into video with artifacts. Figure \ref{fig:frame_comparison} compares two versions of the same image. Figure \ref{fig:frame_comparison.a} contains no video artifacts and Figure \ref{fig:frame_comparison.b} contains video artifacts due to packet loss.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{lossy_system}
+  
+  \caption{Lossy video transmission system}
+  \label{fig:lossy_system}
+
+\end{figure}
 
 \begin{figure} [!h]
   \centering
@@ -25,120 +35,88 @@ One of the main issues affecting the QoE of video conferencing and live streamin
     \centering
     \includegraphics[width=\textwidth]{imgs_27}
     \caption{Frame with no video artifacts}
-    \label{fig:1.1.a}
+    \label{fig:frame_comparison.a}
   \end{subfigure}
   \hfill
   \begin{subfigure}[t]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{imgs_with_loss_27}
     \caption{Frame with video artifacts due to packet loss}
-    \label{fig:1.1.b}
+    \label{fig:frame_comparison.b}
   \end{subfigure}
   
   \caption{Comparison between a video frame with no artifacts and a video frame with artifacts caused by random h264 packet loss.}
-  \label{fig:1.1}
+  \label{fig:frame_comparison}
 
 \end{figure}
 
-There are methods to solve transmission errors in the transport layer or even in the video syntax layer, as mentioned in \cite{Sanyal2021}. In these cases, information is available on how the video packets are encoded, which simplifies the task of error detection and correction. When the user only has the decoded and decompressed information, it is necessary to use methods for artifact detection and correction that only have the pure video information, such as those of \cite{Vranjes2018, Sanyal2021,Goodall2019}. These methods are referred to as ``reference-free methods''.
+There are methods to correct transmission errors in the transport layer or even in the video syntax layer, as mentioned in \cite{Sanyal2021}. In these cases, information is available on how the video packets are encoded, which simplifies the task of error detection and correction. When the user only has the decoded and decompressed information, it is necessary to use methods for artifact detection and correction that only have the raw video information, such as those of \cite{Vranjes2018, Sanyal2021,Goodall2019}. These methods are referred to as ``no-reference methods''.
 
-Video artifacts result in loss of information from the original video. In video conferencing and live streaming applications, it is not possible to recover the lost data without affecting the user's QoE. In order to correct video artifacts, reference-free methods must infer the lost data. The process of restoring unknown areas of an image is called ``video restoration'' \cite{Li2022, Zhou2021}. Video restoration, or simply restoration, is commonly used to remove the presence of objects in a video or image, but can be used to reconstruct areas of an image affected by video artifacts, as is done in ``video restoration'' \cite{Dong2023, Brenes2022}.
+Video artifacts result in loss of information from the original video. In video conferencing and live streaming applications, it is not possible to recover the lost data without affecting the user's QoE. In order to correct video artifacts, no-reference methods must infer the lost data. The process of restoring unknown areas of an image is called ``video inpainting'' \cite{Li2022, Zhou2021}. Video inpainting, or simply inpainting, is commonly used to remove the presence of objects in a video or image, but can be used to reconstruct areas of an image affected by video artifacts, as is done in \cite{Dong2023, Brenes2022}.
 
-Modern restoration algorithms use machine learning models. The restorers of \cite{Li2022, Zhou2021, Liu2021} use ``transformers''. Transformers are machine learning models with outstanding results for signal reconstruction tasks, but they are expensive in both time and processing power. In order to optimize the performance of these models, the use of hardware accelerators is required, the most common being the GPU.
+Modern inpainting algorithms use machine learning models. The inpainters of \cite{Li2022, Zhou2021, Liu2021} use ``transformers''. Transformers are machine learning models with outstanding results for signal restoration tasks, but they are slow and require signficant processing power. GPUs and other hardware accelerators are used in order to optimize the performance of these models.
 
-Restoration models such as \cite{Li2022} require binary masks to identify the areas to be reconstructed. For this reason, the location of video artifacts must be detected and binary masks must be generated and then used in the image reconstruction stage.
+Inpainting models such as \cite{Li2022} require binary masks to identify the areas to be reconstructed. For this reason, the location of video artifacts must be detected and binary masks must be generated and then used in the image restoration stage.
 
-Classifications of different types of artifacts by packet loss exist \cite{Greengrass2009, Glavota2016}. These studies describe the statistical properties of video artifacts. For example, certain video artifacts tend to have high-contrast vertical and horizontal edges that can be detected by high-pass filters. In the MPEG and H.26x video compression standards, the pixels of an image are grouped into ``macroblocks'', which are groups of $16 \times 16$ pixels in the image. Losses of packets containing macroblock information result in artifacts with well-defined edges \cite{Vranjes2019, Glavota2018}.
+\cite{Greengrass2009, Glavota2016} classify the various types of artifacts generated by packet loss. These studies also describe the statistical properties of video artifacts. For example, certain video artifacts tend to have high-contrast vertical and horizontal edges that can be detected by high-pass filters. In the MPEG and H.26x video compression standards, the pixels of an image are grouped into ``macroblocks'', which are groups of $16 \times 16$ pixels in the image. Losses of packets containing macroblock information result in artifacts with well-defined edges \cite{Vranjes2019, Glavota2018}.
 
-Methods for video artifact detection from \cite{Vranjes2018, Glavota2018} focus on filtering algorithms that do not involve machine learning. These methods can reach processing more than 30 video frames per second counting only CPU resources, but they oversimplify the characteristics of video artifacts and fail to achieve high detection rates. There are also artifact detection methods using neural networks, such as those of \cite{Goodall2019, Rajasekar2020}. These methods generalize better than filtering algorithms, but are more resource-heavy and require accelerators, such as GPUs, to achieve speeds comparable to filtering algorithms.
+The artifact detection methods from \cite{Vranjes2018, Glavota2018} focus on filtering algorithms that do not involve machine learning. These methods can process standard definition video at 30 frames per second without GPU acceleration, but they oversimplify the characteristics of video artifacts and fail to perform well on the artifact detection task. The detectors of \cite{Goodall2019, Rajasekar2020} use neural network classifiers. These methods generalize better than filtering algorithms, but they require GPU accelerators in order to achieve comparable framerates with the filtering algorithms.
 
-During 2022, SIPLab developed the dispTEC2-2022 project in conjunction with the company RidgeRun for the restoration of video with packet loss artifacts. The project was developed on Nvidia's Jetson TX2. This system has a 256 CUDA-core GPU, 4 ARM CPUs and 2 Denver CPUs. The development of the image reconstruction stage of dispTEC2-2022 is detailed in \cite{Brenes2022}. This model uses the GPU in its entirety. Brenes' reconstruction model requires binary masks to locate artifacts in the input images and the project in general still lacks an artifact detection method.
-
-\section{The 2022 dispTEC project}
+\section{The dispTEC2-2022 project}
 \label{sec:intro_disptec}
 
-\section{Video Artifact Detection}
+During 2022, RidgeRun LLC and SIPLab developed the dispTEC2-2022 project with the objective of building a Video Restoration System using DeepLearning. The project was developed on Nvidia's Jetson TX2. This system has a 256 CUDA-core GPU, 4 ARM CPUs and 2 Denver CPUs. The development of the image restoration stage of dispTEC2-2022 is detailed in \cite{Brenes2022}.
+
+The resulting system was capable of processing a video frame by frame. For each frame it could simulate randomly linear H264 packet losses, generate a binary detection mask based on the ground truth artifact measure, and then feed it along with the lossy frame into an inpainter transformer to produce a restored frame. \cite{Brenes2022} optimized the model pytorch and CUDA, as well as a number of arquitectural optimizations. He finally concluded that the restoration system could reach a framerate from 0.8 to 1.67 frames per second on the Nvidia Jetson TX2.
+
+However, this system cannot be used in practice because it relies on knowing the original frames in order to generate the binary detection masks. The system requires an artifact detector that can generate the masks from the lossy frames alone.
+
+\section{The Artifact Detector Problem}
 \label{sec:intro_problem}
 
-One objective of video artifact correction in video conferencing and live streaming applications is to ensure high QoE for the end user. In addition, video artifact correction has an artifact detection stage and an artifact restoration stage. The trade-off between the computational cost of these processes and the QoE requirements for the end user complicates the development of a video artifact correction system.
+The dispTEC2-2022 Video Restoration System concluded without a proper artifact detector. Part of dispTEC2-2022 entailed the search and development of an apropiate artifact detector for the system. The artifact detector was expected to run on the CPU alone, in order not to interfere with the CUDA-accelerated inpainting model. As a first approach, the dispTEC2-2022 team implemented the Packet Loss Detection Algorithm (PLDA) from \cite{Vranjes2018}. When testing the algorithm inside a gstreamer element, the algorithm could process a 720p video at $23,0$ frames per second.  After extensive testing of the algorithm using the Non-dominated Sorting Genetic Algorithm (NSGA-II), the dispTEC2-2022 team found no suitable parameters that allowed the detector to perform well on the detection task.
 
-Quality criteria must be established to determine if the artifact correction process performs adequately. The quality perceived by the end user depends on at least two criteria: the speed of the final video and the image quality in the final video.
+The dispTEC2-2022 team also developed a second artifact detection approach based on Random Decision Forests (RDF) \cite{Breiman2001}. In this approach, the RDF classifiers operated directly on each raw video frame and could achieve slightly better detection results than a random classifier. When testing the RDF approach inside a gstreamer element, the algorithm could process 720p video at $26,6$ frames per second.
 
-To determine an appropriate video speed criterion, Zoom is considered as an example of a video conferencing application. According to \cite{ZoomSupport}, Zoom recommends using the application at a resolution of $1280 \times 720$ pixels and at 30 frames per second. Under this recommendation, an obstacle facing artifact detection and restoration processing is to manage to operate on frames of $1280 \times 720$ pixels at a rate of 30 frames per second. In terms of processing time, each frame must be processed in about 33 ms. For the purposes of this paper, this processing speed is referred to as ``real time''.
+These results suggested that the RDF classifers were capable of learning artifact detection from the raw frame information. These results also suggested that the algorithm could be optimized to reach a framerate of $30$ frames per second.
 
-For each frame, it is necessary to detect the locations of video artifacts and then perform the restoration process. For the total processing to happen in real time, both the detection stage and the restoration stage must take even less time than 33 ms per frame.
+\todo{Find PLDA framerate and metrics}
+\todo{Find RDF framerate and metrics}
 
-Restoration processing, which relies on the use of neural networks, requires the use of hardware acceleration to achieve real-time processing. Therefore, consideration must be given to the resources available on the equipment on which video artifact correction is performed.
-
-If video artifact correction occurs on the same device, the detection process must share resources with the restoration process. Considering that the restoration process requires an accelerator, it must be considered that the resources available for the detection process are limited.
-
-The quality of the final video depends on both the effectiveness of the detection process and the capability of the restoration process. The effectiveness of the detection process can be measured through the metrics of accuracy and completeness. Using the definitions of \cite{ScikitLearn}, accuracy is the ratio of the number of correct detections to the number of total detections. Completeness is the ratio between the number of correct detections and the number of detections that should ideally be obtained. To ensure a high quality of artifact detection, the accuracy and completeness criteria of the detection method must be considered.
-
-The algorithmic complexity of the detection method directly affects the processing power required to perform the detection. The resources available for detection affect both the speed and the processing power available for detection. Therefore, the trade-off between available resources, speed of detection, and quality of detection must be considered.
-
-The work of \cite{Brenes2022} performs the image restoration process and runs on an Nvidia Jetson TX2. It uses the entire GPU to run. This job lacks an artifact detector to identify the image areas to be restored.
-
-No existe un método de detección de artefactos de video para ser utilizado en restauración de video en tiempo real que considere el compromiso entre la administración de recursos disponibles en el equipo a emplear, la velocidad a tiempo real que se desea alcanzar y la calidad del método de detección.
-
-There is no video artifact detection method for use in real-time video restoration that considers the trade-off between the management of available resources in the equipment to be used, the desired real-time speed and the quality of the detection method.
-
-\section{Random Forest Detector}
+\section{Rangerx}
 \label{sec:intro_detector}
 
-The most appropriate solution to the video artifact detection problem is the implementation of a Random Decision Forest. Forests have advantages over the other possible solutions given the speed, resource and quality constraints that must be considered. Filtering algorithms are resource efficient and fast, but they are limited in their ability to generalize to a wide variety of artifacts, so they do not have the best detection quality. Neural networks are powerful algorithms and result in the best detection results, but they consume more resources than are available for artifact detection. If neural networks are run with limited resources, the processing time increases significantly. Random Decision Forests are capable of generalizing detection tasks with \cite{Keskin2012} images, as well as being efficient in resource uses and speed. For this reason Random Decision Forests are the most appropriate solution for the problem to be solved.
+The dispTEC2-2022 Video Restoration System aimed to restore video frame by frame in real-time from a video with artifacts. Figure \ref{fig:restoration_system_overview} describes the general structure of the system.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{video_inpainter_general}
+  
+  \caption{Video restoration system overview.}
+  \label{fig:restoration_system_overview}
+
+\end{figure}
+
+In order to achieve this goal, Figure \ref{fig:restoration_system_steps} shows that the system is composed of the Artifact Detection System and the Inpaining System. The Artifact Detection System takes the frames with artifacts and generates binary detection masks. The Inpainting System takes the frame with artifacts and the detection masks and generates the restored video frames.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{video_inpainter_steps}
+  
+  \caption{Video restoration process. }
+  \label{fig:restoration_system_steps}
+
+\end{figure}
+
+This project proposes Rangerx, a new Artifact Detection System. Rangerx aims to improve over the dispTEC2-2022 detection system by expanding the training dataset, redesigning and optimizing the feature extraction strategy, and replacing the RDF backend with the optimized Ranger C++ Core Library.
+
+Random Decision Forests are subject to overfitting when training with small, highly self correlated datasets \cite{Breiman2001}. Rangerx expands the dataset with diverse video content in order to reduce the RDF detector overfitting.
+
+The dispTEC2-2022 research found that RDF detectors could learn from raw image data. However, the feature extraction strategy can be improved by considering some of the statistical properties of artifacts described in \cite{Vranjes2019, Glavota2018}. Rangerx filters the raw image data to detect high contrast vertical and horizontal borders, then generates 132 statistical features from the filtered results.
+
+Random Decision Forests agregate the results of a set of independent Decision Tree Classifiers. The dispTEC2-2022 RDF library ran the individual classifers consecutivelly. In contrast, the Ranger C++ Core Library runs the individual classifiers concurrently in seperate threads. Rangerx replaces the dispTEC2-2022 RDF backend with Ranger in order to improve the detection speed.
 
 \section{Project objectives and document structure}
 \label{sec:intro_objectives}
-
-\section{Introduction Outline}
-\label{sec:intro_outline}
-
-\begin{enumerate}
-  \item Hook: Convince reader that real time video transmission is important and interesting. The idea being that these are used everywhere nowdays.
-  \item Then make the argument that because of this, it is important to assure a good QoS.
-  \item Then talk about possible challenges to QoS. Here might be the place to mention macroblock errors. Consider justifying that in some contexts, only the raw stream is obtained.
-  \item Then talk about possible solutions to problem.
-  \item Perhaps use a few paragraphs to detail how correction is broken down into detection, then repainting.
-\end{enumerate}
-
-\subsection{Antecedentes}
-
-\begin{enumerate}
-  \item Introduce dispTEC2 - What is it? What was it trying to accomplish
-  \item Here might be a good place for the complete block diagram
-  \item Explain the challenges in designing for the TX2 and how dispTEC2 decided to face them.
-  \item Explain the work done in inpainting and mention Greivin's results
-  \item Explain the work done in decoding and give some results
-  \item Explain challenges in decoder
-\end{enumerate}
-
-\subsection{Planteamiento del problema}
-
-\begin{enumerate}
-  \item This part may link with with previous section, continuing off the challenges in the decoder
-  \item Perhaps here I can use diagrams to be clear with every challenge
-  \item Address resource challenges, why can detection only use CPU?
-  \item Address performance challenges, why must it run at 30 fps?
-  \item Address previous work challenges with using PLDA algorithm and such
-  \item Finally, sinthetize the problem
-\end{enumerate}
-
-\subsection{Propuesta de solución}
-
-\begin{enumerate}
-  \item Here introduce a variety of different solutions for this problem
-  \item Introduce the advantages and disadvantages of each one
-  \item Perhaps talk about using detection algorithms
-  \item Then talk about using neural network
-  \item Then talk about other machine learning alternatives
-  \item Finally, talk about how RDFs are the best solution for my specific situation
-  \item Use block diagram to show design
-  \item 
-\end{enumerate}
-
-\subsection{Objetivos y estructura del documento}
-
-\begin{enumerate}
-  \item Here I can almost use the same objectives from project proposal
-\end{enumerate}
-
