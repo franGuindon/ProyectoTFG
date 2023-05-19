@@ -24,6 +24,11 @@ version_major = version_arr[0].to_int()
 version_minor = version_arr[1].to_int()
 version_micro = version_arr[2].to_int()
 
+# Compiler
+cc = meson.get_compiler('cpp')
+cpu_family = build_machine.cpu_family()
+assert(cpu_family == 'x86_64')
+
 # Project dependencies
 project_deps = []
 
