@@ -42,6 +42,12 @@ projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/in
 
 cpp_args = ['-DHAVE_CONFIG_H']
 
+if cpu_family == 'x86_64'
+  cpp_args += ['-mavx']
+else
+  cpp_args += ['-mavx']
+endif
+
 developer_mode = get_option('developer-mode')
 if developer_mode
   pre_commit = find_program('pre-commit', required : true, native : true)
