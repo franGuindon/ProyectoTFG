@@ -48,6 +48,8 @@ else
   cpp_args += ['-mavx']
 endif
 
+add_global_arguments(cpp_args, language : 'cpp')
+
 developer_mode = get_option('developer-mode')
 if developer_mode
   pre_commit = find_program('pre-commit', required : true, native : true)
