@@ -45,7 +45,7 @@ cpp_args = ['-DHAVE_CONFIG_H']
 
 if cpu_family == 'x86_64'
   cpp_args += ['-mavx']
-else
+else if cpu_family == 'aarch64'
   cpp_args += ['-mavx']
 endif
 
