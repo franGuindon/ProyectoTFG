@@ -24,6 +24,12 @@ version_major = version_arr[0].to_int()
 version_minor = version_arr[1].to_int()
 version_micro = version_arr[2].to_int()
 
+# Compiler
+cc = meson.get_compiler('cpp')
+cpu_family = build_machine.cpu_family()
+message(cpu_family)
+assert(cpu_family == 'x86_64' or cpu_family == 'aarch64')
+
 # Project dependencies
 project_deps = []
 
@@ -36,6 +42,18 @@ project_deps += gstapp_dep
 projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/include')
 
 cpp_args = ['-DHAVE_CONFIG_H']
+
+if cpu_family == 'x86_64'
+  cpp_args += ['-mavx -O3']
+elif cpu_family == 'aarch64'
+  cpp_args += ['-march=armv8-a', '-mcpu=cortex-a57', '-O3']
+  # cpp_args += ['-mfpu=neon -mcpu=cortex-a9 -O3']
+  # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O3']
+  # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O2 -ftree-vectorize']
+  # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O3 -ftree-vectorize']
+endif
+
+add_global_arguments(cpp_args, language : 'cpp')
 
 developer_mode = get_option('developer-mode')
 if developer_mode
