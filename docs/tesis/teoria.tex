@@ -1,6 +1,24 @@
 \chapter{Theoretical Framework}
 \label{ch:marco}
 
+\section{The Amdahl Virtual Machine}
+\label{sec:theory_amdahl}
+  
+The School of Electronic Engineering disposes of a large server for students, professors, and researchers. Within this server, resources can be allocated in a variety of ways to suit different performance needs. Amdahl is a virtual machine that runs within the school's server. Amdahl emulates an x86 32 core machine with 62.8Gb of memory available to the main running process. Table \ref{tab:cpu-info} shows Amdahl's CPU information, in particular the speed. Amdahl provides an optimized CPU environment to train the Random Forest classifiers developed in this project. Amdahl was capable of loading and training with a complete dataset of 19 sets of 200 720p frames, this generated in total 12745200 training examples.
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Model Name} & Intel(R) Xeon(R) CPU E5-4667 v3 @ 2.00GHz \\
+    \hline
+    \textbf{CPU MHz} & 1995.379 \\
+    \hline
+  \end{tabular}
+  \caption{Amdahl's CPU Information. All 32 cores are identical.}
+  \label{tab:cpu-info}
+\end{table}
+
 \section{Theoretical Framework Outline}
 
 \begin{enumerate}
