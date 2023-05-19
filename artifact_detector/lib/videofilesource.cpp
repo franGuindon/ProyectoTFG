@@ -53,10 +53,9 @@ VideofileSource::~VideofileSource() { freeResources(); }
 ReturnValue VideofileSource::openFile() {
   gst_init(0, 0);
   gst_pipeline_ = gst_parse_launch(
-      format(
-          "filesrc location=%s ! qtdemux ! video/x-h264, format=I420 ! "
-          "h264parse ! avdec_h264 ! appsink sync=false max-buffers=5 name=%s",
-          file_.c_str(), gst_sink_name_)
+      format("filesrc location=%s ! decodebin ! video/x-raw, format=I420 ! "
+             "appsink sync=false max-buffers=5 name=%s",
+             file_.c_str(), gst_sink_name_)
           .c_str(),
       &gst_error_);
 
