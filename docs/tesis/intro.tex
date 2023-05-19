@@ -67,7 +67,7 @@ The artifact detection methods from \cite{Vranjes2018, Glavota2018} focus on fil
 
 During 2022, RidgeRun LLC and SIPLab developed the dispTEC2-2022 project with the objective of building a Video Restoration System using DeepLearning. The project was developed on Nvidia's Jetson TX2. This system has a 256 CUDA-core GPU, 4 ARM CPUs and 2 Denver CPUs. The development of the image restoration stage of dispTEC2-2022 is detailed in \cite{Brenes2022}.
 
-The resulting system was capable of processing a video frame by frame. For each frame it could simulate randomly linear H264 packet losses, generate a binary detection mask based on the ground truth artifact measure, and then feed it along with the lossy frame into an inpainter transformer to produce a restored frame. \cite{Brenes2022} optimized the model pytorch and CUDA, as well as a number of arquitectural optimizations. He finally concluded that the restoration system could reach a framerate from 0.8 to 1.67 frames per second on the Nvidia Jetson TX2.
+The resulting system was capable of processing a video frame by frame. For each frame it could simulate randomly linear H264 packet losses, generate a binary detection mask based on the ground truth artifact measure, and then feed it along with the lossy frame into an inpainter transformer to produce a restored frame. \cite{Brenes2022} optimized the model with pytorch and CUDA, as well as a number of arquitectural optimizations. He finally concluded that the restoration system could reach a framerate from 0.8 to 1.67 frames per second on the Nvidia Jetson TX2.
 
 However, this system cannot be used in practice because it relies on knowing the original frames in order to generate the binary detection masks. The system requires an artifact detector that can generate the masks from the lossy frames alone.
 
@@ -76,7 +76,7 @@ However, this system cannot be used in practice because it relies on knowing the
 
 The dispTEC2-2022 Video Restoration System concluded without a proper artifact detector. Part of dispTEC2-2022 entailed the search and development of an apropiate artifact detector for the system. The artifact detector was expected to run on the CPU alone, in order not to interfere with the CUDA-accelerated inpainting model. As a first approach, the dispTEC2-2022 team implemented the Packet Loss Detection Algorithm (PLDA) from \cite{Vranjes2018}. When testing the algorithm inside a gstreamer element, the algorithm could process a 720p video at $23,0$ frames per second.  After extensive testing of the algorithm using the Non-dominated Sorting Genetic Algorithm (NSGA-II), the dispTEC2-2022 team found no suitable parameters that allowed the detector to perform well on the detection task.
 
-The dispTEC2-2022 team also developed a second artifact detection approach based on Random Decision Forests (RDF) \cite{Breiman2001}. In this approach, the RDF classifiers operated directly on each raw video frame and could achieve slightly better detection results than a random classifier. When testing the RDF approach inside a gstreamer element, the algorithm could process 720p video at $26,6$ frames per second.
+The dispTEC2-2022 team also developed a second artifact detection approach based on Random Decision Forests (RDF) \cite{Breiman2001}. In this approach, the RDF classifiers operated directly on each raw video frame and could achieve slightly better detection results than a random classifier. This classifier was trained on 200 frames from a training dataset containing only 2 video content types. When testing the RDF approach inside a gstreamer element, the algorithm could process 720p video at $26,6$ frames per second.
 
 These results suggested that the RDF classifers were capable of learning artifact detection from the raw frame information. These results also suggested that the algorithm could be optimized to reach a framerate of $30$ frames per second.
 
@@ -86,7 +86,7 @@ These results suggested that the RDF classifers were capable of learning artifac
 \section{Rangerx}
 \label{sec:intro_detector}
 
-The dispTEC2-2022 Video Restoration System aimed to restore video frame by frame in real-time from a video with artifacts. Figure \ref{fig:restoration_system_overview} describes the general structure of the system.
+The dispTEC2-2022 Video Restoration System is aimed at restoring video with artifacts frame by frame. Figure \ref{fig:restoration_system_overview} describes the general structure of the system and displays an example clip of an input frame with artifacts and the expected output clip from the system.
 
 \begin{figure} [!h]
   \centering
@@ -98,7 +98,7 @@ The dispTEC2-2022 Video Restoration System aimed to restore video frame by frame
 
 \end{figure}
 
-In order to achieve this goal, Figure \ref{fig:restoration_system_steps} shows that the system is composed of the Artifact Detection System and the Inpaining System. The Artifact Detection System takes the frames with artifacts and generates binary detection masks. The Inpainting System takes the frame with artifacts and the detection masks and generates the restored video frames.
+In order to achieve this goal, Figure \ref{fig:restoration_system_steps} shows that the system is composed of the Artifact Detection System and the Inpainting System. The Artifact Detection System takes the frames with artifacts and generates binary detection masks. The Inpainting System takes the frame with artifacts and the detection masks and generates the restored video frames.
 
 \begin{figure} [!h]
   \centering
@@ -120,3 +120,13 @@ Random Decision Forests agregate the results of a set of independent Decision Tr
 
 \section{Project objectives and document structure}
 \label{sec:intro_objectives}
+
+The aim of this project is to develop Rangerx, a real-time Artifact Detection System that can generate binary detection masks from video with artifacts. This system should improve over the dispTEC2-2022 system. This project focuses on video artifacts produced by decoding H264 packet loss. The system should run on an NVIDIA Jetson TX2 without using the GPU, which should be verified with CPU and GPU profiles. The training dataset should be expanded from the original 200 frames and 2 video content types to at least 18 video content types with 200 frames each. The new Artifact Detection System should achieve at least 70\% in both precision and recall detection metrics. The new system should provide a testing tool to verify these metrics. The new system should achieve a framerate of 30 frames per second. The new system should also provide a testing tool to verify the framerate.
+
+The first milestone in the development of Rangerx is the expansion of the training dataset. This not only requires obtaining new video, but also requires procesing the videos to generate the ground truth binary masks that will be used as labels in the training procedure. \cite{Brenes2022} provides a similar tool, which can be used as a starting point. The final dataset should contain 18 video content types with at least 3 different illumination types.
+
+The second milestone in the development of Rangerx is implementing the training procedure, the feature selection and the replacement of the RDF backend. These changes are aimed at improving the precision and recall detection metrics up to 70\%. Rangerx should provide a tool that can verify the detection performance against a test dataset.
+
+The third milestone in the development of Rangerx is optimizing the feature selection and detection procedures in order to achieve real-time performance. Rangerx should provide a tool that can verify a framerate of 30 frames per second while testing the system on an input video.
+
+The following chapters explore the project's main theoretical aspects, a detailed description of Rangerx and the final results. Chapter \ref{ch:marco} explores several theoretical concepts used in the development of Rangerx. Chapter \ref{ch:solucion} describes Rangerx in detail. Chapter \ref{chp:results} discusses Rangerx's final results. Chapter \ref{chp:conclusions} summarizes the project's main accomplishments, as well as future work related to Rangerx and dispTEC2-2022's Video Restoration System.
