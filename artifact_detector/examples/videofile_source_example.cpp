@@ -38,8 +38,9 @@ int main(int argc, char** argv) {
 
     printf("Pulled frame: %p %ldx%ld (%ld)\n", frame.data, frame.width,
            frame.height, frame.pts);
-    save_frame("test_frame.1920.1080.i420", frame.data,
-               frame.height * frame.width);
+    save_frame("test_frame." + std::to_string(frame.width) + "." +
+                   std::to_string(frame.height) + ".i420",
+               frame.data, frame.height * frame.width);
 
     ret = input_video->pushFrame(&frame);
     if (ReturnCode::Success != ret.code) {
