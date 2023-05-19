@@ -46,7 +46,7 @@ cpp_args = ['-DHAVE_CONFIG_H']
 if cpu_family == 'x86_64'
   cpp_args += ['-mavx -O3']
 elif cpu_family == 'aarch64'
-  cpp_args += ['-march=armv8-a+simd -O3']
+  cpp_args += ['-march=armv8-a -mcpu=cortex-a57 -O3']
   # cpp_args += ['-mfpu=neon -mcpu=cortex-a9 -O3']
   # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O3']
   # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O2 -ftree-vectorize']
