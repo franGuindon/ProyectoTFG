@@ -1,4 +1,43 @@
-\chapter{Resultados y análisis}
+\chapter{Results and Analysis}
+\label{chp:results}
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+    \textbf{ID} & \textbf{Name} & \textbf{\# Sets} & \textbf{Description} \\
+    \hline
+    1 & Walking Tour & 19 & A tour of the numerous sights in Valencia, Spain. \\
+    \hline
+    2 & Dataset B & 5 & Dataset B is a collection of images captured from various sources. \\
+    \hline
+    3 & Dataset C & 20 & Dataset C includes sensor readings from multiple sensors. \\
+    \hline
+  \end{tabular}
+  \caption{Dataset Information}
+  \label{tab:dataset-info}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{Dataset} & \multicolumn{2}{c|}{\textbf{Confusion Matrix}} & \textbf{Precision} & \textbf{Recall} \\
+    \hline
+    \multirow{2}{*}{1}           & 3717218 & 5311 &
+    \multirow{2}{*}{} &
+    \multirow{2}{*}{Recall 1}   \\
+    \cline{2-3}                  &      95 & 3712001 & & \\
+    \hline
+    \multirow{2}{*}{Dataset 2} & True Positive & False Negative &
+    \multirow{2}{*}{Precision 2} &
+    \multirow{2}{*}{Recall 2} \\
+    \cline{2-3}                & False Positive & True Negative & & \\
+    \hline
+  \end{tabular}
+  \caption{Confusion Matrix, Precision, and Recall for Different Datasets}
+  \label{tab:confusion-matrix}
+\end{table}
 
 En este capítulo se exponen los diseños experimentales realizados para
 comprobar el funcionamiento correcto del sistema. Por ejemplo, si se
