@@ -27,7 +27,8 @@ version_micro = version_arr[2].to_int()
 # Compiler
 cc = meson.get_compiler('cpp')
 cpu_family = build_machine.cpu_family()
-assert(cpu_family == 'x86_64')
+message(cpu_family)
+assert(cpu_family == 'x86_64' or cpu_family == 'aarch64')
 
 # Project dependencies
 project_deps = []
