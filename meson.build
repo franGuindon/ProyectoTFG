@@ -44,9 +44,11 @@ projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/in
 cpp_args = ['-DHAVE_CONFIG_H']
 
 if cpu_family == 'x86_64'
-  cpp_args += ['-mavx']
-else if cpu_family == 'aarch64'
-  cpp_args += ['-mavx']
+  cpp_args += ['-mavx -O3']
+elif cpu_family == 'aarch64'
+  cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O3']
+  # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O2 -ftree-vectorize']
+  # cpp_args += ['-march=armv8-a-mcpu=cortex-a57 -O3 -ftree-vectorize']
 endif
 
 add_global_arguments(cpp_args, language : 'cpp')
