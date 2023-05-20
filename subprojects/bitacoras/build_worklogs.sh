@@ -21,14 +21,14 @@ export MAINFILE=${TGT}
 echo "bin/sh$ make clean && make && make clean"
 make clean && make && make clean
 
-echo "bin/sh$ cd ${CURRENT_DIRECTORY}"
-cd ${CURRENT_DIRECTORY}
-
-if [ ! -d ${WORKLOGS_DIRECTORY}/${TGT_OUT} ]
+if [ -d ${WORKLOGS_DIRECTORY}/${TGT_OUT} ]
 then
   echo "Target '${TGT}' construction failed"
   exit 1;
 fi
+
+echo "bin/sh$ cd ${CURRENT_DIRECTORY}"
+cd ${CURRENT_DIRECTORY}
 
 echo "bin/sh$ cp ${WORKLOGS_DIRECTORY}/${TGT_OUT} ${OUTPUT_DIRECTORY}"
 cp "${WORKLOGS_DIRECTORY}/${TGT_OUT}" ${OUTPUT_DIRECTORY}
