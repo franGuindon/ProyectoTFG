@@ -1,8 +1,10 @@
-\chapter{Random Forest Video Artifact Detector }
+\chapter{The Rangerx Artifact Detection System}
 \label{ch:solucion}
 
-\section{General Rangerx Structure}
+\section{Artifact Detection System Structure}
 \label{sec:sol_struct}
+
+The Artifact Detection System generates detection masks from frames with artifacts. These masks are white on macroblocks which contain artifacts and black on the remaining artifacts. Figure \ref{fig:detector_overview} illustrates the input frame with artifacts, which is processed by the system, and finally produces the detection masks.
 
 \begin{figure} [!h]
   \centering
@@ -14,6 +16,8 @@
 
 \end{figure}
 
+In order to achieve this, the Artifact Detection System must first extract features from the input frame. These features become the inputs to the RDF Classifier. The RDF Classifier outputs a prediction vector. The prediction vector is then mapped to the binary mask output. Figure \ref{fig:detector_steps} illustrates these steps.
+
 \begin{figure} [!h]
   \centering
   
@@ -24,13 +28,33 @@
 
 \end{figure}
 
+This structure was used in the dispTEC2-2022 RDF system. The Rangerx system maintains this structure and improves over the previous system by 
 
+\subsection{The Feature Extractor}
+\label{sec:sol_features}
+
+The feature extractor
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{extractor_steps}
+  
+  \caption{Feature extraction process. }
+  \label{fig:extractor_steps}
+
+\end{figure}
+
+\subsection{The RDF Classifier}
+\label{sec:sol_rdf}
+
+\subsection{The Mask Generatorr}
+\label{sec:sol_maskgen}
 
 \section{Training}
 \label{sec:sol_}
 
-\subsection{Generating }
-\label{sec:intro_problem}
+
 
 \section{Testing}
 \label{sec:intro_problem}
