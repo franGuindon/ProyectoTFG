@@ -13,3 +13,13 @@
 *.blg
 *.bcf
 *.bbl
+
+# Added by F.Guindon
+*.fls
+*.xml
+*.gz
+*.fdb_latexmk
+*ranger*
+*anteproyecto*
+*bitacoras
+semana_*.pdf
