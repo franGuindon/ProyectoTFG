@@ -1,0 +1,1152 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 13}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      %wed
+      17/5/23 & 0.5 h & Reunión de avance 13 & \\
+      17/5/23 & 4.5 h & Tesis & Terminando introducción \\
+      %thurs
+      18/5/23 & 4 h & & Envío de primera versión de la introducción \\
+      %fri
+      19/5/23 & 0 h & Task 3 & Descripción \\
+      %sat
+      20/5/23 & 4 h & Task 4 & Descripción \\
+      %sun
+      21/5/23 & 4 h & Task 5 & Descripción \\
+      %mon
+      22/5/23 & 4 h & Task 6 & Descripción \\
+      %tues
+      23/5/23 & 4 h & Task 7 & Descripción \\
+      %wed
+      24/5/23 & 0 h & Task 8 & Descripción \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Wednesday:}
+  \begin{lstlisting}
+    Meeting:
+    - Thesis Chapters 1,2,3
+    - Experiments with new dataset (add to resultados)
+  \end{lstlisting}
+
+  \begin{enumerate}
+    \item Worked on finishing introduction
+    \item Tested disptec work (Apendix A)
+    \item Result: 12,656 fps (using develop gstartifactdetector and perf, averaged over well over 100 frames)
+    \item This uses the RDF project as a backend
+    \item 11 trees, depth 10, 1980x1080 resolution
+    \item Quality ... ?
+    \begin{enumerate}
+      \item I need a tool that can simply take a video and hand out live results
+      \item Test getting the buffers and comparing them
+      \item Use gstreamer source (I can now fix it with my new gst trick)
+    \end{enumerate}
+    \item Framerate of same pipeline without detector element: 66,031 (Appendix B)
+    \item Framerate with PLDA using 1080p: 10,269 (Appendix C)
+    \item Framerate with PLDA using  720p: 23,037 (Appendix D)
+    \item Framerate with RDF using  720p: 26,585 (Appendix E)
+  \end{enumerate}
+
+  \subsection*{Thursday:}
+  \begin{enumerate}
+    \item Finished Thesis Introduction
+    \item Setup project in Jetson TX2.
+    \item Got installation list (also using docker to test) (Appendix G)
+    \item Trained some simple models using only single video snippet
+    \item Got training durations of around 36, 35, 34, 40 seconds (Appendix F)
+    \item All training tests yielded precision 1.00 and recall 1.00
+    \item Current prediction analyzer yields precision of 0.55 and recal of 0.02 even when testing same training data. This suggest a bug in the analyzer code.
+    \item Trained with 19 snips from video 0 and 1 snip from video 1. Obtained Precision 0.99 and Recall 1.00.
+  \end{enumerate}
+
+  \subsection*{Friday:}
+
+  \begin{enumerate}
+    \item Testing videofilesource with and without loss (
+      useful tool for loading video file into frames)
+    \item Writing 3.1 ... Need binary mask for diagram
+    \item Copy Greivin's code to get CPP ground truth
+    \item Encapsulate in function
+  \end{enumerate}
+
+  Todo:
+  \begin{enumerate}
+    \item Finish solution chapter
+    \begin{enumerate}
+      \item Add general solution description
+      \item Add feature extraction description
+      \item Add RDF classifier description
+      \item Add binary mask creation description
+      \item Add training procedure description
+      \item Add ground truth generation description
+    \end{enumerate}
+    \item Finish testing tool
+  \end{enumerate}
+
+  \subsection*{Saturday:}
+
+  \subsection*{Sunday:}
+
+
+\subsection*{Appendix A}
+
+\begin{lstlisting}
+  $\$$ GST_DEBUG=WARNING gst-launch-1.0 filesrc location= dataset/base_videos/disptec_day/pinares_1080p.MOV ! decodebin ! video/x-raw, width=1920, height=1080, format=I420 ! queue ! x264enc ! h264parse ! identity drop-probability=0.01 ! avdec_h264 ! 'video/x-raw, width=1920, height=1080, format=I420' ! queue ! artifactdetector modelpath= tfg/subprojects/disptec-2022/artifact_detection/assets/rf48_balanced_0.model upscale=true ! perf ! fakesink #xvimagesink sync=false
+  Setting pipeline to PAUSED ...
+  0:00:00.052842411 356874 0x55d8ccea8920 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+  Pipeline is PREROLLING ...
+  0:00:00.057958946 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type sowt
+  0:00:00.057974625 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type Lavf
+  0:00:00.058001218 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+  0:00:00.058055949 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 2
+  0:00:00.058072330 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux.c:13188:qtdemux_tag_add_str_full:<qtdemux0> Ignoring metadata entry with multiple text alternatives, reading only first one
+  0:00:00.058148481 356874 0x55d8cce47f00 WARN               structure gststructure.c:821:gst_structure_set_field: Trying to set empty string on taglist field 'application-name'. Please file a bug.
+  0:00:00.058166335 356874 0x55d8cce47f00 WARN                 qtdemux qtdemux.c:771:gst_qtdemux_pull_atom:<qtdemux0> atom has bogus size 18446744073709551615
+  Redistribute latency...
+  Redistribute latency...
+  Redistribute latency...
+  Redistribute latency...
+  Redistribute latency...
+  RandomForest.cpp: total tree number: 11
+  RandomForest.cpp: max depth of a single tree: 10
+  RandomForest.cpp: _classNum: 2
+  RandomForest.cpp: _isRegression: 0
+  INFO:
+  perf: perf0; timestamp: 155:11:29.314410810; bps: 0,000; mean_bps: 0,000; fps: 0,000; mean_fps: 0,000
+  Pipeline is PREROLLED ...
+  Setting pipeline to PLAYING ...
+  New clock: GstSystemClock
+  INFO:
+  perf: perf0; timestamp: 155:11:30.335387703; bps: 99532800,000; mean_bps: 49766400,000; fps: 12,733; mean_fps: 12,733
+  INFO:
+  perf: perf0; timestamp: 155:11:31.372999190; bps: 323481600,000; mean_bps: 141004800,000; fps: 12,529; mean_fps: 12,631
+  INFO:
+  perf: perf0; timestamp: 155:11:32.395843670; bps: 323481600,000; mean_bps: 186624000,000; fps: 12,710; mean_fps: 12,657
+  INFO:
+  perf: perf0; timestamp: 155:11:33.475652103; bps: 298598400,000; mean_bps: 209018880,000; fps: 12,965; mean_fps: 12,734
+  INFO:
+  perf: perf0; timestamp: 155:11:34.495449941; bps: 323481600,000; mean_bps: 228096000,000; fps: 12,748; mean_fps: 12,737
+  INFO:
+  perf: perf0; timestamp: 155:11:35.538763469; bps: 323481600,000; mean_bps: 241722514,286; fps: 13,419; mean_fps: 12,851
+  INFO:
+  perf: perf0; timestamp: 155:11:36.543734515; bps: 323481600,000; mean_bps: 251942400,000; fps: 12,936; mean_fps: 12,863
+  INFO:
+  perf: perf0; timestamp: 155:11:37.552423316; bps: 323481600,000; mean_bps: 259891200,000; fps: 11,897; mean_fps: 12,742
+  INFO:
+  perf: perf0; timestamp: 155:11:38.619606326; bps: 298598400,000; mean_bps: 266928872,727; fps: 12,182; mean_fps: 12,680
+  INFO:
+  perf: perf0; timestamp: 155:11:39.645759458; bps: 323481600,000; mean_bps: 271641600,000; fps: 12,669; mean_fps: 12,679
+  INFO:
+  perf: perf0; timestamp: 155:11:40.708216064; bps: 298598400,000; mean_bps: 273715200,000; fps: 12,236; mean_fps: 12,638
+  0:00:15.133483834 356874 0x7faf482ce810 ERROR                  libav :0:: reference picture missing during reorder
+  0:00:15.133528244 356874 0x7faf482ce810 ERROR                  libav :0:: reference picture missing during reorder
+  0:00:15.133533869 356874 0x7faf482ce810 ERROR                  libav :0:: reference picture missing during reorder
+  0:00:15.133540534 356874 0x7faf482ce810 ERROR                  libav :0:: Missing reference picture, default is 65882
+  0:00:15.133545280 356874 0x7faf482ce810 ERROR                  libav :0:: Missing reference picture, default is 65882
+  0:00:15.133550336 356874 0x7faf482ce810 ERROR                  libav :0:: Missing reference picture, default is 65882
+  INFO:
+  perf: perf0; timestamp: 155:11:41.746667339; bps: 323481600,000; mean_bps: 277269942,857; fps: 12,519; mean_fps: 12,628
+  0:00:15.444209674 356874 0x7faf482cf750 ERROR                  libav :0:: reference picture missing during reorder
+  0:00:15.444258054 356874 0x7faf482cf750 ERROR                  libav :0:: Missing reference picture, default is 65890
+  0:00:15.601886977 356874 0x55d8cce47a40 ERROR                  libav :0:: mmco: unref short failure
+  INFO:
+  perf: perf0; timestamp: 155:11:42.773432340; bps: 298598400,000; mean_bps: 278691840,000; fps: 12,661; mean_fps: 12,631
+  INFO:
+  perf: perf0; timestamp: 155:11:43.773686333; bps: 323481600,000; mean_bps: 281491200,000; fps: 12,997; mean_fps: 12,657
+  INFO:
+  perf: perf0; timestamp: 155:11:44.780508218; bps: 323481600,000; mean_bps: 283961223,529; fps: 12,912; mean_fps: 12,674
+  INFO:
+  perf: perf0; timestamp: 155:11:45.831156765; bps: 323481600,000; mean_bps: 286156800,000; fps: 12,373; mean_fps: 12,655
+  INFO:
+  perf: perf0; timestamp: 155:11:46.849698772; bps: 273715200,000; mean_bps: 285501978,947; fps: 11,782; mean_fps: 12,604
+  INFO:
+  perf: perf0; timestamp: 155:11:47.896505406; bps: 323481600,000; mean_bps: 287400960,000; fps: 12,419; mean_fps: 12,594
+  INFO:
+  perf: perf0; timestamp: 155:11:48.942923341; bps: 298598400,000; mean_bps: 287934171,429; fps: 12,423; mean_fps: 12,585
+  INFO:
+  perf: perf0; timestamp: 155:11:49.994243584; bps: 323481600,000; mean_bps: 289549963,636; fps: 12,365; mean_fps: 12,574
+  0:00:23.790811644 356874 0x55d8cce47a40 ERROR                  libav :0:: mmco: unref short failure
+  INFO:
+  perf: perf0; timestamp: 155:11:51.015644929; bps: 298598400,000; mean_bps: 289943373,913; fps: 12,728; mean_fps: 12,581
+  INFO:
+  perf: perf0; timestamp: 155:11:52.029581537; bps: 323481600,000; mean_bps: 291340800,000; fps: 12,821; mean_fps: 12,592
+  INFO:
+  perf: perf0; timestamp: 155:11:53.113690684; bps: 323481600,000; mean_bps: 292626432,000; fps: 12,914; mean_fps: 12,606
+  INFO:
+  perf: perf0; timestamp: 155:11:54.184952535; bps: 323481600,000; mean_bps: 293813169,231; fps: 13,069; mean_fps: 12,625
+  INFO:
+  perf: perf0; timestamp: 155:11:55.202509194; bps: 323481600,000; mean_bps: 294912000,000; fps: 12,776; mean_fps: 12,631
+  INFO:
+  perf: perf0; timestamp: 155:11:56.232643383; bps: 323481600,000; mean_bps: 295932342,857; fps: 12,620; mean_fps: 12,631
+  INFO:
+  perf: perf0; timestamp: 155:11:57.325643635; bps: 298598400,000; mean_bps: 296024275,862; fps: 11,894; mean_fps: 12,603
+  INFO:
+  perf: perf0; timestamp: 155:11:58.356904407; bps: 298598400,000; mean_bps: 296110080,000; fps: 12,606; mean_fps: 12,604
+  INFO:
+  perf: perf0; timestamp: 155:11:59.379308955; bps: 323481600,000; mean_bps: 296993032,258; fps: 12,715; mean_fps: 12,607
+  INFO:
+  perf: perf0; timestamp: 155:12:00.417976993; bps: 323481600,000; mean_bps: 297820800,000; fps: 13,479; mean_fps: 12,636
+  INFO:
+  perf: perf0; timestamp: 155:12:01.427347489; bps: 323481600,000; mean_bps: 298598400,000; fps: 12,879; mean_fps: 12,644
+  INFO:
+  perf: perf0; timestamp: 155:12:02.494496237; bps: 323481600,000; mean_bps: 299330258,824; fps: 13,119; mean_fps: 12,659
+  INFO:
+  perf: perf0; timestamp: 155:12:03.554067235; bps: 323481600,000; mean_bps: 300020297,143; fps: 12,269; mean_fps: 12,647
+  INFO:
+  perf: perf0; timestamp: 155:12:04.571261543; bps: 298598400,000; mean_bps: 299980800,000; fps: 12,780; mean_fps: 12,651
+  INFO:
+  perf: perf0; timestamp: 155:12:05.606583478; bps: 323481600,000; mean_bps: 300615956,757; fps: 12,556; mean_fps: 12,648
+  INFO:
+  perf: perf0; timestamp: 155:12:06.609665788; bps: 323481600,000; mean_bps: 301217684,211; fps: 12,960; mean_fps: 12,657
+  INFO:
+  perf: perf0; timestamp: 155:12:07.619117719; bps: 323481600,000; mean_bps: 301788553,846; fps: 12,878; mean_fps: 12,663
+  INFO:
+  perf: perf0; timestamp: 155:12:08.665965059; bps: 298598400,000; mean_bps: 302239843,902; fps: 12,418; mean_fps: 12,657
+  ^XINFO:
+  perf: perf0; timestamp: 155:12:09.695436331; bps: 323481600,000; mean_bps: 302745600,000; fps: 12,628; mean_fps: 12,656
+  ^Chandling interrupt.
+  Interrupt: Stopping pipeline ...
+  Execution ended after 0:00:41.262509521
+  Setting pipeline to NULL ...
+  Freeing pipeline ...  
+\end{lstlisting}
+
+\subsection*{Appendix B}
+
+\begin{lstlisting}
+$\$$ GST_DEBUG=WARNING gst-launch-1.0 filesrc location= dataset/base_videos/disptec_day/pinares_1080p.MOV ! decodebin ! video/x-raw, width=1920, height=1080, format=I420 ! queue ! x264enc ! h264parse ! identity drop-probability=0.01 ! avdec_h264 ! 'video/x-raw, width=1920, height=1080, format=I420' ! queue ! perf ! fakesink #xvimagesink sync=false
+Setting pipeline to PAUSED ...
+0:00:00.076870242 362682 0x55c6675c0800 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+Pipeline is PREROLLING ...
+0:00:00.081612312 362682 0x55c667565300 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type sowt
+0:00:00.081626215 362682 0x55c667565300 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type Lavf
+0:00:00.081646021 362682 0x55c667565300 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+0:00:00.081694284 362682 0x55c667565300 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 2
+0:00:00.081707780 362682 0x55c667565300 WARN                 qtdemux qtdemux.c:13188:qtdemux_tag_add_str_full:<qtdemux0> Ignoring metadata entry with multiple text alternatives, reading only first one
+0:00:00.081779354 362682 0x55c667565300 WARN               structure gststructure.c:821:gst_structure_set_field: Trying to set empty string on taglist field 'application-name'. Please file a bug.
+0:00:00.081794431 362682 0x55c667565300 WARN                 qtdemux qtdemux.c:771:gst_qtdemux_pull_atom:<qtdemux0> atom has bogus size 18446744073709551615
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+INFO:
+perf: perf0; timestamp: 156:23:05.568323182; bps: 0,000; mean_bps: 0,000; fps: 0,000; mean_fps: 0,000
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+INFO:
+perf: perf0; timestamp: 156:23:06.569728787; bps: 1542758400,000; mean_bps: 1542758400,000; fps: 63,910; mean_fps: 63,910
+INFO:
+perf: perf0; timestamp: 156:23:07.584529773; bps: 1617408000,000; mean_bps: 1580083200,000; fps: 65,037; mean_fps: 64,474
+0:00:03.597456647 362682 0x7fae92f63e60 ERROR                  libav :0:: reference picture missing during reorder
+0:00:03.597515961 362682 0x7fae92f63e60 ERROR                  libav :0:: reference picture missing during reorder
+0:00:03.597525441 362682 0x7fae92f63e60 ERROR                  libav :0:: reference picture missing during reorder
+0:00:03.597534968 362682 0x7fae92f63e60 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:03.597541568 362682 0x7fae92f63e60 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:03.597547281 362682 0x7fae92f63e60 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:03.658230898 362682 0x7fada02cd810 ERROR                  libav :0:: reference picture missing during reorder
+0:00:03.658286297 362682 0x7fada02cd810 ERROR                  libav :0:: Missing reference picture, default is 65890
+0:00:03.669785243 362682 0x55c667564a40 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:23:08.610551413; bps: 1741824000,000; mean_bps: 1633996800,000; fps: 69,199; mean_fps: 66,049
+0:00:05.161068270 362682 0x55c667564a40 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:23:09.611986422; bps: 1667174400,000; mean_bps: 1642291200,000; fps: 68,901; mean_fps: 66,762
+INFO:
+perf: perf0; timestamp: 156:23:10.615848887; bps: 1517875200,000; mean_bps: 1617408000,000; fps: 60,765; mean_fps: 65,563
+INFO:
+perf: perf0; timestamp: 156:23:11.661636718; bps: 1692057600,000; mean_bps: 1629849600,000; fps: 65,979; mean_fps: 65,632
+INFO:
+perf: perf0; timestamp: 156:23:12.666685641; bps: 1667174400,000; mean_bps: 1635181714,286; fps: 65,668; mean_fps: 65,637
+INFO:
+perf: perf0; timestamp: 156:23:13.668100743; bps: 1716940800,000; mean_bps: 1645401600,000; fps: 70,900; mean_fps: 66,295
+INFO:
+perf: perf0; timestamp: 156:23:14.669473485; bps: 1517875200,000; mean_bps: 1631232000,000; fps: 62,914; mean_fps: 65,919
+0:00:10.414912878 362682 0x55c667564a40 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:23:15.671359062; bps: 1567641600,000; mean_bps: 1624872960,000; fps: 61,883; mean_fps: 65,516
+INFO:
+perf: perf0; timestamp: 156:23:16.682849768; bps: 1766707200,000; mean_bps: 1637766981,818; fps: 71,182; mean_fps: 66,031
+^Chandling interrupt.
+Interrupt: Stopping pipeline ...
+Execution ended after 0:00:11.508787196
+Setting pipeline to NULL ...
+Freeing pipeline ...
+\end{lstlisting}
+
+\subsection*{Appendix C}
+
+\begin{lstlisting}
+$\$$ GST_DEBUG=WARNING gst-launch-1.0 filesrc location= dataset/base_videos/disptec_day/pinares_1080p.MOV ! decodebin ! video/x-raw, width=1920, height=1080, format=I420 ! queue ! x264enc ! h264parse ! identity drop-probability=0.01 ! avdec_h264 ! 'video/x-raw, width=1920, height=1080, format=I420' ! queue ! artifactdetect upscale=true ! perf ! fakesink #xvimagesink sync=false
+Setting pipeline to PAUSED ...
+0:00:00.053444778 362583 0x564f13d7c130 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+Pipeline is PREROLLING ...
+0:00:00.058462248 362583 0x564f13d19700 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type sowt
+0:00:00.058479231 362583 0x564f13d19700 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type Lavf
+0:00:00.058502333 362583 0x564f13d19700 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+0:00:00.058555977 362583 0x564f13d19700 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 2
+0:00:00.058571317 362583 0x564f13d19700 WARN                 qtdemux qtdemux.c:13188:qtdemux_tag_add_str_full:<qtdemux0> Ignoring metadata entry with multiple text alternatives, reading only first one
+0:00:00.058652254 362583 0x564f13d19700 WARN               structure gststructure.c:821:gst_structure_set_field: Trying to set empty string on taglist field 'application-name'. Please file a bug.
+0:00:00.058668739 362583 0x564f13d19700 WARN                 qtdemux qtdemux.c:771:gst_qtdemux_pull_atom:<qtdemux0> atom has bogus size 18446744073709551615
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+Redistribute latency...
+INFO:
+perf: perf0; timestamp: 156:21:43.877926382; bps: 0,000; mean_bps: 0,000; fps: 0,000; mean_fps: 0,000
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+INFO:
+perf: perf0; timestamp: 156:21:44.895933258; bps: 199065600,000; mean_bps: 199065600,000; fps: 9,823; mean_fps: 9,823
+INFO:
+perf: perf0; timestamp: 156:21:45.934703281; bps: 248832000,000; mean_bps: 223948800,000; fps: 10,589; mean_fps: 10,206
+INFO:
+perf: perf0; timestamp: 156:21:46.971280692; bps: 273715200,000; mean_bps: 240537600,000; fps: 10,612; mean_fps: 10,341
+INFO:
+perf: perf0; timestamp: 156:21:48.013437659; bps: 248832000,000; mean_bps: 242611200,000; fps: 10,555; mean_fps: 10,395
+INFO:
+perf: perf0; timestamp: 156:21:49.098819038; bps: 273715200,000; mean_bps: 248832000,000; fps: 10,135; mean_fps: 10,343
+INFO:
+perf: perf0; timestamp: 156:21:50.124231364; bps: 248832000,000; mean_bps: 248832000,000; fps: 10,727; mean_fps: 10,407
+INFO:
+perf: perf0; timestamp: 156:21:51.166873884; bps: 273715200,000; mean_bps: 252386742,857; fps: 10,550; mean_fps: 10,427
+INFO:
+perf: perf0; timestamp: 156:21:52.218509094; bps: 273715200,000; mean_bps: 255052800,000; fps: 10,460; mean_fps: 10,431
+INFO:
+perf: perf0; timestamp: 156:21:53.290340082; bps: 248832000,000; mean_bps: 254361600,000; fps: 10,263; mean_fps: 10,413
+INFO:
+perf: perf0; timestamp: 156:21:54.343722867; bps: 248832000,000; mean_bps: 253808640,000; fps: 10,443; mean_fps: 10,416
+INFO:
+perf: perf0; timestamp: 156:21:55.393794691; bps: 273715200,000; mean_bps: 255618327,273; fps: 10,475; mean_fps: 10,421
+INFO:
+perf: perf0; timestamp: 156:21:56.462147188; bps: 248832000,000; mean_bps: 255052800,000; fps: 10,296; mean_fps: 10,411
+INFO:
+perf: perf0; timestamp: 156:21:57.512250007; bps: 248832000,000; mean_bps: 254574276,923; fps: 10,475; mean_fps: 10,416
+INFO:
+perf: perf0; timestamp: 156:21:58.541874305; bps: 273715200,000; mean_bps: 255941485,714; fps: 10,684; mean_fps: 10,435
+0:00:16.252213924 362583 0x7f2e742cd810 ERROR                  libav :0:: reference picture missing during reorder
+0:00:16.252247121 362583 0x7f2e742cd810 ERROR                  libav :0:: reference picture missing during reorder
+0:00:16.252250335 362583 0x7f2e742cd810 ERROR                  libav :0:: reference picture missing during reorder
+0:00:16.252254138 362583 0x7f2e742cd810 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:16.252256713 362583 0x7f2e742cd810 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:16.252259285 362583 0x7f2e742cd810 ERROR                  libav :0:: Missing reference picture, default is 65882
+0:00:16.649289970 362583 0x7f2e742ce750 ERROR                  libav :0:: reference picture missing during reorder
+0:00:16.649326010 362583 0x7f2e742ce750 ERROR                  libav :0:: Missing reference picture, default is 65890
+0:00:16.841027296 362583 0x564f13d19240 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:21:59.613450557; bps: 273715200,000; mean_bps: 257126400,000; fps: 10,265; mean_fps: 10,424
+INFO:
+perf: perf0; timestamp: 156:22:00.685653741; bps: 248832000,000; mean_bps: 256150588,235; fps: 10,259; mean_fps: 10,413
+INFO:
+perf: perf0; timestamp: 156:22:01.768904571; bps: 248832000,000; mean_bps: 255744000,000; fps: 10,155; mean_fps: 10,398
+INFO:
+perf: perf0; timestamp: 156:22:02.854260771; bps: 248832000,000; mean_bps: 255380210,526; fps: 10,135; mean_fps: 10,383
+INFO:
+perf: perf0; timestamp: 156:22:03.948293879; bps: 273715200,000; mean_bps: 256296960,000; fps: 10,055; mean_fps: 10,366
+INFO:
+perf: perf0; timestamp: 156:22:05.026365181; bps: 248832000,000; mean_bps: 255941485,714; fps: 10,203; mean_fps: 10,358
+INFO:
+perf: perf0; timestamp: 156:22:06.097856806; bps: 248832000,000; mean_bps: 255618327,273; fps: 10,266; mean_fps: 10,354
+INFO:
+perf: perf0; timestamp: 156:22:07.107602160; bps: 248832000,000; mean_bps: 255323269,565; fps: 9,903; mean_fps: 10,333
+INFO:
+perf: perf0; timestamp: 156:22:08.159879256; bps: 248832000,000; mean_bps: 255052800,000; fps: 10,454; mean_fps: 10,338
+INFO:
+perf: perf0; timestamp: 156:22:09.169570141; bps: 273715200,000; mean_bps: 255799296,000; fps: 9,904; mean_fps: 10,320
+0:00:26.889580273 362583 0x564f13d19240 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:22:10.170789113; bps: 223948800,000; mean_bps: 254574276,923; fps: 9,988; mean_fps: 10,307
+INFO:
+perf: perf0; timestamp: 156:22:11.255929438; bps: 248832000,000; mean_bps: 254361600,000; fps: 10,137; mean_fps: 10,300
+INFO:
+perf: perf0; timestamp: 156:22:12.347377501; bps: 273715200,000; mean_bps: 255052800,000; fps: 10,078; mean_fps: 10,292
+INFO:
+perf: perf0; timestamp: 156:22:13.425985092; bps: 248832000,000; mean_bps: 254838289,655; fps: 10,198; mean_fps: 10,289
+INFO:
+perf: perf0; timestamp: 156:22:14.486291983; bps: 248832000,000; mean_bps: 254638080,000; fps: 10,374; mean_fps: 10,292
+INFO:
+perf: perf0; timestamp: 156:22:15.566595154; bps: 248832000,000; mean_bps: 254450787,097; fps: 10,182; mean_fps: 10,288
+INFO:
+perf: perf0; timestamp: 156:22:16.655277684; bps: 248832000,000; mean_bps: 254275200,000; fps: 10,104; mean_fps: 10,282
+INFO:
+perf: perf0; timestamp: 156:22:17.667138884; bps: 223948800,000; mean_bps: 253955011,765; fps: 9,883; mean_fps: 10,270
+INFO:
+perf: perf0; timestamp: 156:22:18.696973289; bps: 248832000,000; mean_bps: 253808640,000; fps: 9,710; mean_fps: 10,253
+INFO:
+perf: perf0; timestamp: 156:22:19.789914494; bps: 248832000,000; mean_bps: 253670400,000; fps: 10,065; mean_fps: 10,247
+INFO:
+perf: perf0; timestamp: 156:22:20.834090020; bps: 273715200,000; mean_bps: 254212151,351; fps: 10,535; mean_fps: 10,255
+INFO:
+perf: perf0; timestamp: 156:22:21.901449569; bps: 273715200,000; mean_bps: 254725389,474; fps: 11,243; mean_fps: 10,283
+INFO:
+perf: perf0; timestamp: 156:22:22.972672275; bps: 248832000,000; mean_bps: 254574276,923; fps: 10,269; mean_fps: 10,282
+INFO:
+perf: perf0; timestamp: 156:22:24.033413384; bps: 273715200,000; mean_bps: 255052800,000; fps: 10,370; mean_fps: 10,285
+INFO:
+perf: perf0; timestamp: 156:22:25.124993116; bps: 248832000,000; mean_bps: 254901073,171; fps: 10,077; mean_fps: 10,279
+INFO:
+perf: perf0; timestamp: 156:22:26.167070398; bps: 248832000,000; mean_bps: 254756571,429; fps: 10,556; mean_fps: 10,286
+INFO:
+perf: perf0; timestamp: 156:22:27.180025088; bps: 273715200,000; mean_bps: 255197469,767; fps: 9,872; mean_fps: 10,276
+INFO:
+perf: perf0; timestamp: 156:22:28.267978600; bps: 248832000,000; mean_bps: 255052800,000; fps: 10,111; mean_fps: 10,272
+INFO:
+perf: perf0; timestamp: 156:22:29.356744710; bps: 248832000,000; mean_bps: 254914560,000; fps: 10,103; mean_fps: 10,268
+INFO:
+perf: perf0; timestamp: 156:22:30.446921525; bps: 248832000,000; mean_bps: 254782330,435; fps: 10,090; mean_fps: 10,264
+INFO:
+perf: perf0; timestamp: 156:22:31.511432281; bps: 248832000,000; mean_bps: 254655727,660; fps: 10,333; mean_fps: 10,266
+INFO:
+perf: perf0; timestamp: 156:22:32.570240333; bps: 248832000,000; mean_bps: 254534400,000; fps: 10,389; mean_fps: 10,269
+INFO:
+perf: perf0; timestamp: 156:22:33.672787680; bps: 273715200,000; mean_bps: 254925844,898; fps: 9,977; mean_fps: 10,262
+INFO:
+perf: perf0; timestamp: 156:22:34.730842084; bps: 273715200,000; mean_bps: 255174776,471; fps: 11,342; mean_fps: 10,285
+INFO:
+perf: perf0; timestamp: 156:22:35.772291700; bps: 273715200,000; mean_bps: 255531323,077; fps: 10,562; mean_fps: 10,290
+INFO:
+perf: perf0; timestamp: 156:22:36.817539759; bps: 248832000,000; mean_bps: 255404920,755; fps: 10,524; mean_fps: 10,295
+INFO:
+perf: perf0; timestamp: 156:22:37.892164298; bps: 248832000,000; mean_bps: 255283200,000; fps: 10,236; mean_fps: 10,294
+INFO:
+perf: perf0; timestamp: 156:22:38.908134270; bps: 248832000,000; mean_bps: 255165905,455; fps: 9,843; mean_fps: 10,285
+INFO:
+perf: perf0; timestamp: 156:22:39.929565519; bps: 248832000,000; mean_bps: 255052800,000; fps: 9,790; mean_fps: 10,276
+INFO:
+perf: perf0; timestamp: 156:22:40.933096031; bps: 248832000,000; mean_bps: 254943663,158; fps: 9,965; mean_fps: 10,270
+INFO:
+perf: perf0; timestamp: 156:22:42.012790413; bps: 248832000,000; mean_bps: 254838289,655; fps: 10,188; mean_fps: 10,269
+^Chandling interrupt.
+Interrupt: Stopping pipeline ...
+Execution ended after 0:00:58.743497726
+Setting pipeline to NULL ...
+Freeing pipeline ...
+\end{lstlisting}
+
+\subsection*{Appendix D}
+
+\begin{lstlisting}
+$\$$ GST_DEBUG=WARNING gst-launch-1.0 -v filesrc location= dataset/base_videos/walking_tour/walking_tour_720p.mp4 ! decodebin ! video/x-raw, width=1280, height=720, format=I420 ! queue ! x264enc ! h264parse ! identity drop-probability=0.01 ! avdec_h264 ! 'video/x-raw, width=1280, height=720, format=I420' ! artifactdetect upscale=true ! queue ! perf ! xvimagesink sync=false
+Setting pipeline to PAUSED ...
+0:00:00.054803162 364200 0x55fb09f38d20 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+Pipeline is PREROLLING ...
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstTypeFindElement:typefind.GstPad:src: caps = video/quicktime, variant=(string)iso
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstTypeFindElement:typefind.GstPad:src: caps = NULL
+0:00:00.060347953 364200 0x55fb09ee4b60 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type gsst
+0:00:00.060363320 364200 0x55fb09ee4b60 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type gstd
+0:00:00.060395268 364200 0x55fb09ee4b60 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+0:00:00.061323990 364200 0x55fb09ee4b60 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstPad:src_0: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstH264Parse:h264parse1.GstPad:src: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+Redistribute latency...
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_h264:avdec_h264-1.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstCapsFilter:capsfilter2.GstPad:src: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstCapsFilter:capsfilter2.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstH264Parse:h264parse1.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstPad:src_1: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:src: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstMultiQueuePad:sink_0: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstMultiQueuePad:sink_1: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:src: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:src: caps = audio/x-raw, format=(string)F32LE, layout=(string)non-interleaved, rate=(int)44100, channels=(int)2, channel-mask=(bitmask)0x0000000000000003
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_h264:avdec_h264-1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter3: caps = video/x-raw, width=(int)1280, height=(int)720, format=(string)I420
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter3.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter3.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0.GstDecodePad:src_0.GstProxyPad:proxypad2: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0.GstDecodePad:src_0.GstProxyPad:proxypad2: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+/GstPipeline:pipeline0/GstX264Enc:x264enc0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+/GstPipeline:pipeline0/GstX264Enc:x264enc0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstIdentity:identity0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+Redistribute latency...
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstIdentity:identity0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstArtifactdetect:artifactdetect0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstPerf:perf0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstXvImageSink:xvimagesink0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstPerf:perf0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstArtifactdetect:artifactdetect0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter1.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+INFO:
+perf: perf0; timestamp: 156:37:51.003475538; bps: 0,000; mean_bps: 0,000; fps: 0,000; mean_fps: 0,000
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+INFO:
+perf: perf0; timestamp: 156:37:52.027660872; bps: 121651200,000; mean_bps: 0,000; fps: 21,480; mean_fps: 21,480
+INFO:
+perf: perf0; timestamp: 156:37:53.054298532; bps: 254361600,000; mean_bps: 254361600,000; fps: 22,403; mean_fps: 21,942
+INFO:
+perf: perf0; timestamp: 156:37:54.060504290; bps: 243302400,000; mean_bps: 248832000,000; fps: 23,852; mean_fps: 22,579
+INFO:
+perf: perf0; timestamp: 156:37:55.089461927; bps: 265420800,000; mean_bps: 254361600,000; fps: 24,296; mean_fps: 23,008
+INFO:
+perf: perf0; timestamp: 156:37:56.117691684; bps: 265420800,000; mean_bps: 257126400,000; fps: 23,341; mean_fps: 23,075
+INFO:
+perf: perf0; timestamp: 156:37:57.157845811; bps: 254361600,000; mean_bps: 256573440,000; fps: 23,074; mean_fps: 23,074
+INFO:
+perf: perf0; timestamp: 156:37:58.185460342; bps: 254361600,000; mean_bps: 256204800,000; fps: 22,382; mean_fps: 22,976
+INFO:
+perf: perf0; timestamp: 156:37:59.207348317; bps: 254361600,000; mean_bps: 255941485,714; fps: 23,486; mean_fps: 23,039
+INFO:
+perf: perf0; timestamp: 156:38:00.231832663; bps: 265420800,000; mean_bps: 257126400,000; fps: 24,403; mean_fps: 23,191
+INFO:
+perf: perf0; timestamp: 156:38:01.251718283; bps: 254361600,000; mean_bps: 256819200,000; fps: 23,532; mean_fps: 23,225
+INFO:
+perf: perf0; timestamp: 156:38:02.266312219; bps: 276480000,000; mean_bps: 258785280,000; fps: 24,640; mean_fps: 23,354
+INFO:
+perf: perf0; timestamp: 156:38:03.280811186; bps: 265420800,000; mean_bps: 259388509,091; fps: 24,643; mean_fps: 23,461
+INFO:
+perf: perf0; timestamp: 156:38:04.311786857; bps: 276480000,000; mean_bps: 260812800,000; fps: 23,279; mean_fps: 23,447
+INFO:
+perf: perf0; timestamp: 156:38:05.314656813; bps: 254361600,000; mean_bps: 260316553,846; fps: 22,934; mean_fps: 23,410
+INFO:
+perf: perf0; timestamp: 156:38:06.342083511; bps: 254361600,000; mean_bps: 259891200,000; fps: 22,386; mean_fps: 23,342
+0:00:15.937019011 364200 0x7f0df00adb30 ERROR                  libav :0:: reference picture missing during reorder
+0:00:15.937057297 364200 0x7f0df00adb30 ERROR                  libav :0:: reference picture missing during reorder
+0:00:15.937062731 364200 0x7f0df00adb30 ERROR                  libav :0:: Missing reference picture, default is 65556
+0:00:15.937067799 364200 0x7f0df00adb30 ERROR                  libav :0:: Missing reference picture, default is 65556
+0:00:16.114433752 364200 0x7f0df04bbaf0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:16.114482054 364200 0x7f0df04bbaf0 ERROR                  libav :0:: Missing reference picture, default is 65564
+0:00:16.210734620 364200 0x55fb09ee46a0 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:38:07.357018705; bps: 243302400,000; mean_bps: 258785280,000; fps: 22,662; mean_fps: 23,300
+INFO:
+perf: perf0; timestamp: 156:38:08.394427879; bps: 254361600,000; mean_bps: 258508800,000; fps: 23,135; mean_fps: 23,290
+INFO:
+perf: perf0; timestamp: 156:38:09.414348217; bps: 254361600,000; mean_bps: 258264847,059; fps: 23,531; mean_fps: 23,303
+0:00:19.898111867 364200 0x7f0e01a99760 ERROR                  libav :0:: reference picture missing during reorder
+0:00:19.898169361 364200 0x7f0e01a99760 ERROR                  libav :0:: reference picture missing during reorder
+0:00:19.898178718 364200 0x7f0e01a99760 ERROR                  libav :0:: Missing reference picture, default is 65740
+0:00:19.898184301 364200 0x7f0e01a99760 ERROR                  libav :0:: Missing reference picture, default is 65740
+INFO:
+perf: perf0; timestamp: 156:38:10.439439498; bps: 265420800,000; mean_bps: 258662400,000; fps: 22,437; mean_fps: 23,258
+0:00:19.992082267 364200 0x7f0d4817f6f0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:19.992130104 364200 0x7f0d4817f6f0 ERROR                  libav :0:: Missing reference picture, default is 65748
+0:00:20.075104254 364200 0x7f0df00bfa30 ERROR                  libav :0:: reference picture missing during reorder
+0:00:20.075177933 364200 0x7f0df00bfa30 ERROR                  libav :0:: Missing reference picture, default is 65752
+0:00:20.158570407 364200 0x55fb09ee46a0 ERROR                  libav :0:: mmco: unref short failure
+0:00:20.539173045 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:20.539214839 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:20.539219676 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 65770
+0:00:20.539222973 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 65770
+0:00:20.728345305 364200 0x7f0d4417b2d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:20.728385536 364200 0x7f0d4417b2d0 ERROR                  libav :0:: Missing reference picture, default is 65782
+INFO:
+perf: perf0; timestamp: 156:38:11.459854446; bps: 243302400,000; mean_bps: 257853978,947; fps: 23,520; mean_fps: 23,271
+INFO:
+perf: perf0; timestamp: 156:38:12.478207053; bps: 265420800,000; mean_bps: 258232320,000; fps: 24,549; mean_fps: 23,332
+INFO:
+perf: perf0; timestamp: 156:38:13.501590714; bps: 265420800,000; mean_bps: 258574628,571; fps: 24,429; mean_fps: 23,382
+INFO:
+perf: perf0; timestamp: 156:38:14.522361617; bps: 254361600,000; mean_bps: 259169947,826; fps: 23,512; mean_fps: 23,387
+INFO:
+perf: perf0; timestamp: 156:38:15.531021411; bps: 265420800,000; mean_bps: 259430400,000; fps: 23,794; mean_fps: 23,404
+INFO:
+perf: perf0; timestamp: 156:38:16.567497626; bps: 265420800,000; mean_bps: 259670016,000; fps: 24,120; mean_fps: 23,433
+0:00:26.572289905 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:26.572305160 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:26.572311774 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 65670
+0:00:26.572317227 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 65670
+0:00:26.657287048 364200 0x7f0df00adb30 ERROR                  libav :0:: reference picture missing during reorder
+0:00:26.657305866 364200 0x7f0df00adb30 ERROR                  libav :0:: Missing reference picture, default is 65678
+0:00:26.757634477 364200 0x7f0d4417b2d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:26.757652013 364200 0x7f0d4417b2d0 ERROR                  libav :0:: Missing reference picture, default is 65682
+0:00:26.841902872 364200 0x55fb09ee46a0 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:38:17.585854666; bps: 254361600,000; mean_bps: 259465846,154; fps: 22,585; mean_fps: 23,400
+INFO:
+perf: perf0; timestamp: 156:38:18.601934304; bps: 254361600,000; mean_bps: 259276800,000; fps: 22,636; mean_fps: 23,372
+INFO:
+perf: perf0; timestamp: 156:38:19.602291606; bps: 243302400,000; mean_bps: 258706285,714; fps: 21,992; mean_fps: 23,323
+INFO:
+perf: perf0; timestamp: 156:38:20.623271053; bps: 254361600,000; mean_bps: 258556468,966; fps: 22,527; mean_fps: 23,295
+INFO:
+perf: perf0; timestamp: 156:38:21.635596218; bps: 243302400,000; mean_bps: 258048000,000; fps: 22,720; mean_fps: 23,276
+INFO:
+perf: perf0; timestamp: 156:38:22.664236406; bps: 243302400,000; mean_bps: 257572335,484; fps: 22,360; mean_fps: 23,246
+0:00:32.848731515 364200 0x7f0e01a99760 ERROR                  libav :0:: reference picture missing during reorder
+0:00:32.848749245 364200 0x7f0e01a99760 ERROR                  libav :0:: reference picture missing during reorder
+0:00:32.848755851 364200 0x7f0e01a99760 ERROR                  libav :0:: Missing reference picture, default is 65956
+0:00:32.848760048 364200 0x7f0e01a99760 ERROR                  libav :0:: Missing reference picture, default is 65956
+0:00:32.893603428 364200 0x7f0d4c17e010 ERROR                  libav :0:: reference picture missing during reorder
+0:00:32.893719037 364200 0x7f0d4c17e010 ERROR                  libav :0:: Missing reference picture, default is 65960
+0:00:32.982313727 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:32.982347135 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 65964
+INFO:
+perf: perf0; timestamp: 156:38:23.678030806; bps: 254361600,000; mean_bps: 257472000,000; fps: 21,701; mean_fps: 23,198
+0:00:33.945113509 364200 0x7f0df02ddaa0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:33.945145717 364200 0x7f0df02ddaa0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:33.945150881 364200 0x7f0df02ddaa0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:33.945157486 364200 0x7f0df02ddaa0 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:33.945162191 364200 0x7f0df02ddaa0 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:33.945166443 364200 0x7f0df02ddaa0 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:34.151185498 364200 0x7f0df02ca520 ERROR                  libav :0:: reference picture missing during reorder
+0:00:34.151206591 364200 0x7f0df02ca520 ERROR                  libav :0:: Missing reference picture, default is 66010
+INFO:
+perf: perf0; timestamp: 156:38:24.684235523; bps: 221184000,000; mean_bps: 256372363,636; fps: 20,871; mean_fps: 23,128
+0:00:34.236805848 364200 0x55fb09ee46a0 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:38:25.705681498; bps: 243302400,000; mean_bps: 255987952,941; fps: 21,538; mean_fps: 23,081
+INFO:
+perf: perf0; timestamp: 156:38:26.745925302; bps: 243302400,000; mean_bps: 255625508,571; fps: 22,110; mean_fps: 23,053
+INFO:
+perf: perf0; timestamp: 156:38:27.768891198; bps: 243302400,000; mean_bps: 255283200,000; fps: 22,484; mean_fps: 23,037
+^Chandling interrupt.
+Interrupt: Stopping pipeline ...
+Execution ended after 0:00:37.246977086
+Setting pipeline to NULL ...
+Freeing pipeline ...
+\end{lstlisting}
+
+\subsection*{Appendix E}
+
+\begin{lstlisting}
+$\$$ GST_DEBUG=WARNING gst-launch-1.0 -v filesrc location= dataset/base_videos/walking_tour/walking_tour_720p.mp4 ! decodebin ! video/x-raw, width=1280, height=720, format=I420 ! queue ! x264enc ! h264parse ! identity drop-probability=0.01 ! avdec_h264 ! 'video/x-raw, width=1280, height=720, format=I420' ! artifactdetector modelpath= tfg/subprojects/disptec-2022/artifact_detection/assets/rf48_balanced_0.model upscale=true ! queue ! perf ! fakesink #xvimagesink sync=false
+Setting pipeline to PAUSED ...
+0:00:00.060078510 365173 0x55fee37d4120 WARN                 basesrc gstbasesrc.c:3600:gst_base_src_start_complete:<filesrc0> pad not activated yet
+Pipeline is PREROLLING ...
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstTypeFindElement:typefind.GstPad:src: caps = video/quicktime, variant=(string)iso
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstTypeFindElement:typefind.GstPad:src: caps = NULL
+0:00:00.065255176 365173 0x55fee3771f00 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type gsst
+0:00:00.065268439 365173 0x55fee3771f00 WARN                 qtdemux qtdemux_types.c:239:qtdemux_type_get: unknown QuickTime node type gstd
+0:00:00.065294378 365173 0x55fee3771f00 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+0:00:00.066196017 365173 0x55fee3771f00 WARN                 qtdemux qtdemux.c:3250:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstPad:src_0: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstH264Parse:h264parse1.GstPad:src: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+Redistribute latency...
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_h264:avdec_h264-1.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstCapsFilter:capsfilter2.GstPad:src: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstCapsFilter:capsfilter2.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstH264Parse:h264parse1.GstPad:sink: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstPad:src_1: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:src: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstMultiQueuePad:sink_0: caps = video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, codec_data=(buffer)0164001fffe1001c6764001facd1005005bb016a02020280000003008000001e078c188901000468eb8f2c, width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)1/1
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0.GstMultiQueuePad:sink_1: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstAacParse:aacparse0.GstPad:src: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:sink: caps = audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)12100000000000000000000000000000, rate=(int)44100, channels=(int)2
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_aac:avdec_aac0.GstPad:src: caps = audio/x-raw, format=(string)F32LE, layout=(string)non-interleaved, rate=(int)44100, channels=(int)2, channel-mask=(bitmask)0x0000000000000003
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-buffers = 5
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-time = 0
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/GstMultiQueue:multiqueue0: max-size-bytes = 2097152
+/GstPipeline:pipeline0/GstDecodeBin:decodebin0/avdec_h264:avdec_h264-1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter3: caps = video/x-raw, width=(int)1280, height=(int)720, format=(string)I420
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter3.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+/GstPipeline:pipeline0/GstX264Enc:x264enc0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+/GstPipeline:pipeline0/GstX264Enc:x264enc0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstIdentity:identity0.GstPad:src: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+Redistribute latency...
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstIdentity:identity0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
+/GstPipeline:pipeline0/GstH264Parse:h264parse0.GstPad:sink: caps = video/x-h264, codec_data=(buffer)0164001fffe1001c6764001facd9405005bb016a02020280000003008000001e478c18cb01000568ebecb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
+/GstPipeline:pipeline0/avdec_h264:avdec_h264-0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstArtifactDetect:artifactdetect0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue1.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstQueue:queue1.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstPerf:perf0.GstPad:src: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstFakeSink:fakesink0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstPerf:perf0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstArtifactDetect:artifactdetect0.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+/GstPipeline:pipeline0/GstCapsFilter:capsfilter1.GstPad:sink: caps = video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)30/1
+Redistribute latency...
+RandomForest.cpp: total tree number: 11
+RandomForest.cpp: max depth of a single tree: 10
+RandomForest.cpp: _classNum: 2
+RandomForest.cpp: _isRegression: 0
+INFO:
+perf: perf0; timestamp: 156:48:13.725632838; bps: 0,000; mean_bps: 0,000; fps: 0,000; mean_fps: 0,000
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+INFO:
+perf: perf0; timestamp: 156:48:14.751082425; bps: 143769600,000; mean_bps: 0,000; fps: 27,305; mean_fps: 27,305
+INFO:
+perf: perf0; timestamp: 156:48:15.772232753; bps: 298598400,000; mean_bps: 298598400,000; fps: 27,420; mean_fps: 27,363
+INFO:
+perf: perf0; timestamp: 156:48:16.776286779; bps: 309657600,000; mean_bps: 304128000,000; fps: 27,887; mean_fps: 27,537
+INFO:
+perf: perf0; timestamp: 156:48:17.779643739; bps: 298598400,000; mean_bps: 302284800,000; fps: 27,906; mean_fps: 27,630
+INFO:
+perf: perf0; timestamp: 156:48:18.795824536; bps: 320716800,000; mean_bps: 306892800,000; fps: 26,570; mean_fps: 27,418
+INFO:
+perf: perf0; timestamp: 156:48:19.821892156; bps: 298598400,000; mean_bps: 305233920,000; fps: 28,263; mean_fps: 27,559
+INFO:
+perf: perf0; timestamp: 156:48:20.847248721; bps: 287539200,000; mean_bps: 302284800,000; fps: 25,357; mean_fps: 27,244
+INFO:
+perf: perf0; timestamp: 156:48:21.856243846; bps: 287539200,000; mean_bps: 300178285,714; fps: 27,750; mean_fps: 27,307
+INFO:
+perf: perf0; timestamp: 156:48:22.869650477; bps: 320716800,000; mean_bps: 302745600,000; fps: 26,643; mean_fps: 27,234
+INFO:
+perf: perf0; timestamp: 156:48:23.901903818; bps: 298598400,000; mean_bps: 302284800,000; fps: 28,094; mean_fps: 27,320
+INFO:
+perf: perf0; timestamp: 156:48:24.903091074; bps: 298598400,000; mean_bps: 301916160,000; fps: 24,970; mean_fps: 27,106
+INFO:
+perf: perf0; timestamp: 156:48:25.930327267; bps: 265420800,000; mean_bps: 298598400,000; fps: 26,284; mean_fps: 27,038
+INFO:
+perf: perf0; timestamp: 156:48:26.945125384; bps: 298598400,000; mean_bps: 298598400,000; fps: 24,635; mean_fps: 26,853
+0:00:13.995018837 365173 0x7f13d40afc40 ERROR                  libav :0:: reference picture missing during reorder
+0:00:13.995052757 365173 0x7f13d40afc40 ERROR                  libav :0:: reference picture missing during reorder
+0:00:13.995057965 365173 0x7f13d40afc40 ERROR                  libav :0:: Missing reference picture, default is 65556
+0:00:13.995061269 365173 0x7f13d40afc40 ERROR                  libav :0:: Missing reference picture, default is 65556
+0:00:14.141270206 365173 0x7f136db37f90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:14.141322205 365173 0x7f136db37f90 ERROR                  libav :0:: Missing reference picture, default is 65564
+0:00:14.217394927 365173 0x55fee3771640 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:48:27.986250776; bps: 276480000,000; mean_bps: 296896984,615; fps: 25,933; mean_fps: 26,787
+INFO:
+perf: perf0; timestamp: 156:48:28.989733829; bps: 287539200,000; mean_bps: 296228571,429; fps: 27,903; mean_fps: 26,861
+INFO:
+perf: perf0; timestamp: 156:48:30.012675509; bps: 309657600,000; mean_bps: 297123840,000; fps: 25,417; mean_fps: 26,771
+0:00:17.422724945 365173 0x7f13d43008d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.422777099 365173 0x7f13d43008d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.422786627 365173 0x7f13d43008d0 ERROR                  libav :0:: Missing reference picture, default is 65740
+0:00:17.422792892 365173 0x7f13d43008d0 ERROR                  libav :0:: Missing reference picture, default is 65740
+0:00:17.507229108 365173 0x7f132c17da60 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.507269402 365173 0x7f132c17da60 ERROR                  libav :0:: Missing reference picture, default is 65748
+0:00:17.575678058 365173 0x7f13d40c1760 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.575779047 365173 0x7f13d40c1760 ERROR                  libav :0:: Missing reference picture, default is 65752
+0:00:17.641569678 365173 0x55fee3771640 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:48:31.018895927; bps: 276480000,000; mean_bps: 295833600,000; fps: 26,833; mean_fps: 26,775
+0:00:17.962635288 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.962674929 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:17.962682482 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 65770
+0:00:17.962687575 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 65770
+0:00:18.107851793 365173 0x7f131817b430 ERROR                  libav :0:: reference picture missing during reorder
+0:00:18.107895745 365173 0x7f131817b430 ERROR                  libav :0:: Missing reference picture, default is 65782
+INFO:
+perf: perf0; timestamp: 156:48:32.036857009; bps: 298598400,000; mean_bps: 295996235,294; fps: 28,488; mean_fps: 26,870
+INFO:
+perf: perf0; timestamp: 156:48:33.037058832; bps: 320716800,000; mean_bps: 297369600,000; fps: 26,995; mean_fps: 26,877
+INFO:
+perf: perf0; timestamp: 156:48:34.052440153; bps: 298598400,000; mean_bps: 297434273,684; fps: 26,591; mean_fps: 26,862
+INFO:
+perf: perf0; timestamp: 156:48:35.078372220; bps: 298598400,000; mean_bps: 297492480,000; fps: 26,318; mean_fps: 26,836
+INFO:
+perf: perf0; timestamp: 156:48:36.096118395; bps: 287539200,000; mean_bps: 297018514,286; fps: 27,512; mean_fps: 26,867
+0:00:23.292117615 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:23.292133464 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:23.292138361 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 65670
+0:00:23.292142554 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 65670
+0:00:23.375443574 365173 0x7f13d40afc40 ERROR                  libav :0:: reference picture missing during reorder
+0:00:23.375463151 365173 0x7f13d40afc40 ERROR                  libav :0:: Missing reference picture, default is 65678
+0:00:23.455687466 365173 0x7f131817b430 ERROR                  libav :0:: reference picture missing during reorder
+0:00:23.455705668 365173 0x7f131817b430 ERROR                  libav :0:: Missing reference picture, default is 65682
+0:00:23.528818586 365173 0x55fee3771640 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:48:37.116892462; bps: 298598400,000; mean_bps: 297090327,273; fps: 26,451; mean_fps: 26,849
+INFO:
+perf: perf0; timestamp: 156:48:38.117650818; bps: 298598400,000; mean_bps: 297155895,652; fps: 28,978; mean_fps: 26,938
+INFO:
+perf: perf0; timestamp: 156:48:39.126871676; bps: 320716800,000; mean_bps: 298137600,000; fps: 24,772; mean_fps: 26,851
+INFO:
+perf: perf0; timestamp: 156:48:40.145017018; bps: 265420800,000; mean_bps: 296828928,000; fps: 25,537; mean_fps: 26,800
+INFO:
+perf: perf0; timestamp: 156:48:41.168807601; bps: 287539200,000; mean_bps: 296471630,769; fps: 25,396; mean_fps: 26,748
+0:00:28.682200657 365173 0x7f13d43008d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:28.682219122 365173 0x7f13d43008d0 ERROR                  libav :0:: reference picture missing during reorder
+0:00:28.682223854 365173 0x7f13d43008d0 ERROR                  libav :0:: Missing reference picture, default is 65956
+0:00:28.682226868 365173 0x7f13d43008d0 ERROR                  libav :0:: Missing reference picture, default is 65956
+0:00:28.716844543 365173 0x7f13d448d980 ERROR                  libav :0:: reference picture missing during reorder
+0:00:28.716938487 365173 0x7f13d448d980 ERROR                  libav :0:: Missing reference picture, default is 65960
+0:00:28.783772249 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:28.783792333 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 65964
+INFO:
+perf: perf0; timestamp: 156:48:42.173183835; bps: 276480000,000; mean_bps: 295731200,000; fps: 25,887; mean_fps: 26,718
+0:00:29.572288849 365173 0x7f13c8018490 ERROR                  libav :0:: reference picture missing during reorder
+0:00:29.572316842 365173 0x7f13c8018490 ERROR                  libav :0:: reference picture missing during reorder
+0:00:29.572320071 365173 0x7f13c8018490 ERROR                  libav :0:: reference picture missing during reorder
+0:00:29.572324456 365173 0x7f13c8018490 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:29.572327476 365173 0x7f13c8018490 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:29.572330003 365173 0x7f13c8018490 ERROR                  libav :0:: Missing reference picture, default is 65998
+0:00:29.736096424 365173 0x7f13ddd1ea90 ERROR                  libav :0:: reference picture missing during reorder
+0:00:29.736115495 365173 0x7f13ddd1ea90 ERROR                  libav :0:: Missing reference picture, default is 66010
+0:00:29.811731933 365173 0x55fee3771640 ERROR                  libav :0:: mmco: unref short failure
+INFO:
+perf: perf0; timestamp: 156:48:43.203170250; bps: 287539200,000; mean_bps: 295438628,571; fps: 25,243; mean_fps: 26,667
+INFO:
+perf: perf0; timestamp: 156:48:44.220670408; bps: 287539200,000; mean_bps: 294912000,000; fps: 26,536; mean_fps: 26,662
+INFO:
+perf: perf0; timestamp: 156:48:45.224025154; bps: 309657600,000; mean_bps: 295387664,516; fps: 27,906; mean_fps: 26,703
+INFO:
+perf: perf0; timestamp: 156:48:46.234824783; bps: 276480000,000; mean_bps: 294796800,000; fps: 24,733; mean_fps: 26,641
+INFO:
+perf: perf0; timestamp: 156:48:47.237556989; bps: 276480000,000; mean_bps: 294241745,455; fps: 24,932; mean_fps: 26,589
+INFO:
+perf: perf0; timestamp: 156:48:48.258331148; bps: 287539200,000; mean_bps: 294044611,765; fps: 26,451; mean_fps: 26,585
+^Chandling interrupt.
+Interrupt: Stopping pipeline ...
+Execution ended after 0:00:34.604205944
+Setting pipeline to NULL ...
+Freeing pipeline ...
+\end{lstlisting}
+
+\subsection*{Appendix F}
+
+This was executed on the TX2
+
+\begin{lstlisting}
+  $\$$ ./release_repo/build/tools/cpp_tools/trainer/trainer test00 dataset/loss0.1_dataset/0/00/features.bytes dataset/loss0.1_dataset/0/00/block.bytes 
+  Loading feature file: dataset/loss0.1_dataset/0/00/features.bytes
+  Loading label file: dataset/loss0.1_dataset/0/00/block.bytes
+  Building label memory
+  Dataset loading duration: 202835
+  Measuring raw dataset balance
+  Negatives: 506894, Positives: 163906, Total: 670800, Balance: 0.76 : 0.24
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.50% pos
+  Balanced neg cnt: 163906, pos cnt: 163906
+  Dataset balancing duration: 394329
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f5aac0010 0x7f65253010
+  Rangerx init duration: 7454313
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 22%. Estimated remaining time: 1 minute, 50 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file test00.forest.
+  Rangerx training duration: 35940269
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       327812
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      0.00195539
+  
+  Saved confusion matrix to file test00.confusion.
+  disptec@disptec-jetson:~/TFG$\$$ cat test00.confusion 
+  Overall OOB prediction error (Fraction missclassified): 0.00195539
+  
+  Class specific prediction errors:
+                  255     0
+  predicted 255     163906 641   
+  predicted 0     0     163265 
+  disptec@disptec-jetson:~/TFG$\$$ ./release_repo/build/tools/cpp_tools/trainer/trainer test00 dataset/loss0.1_dataset/0/00/features.bytes dataset/loss0.1_dataset/0/00/block.bytes 
+  Loading feature file: dataset/loss0.1_dataset/0/00/features.bytes
+  Loading label file: dataset/loss0.1_dataset/0/00/block.bytes
+  Building label memory
+  Dataset loading duration: 219673
+  Measuring raw dataset balance
+  Negatives: 506894, Positives: 163906, Total: 670800, Balance: 0.76 : 0.24
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.50% pos
+  Balanced neg cnt: 163906, pos cnt: 163906
+  Dataset balancing duration: 346548
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f823c3010 0x7f8cb56010
+  Rangerx init duration: 7225415
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 41%. Estimated remaining time: 45 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file test00.forest.
+  Rangerx training duration: 34598887
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       327812
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      0.00194624
+  
+  Saved confusion matrix to file test00.confusion.
+  disptec@disptec-jetson:~/TFG$\$$ cat test00.confusion 
+  Overall OOB prediction error (Fraction missclassified): 0.00194624
+  
+  Class specific prediction errors:
+                  255     0
+  predicted 255     163906 638   
+  predicted 0     0     163268 
+  disptec@disptec-jetson:~/TFG$\$$ python3 release_repo/tools/python_tools/parse_ranger_confusion_matrix.py test00.confusion 
+  Precision: 1.00
+  Recall:    1.00
+  disptec@disptec-jetson:~/TFG$\$$ ./release_repo/build/tools/cpp_tools/trainer/trainer test00 dataset/loss0.1_dataset/0/00/features.bytes dataset/loss0.1_dataset/0/00/block.bytes 
+  Loading feature file: dataset/loss0.1_dataset/0/00/features.bytes
+  Loading label file: dataset/loss0.1_dataset/0/00/block.bytes
+  Building label memory
+  Dataset loading duration: 202788
+  Measuring raw dataset balance
+  Negatives: 506894, Positives: 163906, Total: 670800, Balance: 0.76 : 0.24
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.50% pos
+  Balanced neg cnt: 163906, pos cnt: 163906
+  Dataset balancing duration: 348086
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f57a2e010 0x7f621c1010
+  Rangerx init duration: 7223776
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 41%. Estimated remaining time: 45 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file test00.forest.
+  Rangerx training duration: 34301848
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       327812
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      0.00192793
+  
+  Saved confusion matrix to file test00.confusion.
+  disptec@disptec-jetson:~/TFG$\$$ cat test00.confusion 
+  Overall OOB prediction error (Fraction missclassified): 0.00192793
+  
+  Class specific prediction errors:
+                  255     0
+  predicted 255     163906 632   
+  predicted 0     0     163274 
+  disptec@disptec-jetson:~/TFG$\$$ python3 release_repo/tools/python_tools/parse_ranger_confusion_matrix.py test00.confusion 
+  Precision: 1.00
+  Recall:    1.00
+  disptec@disptec-jetson:~/TFG$\$$ ./release_repo/build/tools/cpp_tools/trainer/trainer test00 dataset/loss0.1_dataset/0/00/features.bytes dataset/loss0.1_dataset/0/00/block.bytes 
+  Loading feature file: dataset/loss0.1_dataset/0/00/features.bytes
+  Loading label file: dataset/loss0.1_dataset/0/00/block.bytes
+  Building label memory
+  Dataset loading duration: 253821
+  Measuring raw dataset balance
+  Negatives: 506894, Positives: 163906, Total: 670800, Balance: 0.76 : 0.24
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.50% pos
+  Balanced neg cnt: 163906, pos cnt: 163906
+  Dataset balancing duration: 429305
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f65b38010 0x7f702cb010
+  Rangerx init duration: 10226180
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 3%. Estimated remaining time: 16 minutes, 1 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file test00.forest.
+  Rangerx training duration: 40014268
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       327812
+  Number of independent variables:   132
+  Mtry:                              11
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      0.0020103
+  
+  Saved confusion matrix to file test00.confusion.
+  disptec@disptec-jetson:~/TFG$\$$ python3 release_repo/tools/python_tools/parse_ranger_confusion_matrix.py test00.confusion 
+  Precision: 1.00
+  Recall:    1.00
+  disptec@disptec-jetson:~/TFG$\$$ cat test00.confusion 
+  Overall OOB prediction error (Fraction missclassified): 0.0020103
+  
+  Class specific prediction errors:
+                  255     0
+  predicted 255     163906 659   
+  predicted 0     0     163247
+\end{lstlisting}
+
+\subsection*{Appendix G}
+
+\begin{lstlisting}
+  2023  pip3 install pre-commit
+  2024  python3 -m pip install --upgrade pip
+  2025  ./build_release.sh develop
+  2026  sudo apt-get install cpputest
+  2027  history
+  2028  ./build_release.sh develop
+  2029  sudo apt-get install doxygen
+  2030  ./build_release.sh develop
+  2031  sudo apt install graphviz
+  2032  ./build_release.sh develop
+  2033  sudo apt update # FIXME: Move to the top
+  2034  apt list --upgradable
+  2035  sudo apt upgrade
+  2036  ls
+  2037  ./build_release.sh 
+  2038  ./build_release.sh develop
+  2039  history
+  2040  sudo apt install default-jdk
+  2041  history
+  2042  ./build_release.sh develop
+  2043  sudo apt-get install texlive-font-utils
+\end{lstlisting}
+
+\subsection*{Appendix H}
+
+\begin{lstlisting}
+  $\$$ release_repo/build/tools/cpp_tools/analyzer/analyzer test00.forest 4 dataset/loss0.1_dataset/0/00/features.bytes dataset/loss0.1_dataset/0/00/block.bytes 
+  Loading feature file: dataset/loss0.1_dataset/0/00/features.bytes
+  Loading label file: dataset/loss0.1_dataset/0/00/block.bytes
+  Converting feature file from row major to column major
+  Building label memory
+  Dataset loading duration: 1132455
+  Initializing Rangerx
+  Loading from memory: 0x7f7210f010 0x7f71e7f010
+  Loading forest from file test00.forest.
+  Predicting ..
+  Confusion matrix:
+                0   255
+  predicted 0   504835 161351
+  predicted 255 2059 2555
+  
+  Precision: 0.553749
+  
+  Recall:    0.015588  
+\end{lstlisting}
+
+\printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}
+
+
