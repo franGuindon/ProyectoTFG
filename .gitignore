@@ -19,7 +19,6 @@
 *.xml
 *.gz
 *.fdb_latexmk
-*jpeg2ps
 *__pycache__*
 
 # To be addressed in the future:
