@@ -1,0 +1,64 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{every picture/.style={line width=0.4mm}}
+
+\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40, line width=0.4mm, inner sep=15pt]
+\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40, line width=0.4mm, inner sep=15pt]
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+\node[terminal] at (0,0cm) (src) {Video Frame with Artifacts};
+\coordinate[below=of src] (codo0) {};
+\node[nonterminal, below=of codo0, align=center] (detector)
+  {Artifact Detection System \\ (RDF)};
+\node[terminal, right=of detector] (mask) {Binary Mask};
+\node[nonterminal, right=of mask, align=center] (inpainter)
+  {Inpainting System \\ (Transformer)};
+\node[terminal, below=of inpainter] (dst) {Restored video};
+
+\draw[->] (src) -- (codo0) -- (detector);
+\draw[->] (codo0) -| (inpainter);
+\draw[->] (detector) -- (mask);
+\draw[->] (mask) -- (inpainter);
+\draw[->] (inpainter) -- (dst);
+
+\coordinate (codo1) at ($(detector)+(0,2cm)$) {};
+\coordinate (codo2) at ($(inpainter)+(-2.25cm,2cm)$) {};
+
+\node [fit=(detector)(codo1)] (detector_box) {};
+\node [fit=(inpainter)(codo2)] (inpainter_box) {};
+
+\scoped[on background layer]{
+  \node [draw, rectangle, fit=(detector_box)(inpainter_box), fill=orange!30,
+    inner sep=0.3cm] (system) {};
+
+  \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+    Video Restoration System};
+  
+  \node [draw, rectangle, dashed, line width=0.4mm, fit=(detector)(codo1),
+    black!50!white, inner sep=0.2cm] (cpu) {};
+
+  \node [anchor=north west, inner sep=0.3cm, black!50!white] at (cpu.north west)
+    () {CPU};
+  
+  \node [draw, rectangle, dashed, line width=0.4mm, fit=(inpainter)(codo2),
+    black!50!white, inner sep=0.2cm] (gpu) {};
+  
+  \node [anchor=north east, inner sep=0.3cm, black!50!white] at (gpu.north east)
+    () {GPU};
+}
+
+\end{tikzpicture}
+\end{document}

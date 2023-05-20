@@ -1,0 +1,30 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{arrows, arrows.meta, positioning, calc, decorations.pathreplacing}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{every picture/.style={line width=0.4mm, inner sep=15pt}}
+
+\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40, line width=0.4mm]
+\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40, line width=0.4mm]
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+\node[terminal] at (0,0cm) (src) {Video Source};
+\node[nonterminal, below=of src] (encoder) {Video Encoding System};
+\node[nonterminal, right=of encoder, align=center] (channel) {Video Transmission\\(with packet losses)};
+\node[nonterminal, right=of channel] (decoder) {Video Decoding System};
+\node[terminal, below=of decoder] (dst) {Video with Artifacts};
+
+\draw[->] (src) -- (encoder);
+\draw[->] (encoder) -- (channel);
+\draw[->] (channel) -- (decoder);
+\draw[->] (decoder) -- (dst);
+
+% Method to draw (down right down) or (down left down) arrows between nodes:
+%\draw[->] (channel.south) |- ($0.5*(channel.south)+0.5*(decoder.north)$) -| (decoder.north);
+
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,35 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows, arrows.meta, positioning, calc, decorations.pathreplacing}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{every picture/.style={line width=0.4mm, inner sep=15pt}}
+
+\tikzstyle{image} = [draw, rectangle, inner sep=0.1cm]
+\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40]
+\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40]
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm, xcenter around = {}]
+
+\node[terminal] at (0,0cm) (src) {Video Frame with Artifacts};
+
+\node[below=of src] (codo0) {};
+\node[nonterminal, right=of codo0] (inpainter) {Video Restoration System};
+\node[right=of inpainter] (codo1) {};
+\node[terminal, below=of codo1] (dst) {Restored Video Frame};
+\node[image, anchor=south] at ($(inpainter.north east) + (0, 0.4cm)$) (srcx) {\includegraphics[trim={50cm 10cm 10cm 20cm},clip, width=3cm]{imgs_with_loss_27.jpeg}};
+\node[image, anchor=north] at ($(inpainter.south west) - (0, 0.4cm)$) (dstx) {\includegraphics[trim={50cm 10cm 10cm 20cm},clip, width=3cm]{imgs_27.jpeg}};
+
+\draw[->] (src) |- (inpainter);
+\draw[->] (inpainter) -| (dst);
+
+\draw (srcx.north west) edge[dotted] (src.north east);
+\draw (srcx.south west) edge[dotted] (src.south east);
+\draw (dstx.north east) edge[dotted] (dst.north west);
+\draw (dstx.south east) edge[dotted] (dst.south west);
+
+\end{tikzpicture}
+\end{document}

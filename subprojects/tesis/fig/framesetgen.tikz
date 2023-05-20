@@ -30,18 +30,18 @@
   \node[terminal] at (0,0cm) (src) {Base Video File};
   \node[nonterminal, below=of src, align=center] (inspector) {Human inspection};
   \node[terminal, dashed, below=of inspector] (snip_spec) {Video Snipping Specification File};
-  \node[nonterminal, right=of inspector, align=center] (satcalc) {SAT Calculator};
-  \node[terminal, dashed, below=of satcalc] (sat) {SAT};
+  \node[nonterminal, right=of inspector, align=center] (snipper) {SAT Calculator};
+  \node[terminal, dashed, below=of snipper] (sat) {SAT};
   \node[terminal, dashed, below=of sat] (ssat) {Squared SAT};
-  \node[nonterminal, right=of satcalc, align=center] (stats) {Block Statistics Logic};
+  \node[nonterminal, right=of snipper, align=center] (stats) {Block Statistics Logic};
   \node[terminal, below=of stats] (dst) {Feature Matrix};
   
   \draw[->] (src) -- (inspector);
   \draw[->, dashed] (inspector) -- (snip_spec);
-  \draw[->] (inspector) -- (satcalc);
-  \draw[->, dashed] (satcalc) -- (sat);
+  \draw[->] (inspector) -- (snipper);
+  \draw[->, dashed] (snipper) -- (sat);
   \draw[->, dashed] ($(sat.south)+(0,-0.3cm)$) -- (ssat);
-  \draw[->] (satcalc) -- (stats);
+  \draw[->] (snipper) -- (stats);
   \draw[->] (stats) -- (dst);
   
   \node [fit=(inspector)] (inspector_box) {};

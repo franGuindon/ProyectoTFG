@@ -1,0 +1,35 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{arrows, positioning, calc, decorations.pathreplacing}
+
+\begin{document}
+\begin{tikzpicture}[node distance=2cm,
+  inner sep=10pt,
+  terminal/.style={
+    rectangle,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style={
+    rectangle,
+    minimum size=6mm,
+    fill=orange!40
+  }]
+
+\node[terminal] at (0,0cm) (in00) {Video with artifacts};
+\node[nonterminal, right=of in00] (func00) {Video Restorer};
+\node[terminal, right=of func00] (out00) {Restored video};
+
+\draw[->] (in00) -- (func00);
+\draw[->] (func00) -- (out00);
+
+\node[terminal] at (0,2cm) (in01) {Video with artifacts};
+\node[nonterminal, right=of in01] (func01) {Video Restorer};
+\node[terminal, right=of func01] (out01) {Restored video};
+
+\draw[->] (in01) -- (func01);
+\draw[->] (func01) -- (out01);
+
+\end{tikzpicture}
+\end{document}
