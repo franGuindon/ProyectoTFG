@@ -79,7 +79,7 @@ fig/%_.eps : fig/%_.gp
 fig/%.pdf : fig/%.png
 	@echo "Converting $< to $@" ; \
 	set -e ; \
-	convert $< -quality 80 -background white -alpha remove -alpha off $<.jp2 ; \
+	convert $< -quality 80 -background white -alpha remove -alpha off $<.jp2 || (@echo "convert failed, exit code: $$?"; exit 1); \
 	img2pdf -o $@ $<.jp2 ; \
 	rm $<.jp2
 

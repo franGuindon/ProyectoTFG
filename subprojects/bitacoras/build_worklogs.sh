@@ -18,7 +18,7 @@ cd ${WORKLOGS_DIRECTORY}
 echo "bin/sh$ export MAINFILE=${TGT}"
 export MAINFILE=${TGT}
 
-echo "bin/sh$ make clean && make semana_ && make clean"
+echo "bin/sh$ make clean && make && make clean"
 make clean && make && make clean
 
 echo "bin/sh$ cd ${CURRENT_DIRECTORY}"
