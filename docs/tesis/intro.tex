@@ -86,7 +86,7 @@ These results suggested that the RDF classifers were capable of learning artifac
 \section{Rangerx}
 \label{sec:intro_detector}
 
-The dispTEC2-2022 Video Restoration System is aimed at restoring video with artifacts frame by frame. Figure \ref{fig:restoration_system_overview} describes the general structure of the system and displays an example clip of an input frame with artifacts and the expected output clip from the system.
+The dispTEC2-2022 Video Restoration System is designed to restore video with artifacts frame by frame. Figure \ref{fig:restoration_system_overview} describes the general structure of the system. The figure shows a small section of an input frame with artifacts and the expected output from the system.
 
 \begin{figure} [!h]
   \centering
@@ -98,7 +98,7 @@ The dispTEC2-2022 Video Restoration System is aimed at restoring video with arti
 
 \end{figure}
 
-In order to achieve this goal, Figure \ref{fig:restoration_system_steps} shows that the system is composed of the Artifact Detection System and the Inpainting System. The Artifact Detection System takes the frames with artifacts and generates binary detection masks. The Inpainting System takes the frame with artifacts and the detection masks and generates the restored video frames.
+The system has two main components: the Artifact Detection System and the Inpainting System. Figure \ref{fig:restoration_system_steps} displays the inner structure of the Video Restoration System. The Artifact Detection System takes the frames with artifacts and generates binary detection masks. The Inpainting System takes the frames with artifacts and the detection masks. It then generates the restored video frames.
 
 \begin{figure} [!h]
   \centering
