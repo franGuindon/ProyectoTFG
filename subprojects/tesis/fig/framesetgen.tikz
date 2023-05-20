@@ -1,0 +1,58 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm, inner sep=15pt},
+  image/.style         ={draw, rectangle, inner sep=0.1cm},
+  icon/.style          ={draw, rectangle, inner sep=15pt},
+  terminal/.style      ={draw, rectangle, minimum size=6mm, fill=teal!40,
+                         line width=0.4mm},
+  nonterminal/.style   ={draw, rectangle, minimum size=6mm, fill=orange!40,
+                         line width=0.4mm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \node[terminal] at (0,0cm) (src) {Base Video File};
+  \node[nonterminal, below=of src, align=center] (inspector) {Human inspection};
+  \node[terminal, dashed, below=of inspector] (snip_spec) {Video Snipping Specification File};
+  \node[nonterminal, right=of inspector, align=center] (satcalc) {SAT Calculator};
+  \node[terminal, dashed, below=of satcalc] (sat) {SAT};
+  \node[terminal, dashed, below=of sat] (ssat) {Squared SAT};
+  \node[nonterminal, right=of satcalc, align=center] (stats) {Block Statistics Logic};
+  \node[terminal, below=of stats] (dst) {Feature Matrix};
+  
+  \draw[->] (src) -- (inspector);
+  \draw[->, dashed] (inspector) -- (snip_spec);
+  \draw[->] (inspector) -- (satcalc);
+  \draw[->, dashed] (satcalc) -- (sat);
+  \draw[->, dashed] ($(sat.south)+(0,-0.3cm)$) -- (ssat);
+  \draw[->] (satcalc) -- (stats);
+  \draw[->] (stats) -- (dst);
+  
+  \node [fit=(inspector)] (inspector_box) {};
+  
+  \scoped[on background layer]{
+    \node [draw, rectangle, fit=(inspector_box)(stats), fill=orange!30,
+      inner sep=0.3cm] (system) {};
+  
+    \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+      Feature Extractor};
+  }
+  
+\end{tikzpicture}
+\end{document}
