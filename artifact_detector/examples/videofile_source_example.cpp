@@ -25,12 +25,12 @@ int main(int argc, char** argv) {
 
   /* Object construction */
   try {
-    input_video = std::make_unique<VideofileSource>(input_videofile);
+    input_video = std::make_unique<VideofileSource>(input_videofile, 0.1);
   } catch (ReturnValue& ret) {
     printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
   }
 
-  for (size_t i = 0; i < 1; ++i) {
+  for (size_t i = 0; i < 200; ++i) {
     ret = input_video->pullFrame(&frame);
     if (ReturnCode::Success != ret.code) {
       printf("(%d): %s\n", static_cast<int>(ret.code), ret.description.c_str());
