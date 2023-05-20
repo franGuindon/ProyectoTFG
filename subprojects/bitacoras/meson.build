@@ -1,6 +1,6 @@
 project('worklogs')
 
-thesis_builder = files('build_worklogs.sh')
+worklog_builder = files('build_worklogs.sh')
 
 targets = [
   'semana_1',
@@ -27,7 +27,7 @@ foreach target : targets
   custom_target(target,
                 input: [source_file, figs],
                 output: output_file,
-                command: [thesis_builder,
+                command: [worklog_builder,
                   '@SOURCE_ROOT@/subprojects/bitacoras',
                   '@BUILD_ROOT@/subprojects/bitacoras',
                   target],
