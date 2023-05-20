@@ -23,8 +23,10 @@ class VideofileSource {
    * @brief Construct a VideofileSource
    *
    * @param filename  : Name of video file to load
+   * @param loss      : Percent of simulated H264 packet loss to use.
+   *                    (Default: 0)
    */
-  explicit VideofileSource(std::string filename);
+  explicit VideofileSource(std::string filename, float loss = 0);
   /**
    * @brief Destroy the VideofileSource instance
    */
@@ -58,6 +60,8 @@ class VideofileSource {
 
   /* Video filename */
   std::string file_;
+  /* H264 Packet Loss probability percent to apply on video */
+  float loss_;
   /* For internal error management */
   ReturnValue ret_;
   /* Video pipeline */
