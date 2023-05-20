@@ -35,7 +35,32 @@ Section \ref{sec:sol_dataset} details the dataset construction and expansion pro
 \section{Building and Expanding the Dataset}
 \label{sec:sol_dataset}
 
+The first step in expanding the training dataset is to obtain more base videos.
+For each video, a number of 200 frame sets are extracted from different locations in the video. These locations are hand picked according to subjective assessment of video content type.
 
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{framesetgen}
+  
+  \caption{Frameset Generation procedure.}
+  \label{fig:framesetgen}
+
+\end{figure}
+
+Each frame set undergoes a Ground Truth Generation procedure in order to generate the corresponding label set, as shown in Figure \ref{fig:labeler_steps}.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{labeler_steps}
+  
+  \caption{Ground Truth Generation procedure.}
+  \label{fig:labeler_general}
+
+\end{figure}
+
+These videos are preferably stored using H264 encoding and I420 frame format, since the video frames will be reencoded and redecoded during the loss simulation process. By
 
 \section{Improving the Detection Metrics}
 \label{sec:sol_metrics}
