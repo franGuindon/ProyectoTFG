@@ -19,7 +19,12 @@
 *.xml
 *.gz
 *.fdb_latexmk
+*jpeg2ps
+*__pycache__*
+
+# To be addressed in the future:
 *ranger*
 *anteproyecto*
-*bitacoras
-semana_*.pdf
+*disptec-2022*
+*rr-tools*
+subprojects/tesis/.gitignore
