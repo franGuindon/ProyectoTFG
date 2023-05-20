@@ -6,6 +6,7 @@
 # The TFG project can be seen as a collection of tools that can be used to
 # accomplish the objectives laid out in my Project Proposal.
 ################################################################################
+
 project(
   'TFG', ['cpp'],
   version : '0.1.1',
@@ -39,7 +40,8 @@ gstapp_dep = dependency('gstreamer-app-1.0')
 project_deps += gst_dep
 project_deps += gstapp_dep
 
-projectinc = include_directories('.', 'artifact_detector', 'artifact_detector/include')
+projectinc = include_directories('.', 'artifact_detector',
+  'artifact_detector/include')
 
 cpp_args = ['-DHAVE_CONFIG_H']
 
@@ -55,19 +57,52 @@ endif
 
 add_global_arguments(cpp_args, language : 'cpp')
 
-developer_mode = get_option('developer-mode')
-if developer_mode
+#########################################################################
+# Conditional build
+#########################################################################
+
+# Parse build args
+
+dev_mode = false
+test_mode = false
+docs_mode = false
+
+thesis_mode = get_option('only-thesis').enabled()
+worklog_mode = get_option('only-worklogs').enabled()
+proposal_mode = get_option('only-proposal').enabled()
+
+if thesis_mode
+  thesis = subproject('tesis')
+  subdir_done()
+elif worklog_mode
+  worklogs = subproject('bitacoras')
+  subdir_done()
+elif proposal_mode
+  proposal = subproject('anteproyecto')
+  subdir_done()
+else
+  dev_mode = get_option('developer-mode')
+  test_mode = get_option('enable-tests').enabled()
+  docs_mode = get_option('enable-docs').enabled()
+endif
+
+thesis_mode = false
+worklog_mode = false
+proposal_mode = false
+
+# Add conditional dependencies
+
+if dev_mode
   pre_commit = find_program('pre-commit', required : true, native : true)
   run_command(pre_commit, 'install', check : true)
   run_command(pre_commit, 'install', '--hook-type', 'commit-msg', check : true)
 endif
 
-if get_option('enable-tests').enabled()
+if test_mode
   test_dep = dependency('cpputest', required: true)
 endif
 
-# Docs
-if get_option('enable-docs').enabled()
+if docs_mode
   doxygen = find_program('doxygen', required: true)
   dot = find_program('dot', required : true)
   java = find_program('java', required : true)
@@ -79,6 +114,9 @@ if get_option('enable-docs').enabled()
   env.set('PLANTUML_JAR_PATH', plantumlpath)
 endif
 
+# Expose certain variables from ranger subproject
+# These are used when building the ranger extensions
+
 conf_data = configuration_data()
 
 ranger = subproject('ranger')
@@ -89,4 +127,7 @@ ext_sources = ranger.get_variable('ext_sources')
 
 subdir('artifact_detector')
 subdir('tools')
-subdir('docs')
+
+if docs_mode
+  subdir('docs')
+endif
