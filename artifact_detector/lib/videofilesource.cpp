@@ -26,8 +26,9 @@ int get_sample_height(GstSample* sample) {
   return height;
 }
 
-VideofileSource::VideofileSource(std::string filename)
+VideofileSource::VideofileSource(std::string filename, float loss)
     : file_{filename},
+      loss_{loss},
       ret_{ReturnCode::Success, "Videofilesrc initialized correctly"},
       gst_pipeline_{nullptr},
       gst_buffer_{nullptr},
@@ -52,12 +53,21 @@ VideofileSource::~VideofileSource() { freeResources(); }
 
 ReturnValue VideofileSource::openFile() {
   gst_init(0, 0);
-  gst_pipeline_ = gst_parse_launch(
-      format("filesrc location=%s ! decodebin ! video/x-raw, format=I420 ! "
-             "appsink sync=false max-buffers=5 name=%s",
-             file_.c_str(), gst_sink_name_)
-          .c_str(),
-      &gst_error_);
+
+  std::string pipeline_str = format(
+      "filesrc location=%s ! decodebin ! video/x-raw, format=I420 ! "
+      "appsink sync=false max-buffers=5 name=%s",
+      file_.c_str(), gst_sink_name_);
+
+  if (0 < loss_ && loss_ <= 1) {
+    pipeline_str = format(
+        "filesrc location=%s ! decodebin ! video/x-raw, format=I420 ! "
+        "x264enc ! h264parse ! identity drop_probability=%f ! avdec_h264 ! "
+        "video/x-raw, format=I420 ! appsink sync=false max-buffers=5 name=%s",
+        file_.c_str(), loss_, gst_sink_name_);
+  }
+
+  gst_pipeline_ = gst_parse_launch(pipeline_str.c_str(), &gst_error_);
 
   if (!gst_pipeline_) {
     ret_.code = ReturnCode::FileError;
