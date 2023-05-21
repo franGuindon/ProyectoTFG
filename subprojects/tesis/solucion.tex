@@ -16,7 +16,7 @@ The Artifact Detection System generates detection masks from frames with artifac
 
 \end{figure}
 
-In order to achieve this, the Artifact Detection System must first extract features from the input frame. These features become the inputs to the RDF Classifier. The RDF Classifier outputs a prediction vector. The prediction vector is then mapped to the binary mask output. Figure \ref{fig:detector_steps} illustrates these steps.
+In order to achieve this, the Artifact Detection System must first extract features from the input frame. These features, along with a pretrained Forest Model, become the inputs to the RDF Classifier. The RDF Classifier outputs a prediction vector. The prediction vector is then mapped to the binary mask output. Figure \ref{fig:detector_steps} illustrates these steps.
 
 \begin{figure} [!h]
   \centering
@@ -35,7 +35,22 @@ Section \ref{sec:sol_dataset} details the dataset construction and expansion pro
 \section{Building and Expanding the Dataset}
 \label{sec:sol_dataset}
 
-The first step in expanding the training dataset is to obtain more base videos. These base videos are processed by a Packet Loss Simulator to produce corresponding videos with artefacts. Figure \ref{fig:simulator} illustrates the simulator procedure. Base video frames are encoded into H264 packets, then they are processed by a Random H264 Packet Drop system, which uses a constant drop probability. Finally, the H264 Bitstream with losses is decoded into frames with artifacts.
+The first step in expanding the training dataset is to obtain more base videos. These base videos are then processed by the Dataset Generator to produce the training feature and label dataset. Figure \ref{fig:datasetgen} enumerates the general steps in dataset generation. The video file is first processed by a Packet Loss Simulator, which produces a corresponding video with artifacts. 
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{datasetgen}
+  
+  \caption{Dataset Generation procedure}
+  \label{fig:datasetgen}
+
+\end{figure}
+
+\subsection{The Packet Loss Simulator}
+\label{sec:sol_simulation}
+
+The base videos are processed by a Packet Loss Simulator to produce corresponding videos with artefacts. Figure \ref{fig:simulator} illustrates the simulator procedure. Base video frames are encoded into H264 packets, then they are processed by a Random H264 Packet Drop system, which uses a constant drop probability. Finally, the H264 Bitstream with losses is decoded into frames with artifacts.
 
 \begin{figure} [!h]
   \centering
@@ -47,9 +62,10 @@ The first step in expanding the training dataset is to obtain more base videos. 
 
 \end{figure}
 
-In order to ensure that the new dataset reduces the risk of overfitting, each new video is inspected manually and several locations of interest within the video are then described in a Video Snipping Specification File. This file is used by a Video Snipper system to then snip sets of 200 frames from each specified video location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
+\subsection{The Frame Set Generator}
+\label{sec:sol_framesetgen}
 
-The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different frame sets, each with their unique video content type, and the dataset must at least include video in 3 different lighting scenarios.
+In order to ensure that the new dataset reduces the risk of overfitting, each new video is inspected manually and several locations of interest within the video are then described in a Video Snipping Specification File. This file is used by a Video Snipper system to then snip sets of 200 frames from each specified video location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
 
 \begin{figure} [!h]
   \centering
@@ -60,6 +76,11 @@ The locations of interest are chosen according to a subjective assessment of vid
   \label{fig:framesetgen}
 
 \end{figure}
+
+The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different frame sets, each with their unique video content type, and the dataset must at least include video in 3 different lighting scenarios.
+
+\subsection{The Video Synchronizer}
+\label{sec:sol_synch}
 
 The next step in dataset generation is to synchronize the base video with the video with artifacts. Some H264 packets encode vital metadata for the decoding of frames. When these packets are dropped, a complete frame is lost and the distorted video becomes unsynchronized with the base video. By reading the base and distorted frame timestamps in pairs, the Video Synchronizer detects when the distorted frame timestamp jumps forward, it then dumps the unmatched base frames. The next base frame timestamp should match the distorted frame. The Synchronizer outputs base frame and distorted frame pairs with matching timestamps. \ref{fig:synch} illustrates the Video Synchronization procedure.
 
@@ -73,7 +94,18 @@ The next step in dataset generation is to synchronize the base video with the vi
 
 \end{figure}
 
+\subsection{The Label Generator}
+\label{sec:sol_labeler}
 
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{labeler}
+  
+  \caption{Video Labeling procedure.}
+  \label{fig:labeler}
+
+\end{figure}
 
 \section{Improving the Detection Metrics}
 \label{sec:sol_metrics}

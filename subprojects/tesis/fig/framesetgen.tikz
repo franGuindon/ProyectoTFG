@@ -28,7 +28,7 @@
 
   
   \node[terminal] at (0,0cm) (src) {Base Video File};
-  \node[terminal, dashed, anchor=south] at ($(src.north)+(0,0.6cm)$) (src1) {Distorted Video File};
+  \node[terminal, dashed, anchor=south] at ($(src.north)+(0,0.6cm)$) (src1) {Video File with Artifacts};
   \node[below=of src] (codo0) {};
   \node[nonterminal, below=of codo0, align=center] (inspector) {Human inspection};
   \node[terminal, dashed, below=of inspector, align=center] (snip_spec) {
@@ -46,7 +46,7 @@
   \node[right=of inspector] (codo1) {\hspace*{2 cm}};
   \node[nonterminal, right=of codo1, align=center] (snipper) {Video Snipper};
   \node[terminal, below=of snipper] (dst) {Base Frame Sets};
-  \node[terminal, dashed, anchor=north] at ($(dst.south)+(0,-0.6cm)$) (dst1) {Distorted Frame Sets};
+  \node[terminal, dashed, anchor=north] at ($(dst.south)+(0,-0.6cm)$) (dst1) {Frame Sets with Artifacts};
   
   \draw[->, dashed] (src1) -- (src);
   \draw[->] (src) -- (inspector);

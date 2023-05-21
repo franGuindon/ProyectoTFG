@@ -1,0 +1,55 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{every picture/.style={line width=0.4mm}}
+
+\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40, line width=0.4mm, inner sep=15pt]
+\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40, line width=0.4mm, inner sep=15pt]
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+\node[terminal] at (0,0cm) (src) {Video File};
+\coordinate[anchor=north] (codo0) at ($(src.south)+(0,-2cm)$) {}
+\node[nonterminal, below=of codo0, align=center] (simulator) {Packet Loss Simulator};
+\node[terminal, below=of simulator] at ($(simulator)+(0,-3cm)$) (features) {Video with Artifacts};
+\node[nonterminal, right=of simulator, align=center] (rdf) {Frame Set Generator};
+\node[nonterminal, above=of rdf, align=center] (generator2) {Frame Set Generator};
+\node[nonterminal, below=of rdf, align=center] (extractor) {Feature Extractor};
+\node[terminal, below=of extractor] (predictions) {Feature Matrix};
+\node[nonterminal, right=of rdf, align=center] (maskgen) {Video Synchronizer};
+\node[nonterminal, below=of maskgen, align=center] (labeler) {Video Labeler};
+\node[terminal, below=of labeler] (dst) {Label vector};
+
+\draw[->] (src) -- (codo0) -- (simulator);
+\draw[->] (codo0) -- (generator2);
+\draw[->] (simulator) -- (features);
+\draw[->] (simulator) -- (rdf);
+\draw[->] (rdf) -- (extractor);
+\draw[->] (extractor) -- (predictions);
+\draw[->] (rdf) -- (maskgen);
+\draw[->] (maskgen) -- (labeler);
+\draw[->] (labeler) -- (dst);
+
+\node [fit=(simulator)] (simulator_box) {};
+
+\scoped[on background layer]{
+  \node [draw, rectangle, fit=(simulator)(maskgen)(labeler), fill=orange!30,
+    inner sep=0.4cm] (system) {};
+
+  \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+    Dataset Generator};
+}
+
+\end{tikzpicture}
+\end{document}

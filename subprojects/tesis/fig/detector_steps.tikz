@@ -19,10 +19,11 @@
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
 
-\node[terminal] at (0,0cm) (src) {Video Frame with Artifacts};
+\node[terminal] at (0,0cm) (src) {Video Frame with Artifacts};  
 \node[nonterminal, below=of src, align=center] (extractor) {Feature Extractor};
 \node[terminal, dashed, below=of extractor] (features) {Feature Matrix};
 \node[nonterminal, right=of extractor, align=center] (rdf) {RDF Classifier};
+\node[terminal, above=of rdf] (model) {Forest Model};
 \node[terminal, dashed, below=of rdf] (predictions) {Prediction Vector};
 \node[nonterminal, right=of rdf, align=center] (maskgen) {Mask Generator};
 \node[terminal, below=of maskgen] (dst) {Binary Mask};
@@ -30,6 +31,7 @@
 \draw[->] (src) -- (extractor);
 \draw[->, dashed] (extractor) -- (features);
 \draw[->] (extractor) -- (rdf);
+\draw[->] (model) -- (rdf);
 \draw[->, dashed] (rdf) -- (predictions);
 \draw[->] (rdf) -- (maskgen);
 \draw[->] (maskgen) -- (dst);
