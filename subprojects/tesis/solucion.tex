@@ -30,26 +30,12 @@ In order to achieve this, the Artifact Detection System must first extract featu
 
 This structure was used in the dispTEC2-2022 RDF system. The Rangerx system maintains this structure and improves over the previous system by increasing the training dataset size, by redesigning the Feature Extractor and by replacing the previous RDF library with the Ranger C++ Core Library.
 
-Section \ref{sec:sol_dataset} details the dataset construction and expansion procedure. Section \ref{sec:sol_metrics} explains the main strategies Rangerx uses to improve performance on the detection task, as measured by the Precision and Recall Metrics. This section details out the Rangerx Feature Extractor design. Section \ref{sec:sol_speed} discusses the optimizations used in Rangerx to improve on the previous system's speed. This section justifies the use of Ranger as the new RDF backend. Section \ref{sec:sol_maskgen} is a brief explanation of the Rangerx Mask Generator (This Generator is identical to the one used in dispTEC2-2022). Section \ref{sec:sol_maskgen} is a brief explanation of the Rangerx Mask Generator (This Generator is identical to the one used in dispTEC2-2022). Finally, Section \ref{sec:sol_traintest} elaborates on the training and testing procedures.
+Section \ref{sec:sol_dataset} details the dataset construction and expansion procedure. Section \ref{sec:sol_metrics} explains the main strategies Rangerx uses to improve performance on the detection task, as measured by the Precision and Recall Metrics. This section details out the Rangerx Feature Extractor design. Section \ref{sec:sol_speed} discusses the optimizations used in Rangerx to improve on the previous system's speed. This section justifies the use of Ranger as the new RDF backend. Section \ref{sec:sol_maskgen} is a brief explanation of the Rangerx Mask Generator (This Generator is identical to the one used in dispTEC2-2022). Finally, Section \ref{sec:sol_traintest} elaborates on the training and testing procedures.
 
 \section{Building and Expanding the Dataset}
 \label{sec:sol_dataset}
 
-The first step in expanding the training dataset is to obtain more base videos. Each new video is inspected manually in order to identify several locations of interest within the video. These locations are then described in a Video Snipping Specification File, used to then snip sets of 200 frames from each specified location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
-
-\begin{figure} [!h]
-  \centering
-  
-  \includegraphics{framesetgen}
-  
-  \caption{Frameset Generation procedure.}
-  \label{fig:framesetgen}
-
-\end{figure}
-
-The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different video content types, and the dataset must at least include video in 3 different lighting scenarios.
-
-Each frame set undergoes a Ground Truth Generation procedure in order to generate the corresponding label set, as described in Figure \ref{fig:labeler_steps}. In this procedure, the frame is encoded using H264
+The first step in expanding the training dataset is to obtain more base videos. These base videos are processed by a Packet Loss Simulator to produce corresponding videos with artefacts. Figure \ref{fig:simulator} illustrates the simulator procedure. Base video frames are encoded into H264 packets, then they are processed by a Random H264 Packet Drop system, which uses a constant drop probability. Finally, the H264 Bitstream with losses is decoded into frames with artifacts.
 
 \begin{figure} [!h]
   \centering
@@ -61,7 +47,33 @@ Each frame set undergoes a Ground Truth Generation procedure in order to generat
 
 \end{figure}
 
-These videos are preferably stored using H264 encoding and I420 frame format, since the video frames will be reencoded and redecoded during the loss simulation process. By
+In order to ensure that the new dataset reduces the risk of overfitting, each new video is inspected manually and several locations of interest within the video are then described in a Video Snipping Specification File. This file is used by a Video Snipper system to then snip sets of 200 frames from each specified video location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
+
+The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different frame sets, each with their unique video content type, and the dataset must at least include video in 3 different lighting scenarios.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{framesetgen}
+  
+  \caption{Frame Set Generation procedure.}
+  \label{fig:framesetgen}
+
+\end{figure}
+
+The next step in dataset generation is to synchronize the base video with the video with artifacts. Some H264 packets encode vital metadata for the decoding of frames. When these packets are dropped, a complete frame is lost and the distorted video becomes unsynchronized with the base video. By reading the base and distorted frame timestamps in pairs, the Video Synchronizer detects when the distorted frame timestamp jumps forward, it then dumps the unmatched base frames. The next base frame timestamp should match the distorted frame. The Synchronizer outputs base frame and distorted frame pairs with matching timestamps. \ref{fig:synch} illustrates the Video Synchronization procedure.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{synch}
+  
+  \caption{Video Synchronization procedure.}
+  \label{fig:synch}
+
+\end{figure}
+
+
 
 \section{Improving the Detection Metrics}
 \label{sec:sol_metrics}

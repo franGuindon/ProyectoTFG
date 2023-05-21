@@ -1,0 +1,50 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{every picture/.style={line width=0.4mm}}
+
+\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
+  line width=0.4mm, inner sep=15pt]
+\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
+  line width=0.4mm, inner sep=15pt]
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \node[terminal] at (0,0cm) (src) {Base Video Frame};
+  \node[nonterminal, below=of src, align=center] (encoder) {H264 Encoder};
+  \node[terminal, dashed, below=of encoder] (bitstream) {H264 Bitstream};
+  \node[nonterminal, right=of encoder, align=center] (simulator) {Random H264 Packet Drop};
+  \node[terminal, dashed, below=of simulator, align=center] (lossy_bitstream) {H264 Bitstream\\with losses};
+  \node[nonterminal, right=of simulator, align=center] (decoder) {H264 Decoder};
+  \node[terminal, below=of decoder] (dst) {Frame with Artifacts};
+  
+  \draw[->] (src) -- (encoder);
+  \draw[->, dashed] (encoder) -- (bitstream);
+  \draw[->] (encoder) -- (simulator);
+  \draw[->, dashed] (simulator) -- (lossy_bitstream);
+  \draw[->] (simulator) -- (decoder);
+  \draw[->] (decoder) -- (dst);
+  
+  \node [fit=(encoder)] (encoder_box) {};
+  
+  \scoped[on background layer]{
+    \node [draw, rectangle, fit=(encoder_box)(decoder), fill=orange!30,
+      inner sep=0.3cm] (system) {};
+  
+    \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+      Packet Loss Simulation};
+  }
+  
+  \end{tikzpicture}
+\end{document}

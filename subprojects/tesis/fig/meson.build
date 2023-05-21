@@ -6,5 +6,6 @@ source_files += files([
   'detector_general.tikz',
   'detector_steps.tikz',
   'framesetgen.tikz',
-  'labeler_steps.tikz',
+  'simulator.tikz',
+  'synch.tikz'
 ])

@@ -11,24 +11,26 @@
   backgrounds,
   fit}
 
-\tikzset{
-  % General
-  > ={Latex[width=3mm, height=3mm]},
-  % Node
-  every picture/.style ={line width=0.4mm},
-  image/.style         ={draw, rectangle, inner sep=0.1cm},
-  icon/.style          ={draw, rectangle, inner sep=15pt},
-  terminal/.style      ={draw, rectangle, minimum size=6mm, fill=teal!40,
-                         line width=0.4mm, inner sep=15pt},
-  nonterminal/.style   ={draw, rectangle, minimum size=6mm, fill=orange!40,
-                         line width=0.4mm, inner sep=15pt},
-}
+  \tikzset{
+    % General
+    > ={Latex[width=3mm, height=3mm]},
+    % Node
+    every picture/.style ={line width=0.4mm},
+    block/.style         ={draw, rectangle, inner sep=15pt},
+    image/.style         ={block, inner sep=0.1cm},
+    icon/.style          ={block},
+    terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+    nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+  }
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
 
+  
   \node[terminal] at (0,0cm) (src) {Base Video File};
-  \node[nonterminal, below=of src, align=center] (inspector) {Human inspection};
+  \node[terminal, dashed, anchor=south] at ($(src.north)+(0,0.6cm)$) (src1) {Distorted Video File};
+  \node[below=of src] (codo0) {};
+  \node[nonterminal, below=of codo0, align=center] (inspector) {Human inspection};
   \node[terminal, dashed, below=of inspector, align=center] (snip_spec) {
     Video Snipping Specification File \\ \\
     \begin{tabular}[!h]{|c|c|c|}
@@ -41,23 +43,27 @@
       \hline
     \end{tabular}
   };
-  \node[right=of inspector] (codo0) {\hspace*{2 cm}};
-  \node[nonterminal, right=of codo0, align=center] (snipper) {Video Snipper};
-  \node[terminal, below=of snipper] (dst) {Frame Set Files};
+  \node[right=of inspector] (codo1) {\hspace*{2 cm}};
+  \node[nonterminal, right=of codo1, align=center] (snipper) {Video Snipper};
+  \node[terminal, below=of snipper] (dst) {Base Frame Sets};
+  \node[terminal, dashed, anchor=north] at ($(dst.south)+(0,-0.6cm)$) (dst1) {Distorted Frame Sets};
   
+  \draw[->, dashed] (src1) -- (src);
   \draw[->] (src) -- (inspector);
+  \draw[->] (codo0.center) -| (snipper);
   \draw[->, dashed] (inspector) -- (snip_spec);
   \draw[->] (inspector) -- (snipper);
   \draw[->] (snipper) -- (dst);
+  \draw[->, dashed] (dst) -- (dst1);
   
-  \node [fit=(inspector)] (inspector_box) {};
+  \node [fit=(inspector)(codo0)] (inspector_box) {};
 
   \scoped[on background layer]{
     \node [draw, rectangle, fit=(inspector_box)(snipper), fill=orange!30,
       inner sep=0.3cm] (system) {};
   
     \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
-      Feature Extractor};
+      Frame Set Generator};
   }
   
 \end{tikzpicture}
