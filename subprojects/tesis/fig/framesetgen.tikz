@@ -15,13 +15,13 @@
   % General
   > ={Latex[width=3mm, height=3mm]},
   % Node
-  every picture/.style ={line width=0.4mm, inner sep=15pt},
+  every picture/.style ={line width=0.4mm},
   image/.style         ={draw, rectangle, inner sep=0.1cm},
   icon/.style          ={draw, rectangle, inner sep=15pt},
   terminal/.style      ={draw, rectangle, minimum size=6mm, fill=teal!40,
-                         line width=0.4mm},
+                         line width=0.4mm, inner sep=15pt},
   nonterminal/.style   ={draw, rectangle, minimum size=6mm, fill=orange!40,
-                         line width=0.4mm},
+                         line width=0.4mm, inner sep=15pt},
 }
 
 \begin{document}
@@ -29,25 +29,31 @@
 
   \node[terminal] at (0,0cm) (src) {Base Video File};
   \node[nonterminal, below=of src, align=center] (inspector) {Human inspection};
-  \node[terminal, dashed, below=of inspector] (snip_spec) {Video Snipping Specification File};
-  \node[nonterminal, right=of inspector, align=center] (snipper) {SAT Calculator};
-  \node[terminal, dashed, below=of snipper] (sat) {SAT};
-  \node[terminal, dashed, below=of sat] (ssat) {Squared SAT};
-  \node[nonterminal, right=of snipper, align=center] (stats) {Block Statistics Logic};
-  \node[terminal, below=of stats] (dst) {Feature Matrix};
+  \node[terminal, dashed, below=of inspector, align=center] (snip_spec) {
+    Video Snipping Specification File \\ \\
+    \begin{tabular}[!h]{|c|c|c|}
+      \hline
+      Snip id & Location & Description \\
+      \hline
+      0 & 00:00:00 & Video Content Type 0 \\
+      1 & 00:10:00 & Video Content Type 1 \\
+      ... & ... & ... \\
+      \hline
+    \end{tabular}
+  };
+  \node[right=of inspector] (codo0) {\hspace*{2 cm}};
+  \node[nonterminal, right=of codo0, align=center] (snipper) {Video Snipper};
+  \node[terminal, below=of snipper] (dst) {Frame Set Files};
   
   \draw[->] (src) -- (inspector);
   \draw[->, dashed] (inspector) -- (snip_spec);
   \draw[->] (inspector) -- (snipper);
-  \draw[->, dashed] (snipper) -- (sat);
-  \draw[->, dashed] ($(sat.south)+(0,-0.3cm)$) -- (ssat);
-  \draw[->] (snipper) -- (stats);
-  \draw[->] (stats) -- (dst);
+  \draw[->] (snipper) -- (dst);
   
   \node [fit=(inspector)] (inspector_box) {};
-  
+
   \scoped[on background layer]{
-    \node [draw, rectangle, fit=(inspector_box)(stats), fill=orange!30,
+    \node [draw, rectangle, fit=(inspector_box)(snipper), fill=orange!30,
       inner sep=0.3cm] (system) {};
   
     \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {

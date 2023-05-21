@@ -5,5 +5,6 @@ source_files += files([
   'extractor_steps.tikz',
   'detector_general.tikz',
   'detector_steps.tikz',
-  'framesetgen.tikz'
+  'framesetgen.tikz',
+  'labeler_steps.tikz',
 ])

@@ -35,8 +35,7 @@ Section \ref{sec:sol_dataset} details the dataset construction and expansion pro
 \section{Building and Expanding the Dataset}
 \label{sec:sol_dataset}
 
-The first step in expanding the training dataset is to obtain more base videos.
-For each video, a number of 200 frame sets are extracted from different locations in the video. These locations are hand picked according to subjective assessment of video content type.
+The first step in expanding the training dataset is to obtain more base videos. Each new video is inspected manually in order to identify several locations of interest within the video. These locations are then described in a Video Snipping Specification File, used to then snip sets of 200 frames from each specified location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
 
 \begin{figure} [!h]
   \centering
@@ -48,15 +47,17 @@ For each video, a number of 200 frame sets are extracted from different location
 
 \end{figure}
 
-Each frame set undergoes a Ground Truth Generation procedure in order to generate the corresponding label set, as shown in Figure \ref{fig:labeler_steps}.
+The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different video content types, and the dataset must at least include video in 3 different lighting scenarios.
+
+Each frame set undergoes a Ground Truth Generation procedure in order to generate the corresponding label set, as described in Figure \ref{fig:labeler_steps}. In this procedure, the frame is encoded using H264
 
 \begin{figure} [!h]
   \centering
   
-  \includegraphics{labeler_steps}
+  \includegraphics{simulator}
   
-  \caption{Ground Truth Generation procedure.}
-  \label{fig:labeler_general}
+  \caption{H264 Packet Loss Simulation procedure}
+  \label{fig:simulator}
 
 \end{figure}
 
