@@ -1,0 +1,98 @@
+%% ---------------------------------------------------------------------------
+%% paNotation.tex
+%%
+%% Notation
+%%
+%% $Id: paNotation.tex,v 1.15 2004/03/30 05:55:59 alvarado Exp $
+%% ---------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\nomname}{List of Symbols and Abbreviations}
+\setlength{\nomitemsep}{-\parsep}
+
+%%
+% Commands required for the nomenclature groups
+%
+% There are following prefix forms:
+%  a   abbreviation    \syma[key]{symbol}{description}
+%  g   general         \symg[key]{symbol}{description}
+%%
+
+\renewcommand{\nomgroup}[1]{%
+  \ifthenelse{\equal{#1}{G}}{\section*{\hspace*{-\leftmargin}General Notation}}{}%
+  \ifthenelse{\equal{#1}{A}}{\section*{\hspace*{-\leftmargin}Abreviations and Acronyms}}{}%
+}
+
+\newcommand{\syma}[3][foo]{%
+  \ifthenelse{\equal{#1}{foo}}%
+  {\nomenclature[A]{#2}{#3}}{\nomenclature[A#1]{#2}{#3}}}
+\newcommand{\symg}[3][foo]{%
+  \ifthenelse{\equal{#1}{foo}}%
+  {\nomenclature[G]{#2}{#3}}{\nomenclature[G#1]{#2}{#3}}}
+
+%%
+% Símbolos en la notación general
+% (es posible poner la declaración en el texto
+%%
+
+\symg[yscalar]{$y$}{Scalar.}
+\symg[xvector]{$\vct{x}$}{Vector. \newline\hspace{1mm}%
+  $\vct{x}=\left[ x_1 \; x_2 \; \ldots \; x_n \right]^T =
+  \begin{bmatrix}
+    x_1 \\ x_2 \\ \vdots \\ x_n
+  \end{bmatrix}$}
+
+\symg[mmatrix]{$\mat{A}$}{Matrix. \newline\hspace{1mm}%
+  $\mat{A} =
+  \begin{bmatrix}
+    a_{11} & a_{12} & \cdots & a_{1m}\\
+    a_{21} & a_{22} & \cdots & a_{2m}\\
+    \vdots & \vdots & \ddots & \vdots\\
+    a_{n1} & a_{n2} & \cdots & a_{nm}\\
+  \end{bmatrix}$}
+  \symg[S]{$\set{S}$}{Set.}
+  \symg[SN]{$\setN$}{Set of Natural Numbers.}
+  \symg[SNE]{$\setN_{8-bit}$}{Set of 8-bit Natural Numbers. }
+
+%%
+% Algunas abreviaciones
+%%
+
+\syma{QoE}{Quality of Experience}
+\syma{CPU}{Central Processing Unit}
+\syma{GPU}{Graphics Processing Unit}
+\syma{MPEG}{Moving Picture Experts Group}
+\syma{PLDA}{Packet Loss Detection Algorithm}
+\syma{NSGA-II}{Non-dominated Sorting Genetic Algorithm}
+\syma{RDF}{Random Decision Forests}
+\syma{VCL}{Video Coding Layer}
+\syma{NAL}{Network Abstraction Layer}
+\syma{SPS}{Sequence Parameter Set}
+\syma{PPS}{Picture Parameter Set}
+\syma{RTP}{Real-time Transport Protocol}
+\syma{NCA}{Non-Concealed Artifact}
+\syma{LSAA}{Low Spatial Activity Artifact}
+\syma{HSAA}{High Spatial Activity Artifact}
+\syma{TCA}{Temporally-Concealed Artifact}
+\syma{PA}{Propagation Artifact}
+\syma{RPD}{Random Packet Dropper}
+\syma{ML}{Machine Learning}
+\syma{SAT}{Summed-Area Table}
+\syma{SSAT}{Squared Summed-Area Table}
+\syma{ARM}{Acorn RISC Machine}
+\syma{ITB}{In-the-Bag}
+\syma{OOB}{Out-of-Bag}
+\syma{TP}{True Positive}
+\syma{TN}{True Negative}
+\syma{FP}{False Positive}
+\syma{FN}{False Negative}
+\syma{dT2}{dispTEC2}
+\syma{Art-FD}{Artifact Detector based on Random Decision Forests}
+\syma{SIMD}{Singe-Instruction Multiple-Output}
+
+\printnomenclature[20mm]
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paMain"
+%%% End:

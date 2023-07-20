@@ -1,0 +1,78 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 12}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      %wed
+      11/5/23 & 0.5 h & Reunión de avance 12 & Metas son: Terminar Capítulos 1,2,3. Hacer prueba de predicción con otro video. Entrenar con varios videos.\\
+      %thurs
+      12/5/23 & 8 h & Predecir con otro video & Agregando código para poder predecir y medir performance por mi cuenta. Tiene una pulga y todavía no se ha resuelto. \\
+      %sat
+      13/5/23 & 4 h & Tesis & Trabajando en introducción \\
+      13/5/23 & 4 h & Predicción & Intentando arreglar pulga \\
+      %tues
+      16/5/23 & 4.5 h & Tesis & Trabajando en introducción y teoría \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Wednesday:}
+  \begin{lstlisting}
+  Meeting:
+  - Thesis Chapters 1,2,3
+  - Experiments with new dataset
+  \end{lstlisting}
+
+  \printbibliography[title={Bibliografía},heading=bibintoc]
+\end{document}

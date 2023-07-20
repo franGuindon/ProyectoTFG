@@ -1,0 +1,103 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{every picture/.style={line width=0.4mm}}
+
+% \tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
+%   line width=0.4mm, inner sep=15pt]
+% \tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
+%   line width=0.4mm, inner sep=15pt]
+
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
+  
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \node[terminal] at (0,0cm) (src) {Base Video Frame};
+  \node[terminal, xshift=-0.5cm, right=of src] (src1) {Video Frame with Artifacts};
+  \coordinate[yshift=-0.4cm] (codo0) at (src.south east) {};
+
+  \node[nonterminal, below=of codo0, align=center] (encoder) {Absolute Difference \\ Operator};
+  \node[terminal, below=of encoder, align=center] (bitstream) {Absolute Difference \\ Frame};
+  \node[nonterminal, xshift=0.4cm, right=of encoder, align=center] (simulator) {Macroblock Averager};
+  \node[terminal, anchor=north, align=center] at ($(simulator.north)!(bitstream.north)!(simulator.south)$)(lossy_bitstream) {Macroblock Average\\Vector};
+  \node[nonterminal, xshift=0.3cm, right=of simulator, align=center] (decoder) {Discretizer};
+  \node[terminal, anchor=north] at ($(decoder.north)!(bitstream.north)!(decoder.south)$) (dst) {Label Vector};
+  
+  \draw (src) |- (codo0) -| (src1);
+  \draw[->] (codo0) -- (encoder);
+  \draw[->] (encoder) -- (bitstream);
+  \draw[->] (bitstream) -| ($(encoder.south east)!0.55!(simulator.south west)$) |- (simulator);
+  \draw[->] (simulator) -- (lossy_bitstream);
+  \draw[->] (lossy_bitstream) -| ($(simulator.south east)!0.5!(decoder.south west)$) |- (decoder);
+  \draw[->] (decoder) -- (dst);
+  
+  \node [fit=(encoder)] (encoder_box) {};
+  
+  \scoped[on background layer]{
+    \node [draw, rectangle, fit=(encoder_box)(decoder), fill=orange!30,
+      inner sep=0.3cm] (system) {};
+  
+    \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+      Labeler};
+  }
+  
+  \end{tikzpicture}
+\end{document}

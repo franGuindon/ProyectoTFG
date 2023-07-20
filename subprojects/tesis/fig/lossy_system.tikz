@@ -1,0 +1,68 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
+
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},  
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+\node[terminal] at (0,0cm) (src) {Video Source};
+\node[nonterminal, below=of src] (encoder) {Video Encoding System};
+\node[nonterminal, right=of encoder, align=center] (channel) {Video Transmission\\(with packet losses)};
+\node[nonterminal, right=of channel] (decoder) {Video Decoding System};
+\node[terminal, below=of decoder] (dst) {Video with Artifacts};
+
+\draw[->] (src) -- (encoder);
+\draw[->] (encoder) -- (channel);
+\draw[->] (channel) -- (decoder);
+\draw[->] (decoder) -- (dst);
+
+\end{tikzpicture}
+\end{document}

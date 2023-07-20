@@ -1,0 +1,248 @@
+\chapter{Theoretical Framework}
+\label{ch:marco}
+
+This work makes use of a number of key engineering concepts. First, this work studies the comparison between videos without artifacts and the same videos with artifacts generated from H264 packet loss. Section \ref{sec:h264} describes H264 video encoding. Section \ref{sec:h264_pl} describes the general characteristics of video artifacts caused by H264 packet losses. Section \ref{sec:simulation} describes packet loss simulation. Next, this work makes use of the RDF Classifier. Sections \ref{sec:classicalML} and \ref{sec:rdf_algorithm} explain Machine Learning and the RDF Classifier Algorithm, respectively. This work also makes use of mathematical concepts from Signal Processing. Section \ref{sec:2d_filter} explains the 2D Bi-linear High Pass Filtering algorithm. Section \ref{sec:sat_calc} explains the Summed-Area Table Algorithm. Finally, this work considers a series of hardware and software optimizations. Section \ref{sec:loop_unrolling} describes the software technique of loop fusion. Section \ref{sec:teo_multithreading} explains multithreading within the context of a multi-core machine. Section \ref{sec:tx2_simd} explains the characteristics of the TX2 target hardware.
+
+\section{H264 Encoding}
+\label{sec:h264}
+
+H264 encoding compresses video into a series of Network Abstraction Layer (NAL) units \cite{h264}. These are either Video Coding Layer (VCL) units, which contain the compressed video data, or non-VCL units, which contain sequence (SPS) and picture (PPS) meta-data. These units are sent through a transmission channel in transport layer RTP packets \cite{Schulzrinne2003} from one end-point machine to another. An H264 bitstream refers to complete stream of packets corresponding to an input video source. The H264 decoding algorithm is used to recreate the video at the receiving end-point with varying degrees of compression distortion. Under certain encoding settings, H264 encodes and decodes Digital Satellite TV quality video at 1.5 megabits per second \cite{Jesup2011}.
+
+Some features of H264 encoding are frame color subsampling, integer discrete cosine transform for intra-picture compression, and inter-picture prediction \cite{h264}. H264 makes use of video frames with I420 color subsampling, which compresses each frame to half the original size by separating the luma and chroma components of an image, then subsampling the chroma components by a factor of 2 in each dimension.
+
+\todo{I420 Layout Diagram}
+
+The Integer Discrete Cosine Transform is used to compress video frames by only considering the low frequency components of an image. These components are then used with the Inverse Integer Discrete Cosine Transform to recreate the image with minimal distortion. Within the context of video encoding, image compression is sometimes refered to as spatial or intra-picture compression.
+
+H264 inter-picture prediction allows to compress some video frames with respect to previous or future frames by motion estimation and motion compensation. Motion estimation compares pixel blocks, computes block differences, and generates set of motion vectors. These vectors allow predicted frames to be constructed from previous frames. By using 6-tap filtering (a kind of 6th order digital filter) the frame prediction can interpolate block motion and reduce artifacts caused by compression.
+
+Encoded video frames are classified into 3 categories: I-frames, P-frames, and B-frames. I-frames only use spatial compression and are used as references for P-frames and B-frames. P-frames only store motion predictions with respect to previous I-frames or P-frames. B-frames use motion predictions with respect to previous I-frames or P-frames, as well as following I-frames or P-frames. The distance between reference frames (I-frames or P-frames) and the distance between I-frames are parameters that affect the bitrate of the encoded video.
+
+\todo{H264 frame types diagram}
+
+\section{Types of Artifacts caused by H264 Packet Loss}
+\label{sec:h264_pl}
+
+H264 and MPEG-2 (another video encoding algorithm) differ in may ways. However, they share the same types of artifacts caused by packet loss. MPEG-2 artifacts are classified in \cite{Greengrass2009} as slice errors, blocking or pixelation errors, ghosting, and freeze frames.
+
+Slice errors occur when H264 packets corresponding to complete rows of an image are dropped. These losses mostly occur in I-frame packets and cause strips of the video to appear distorted. Blocking or pixelation errors occur within I-frames or certain P-frames. These losses can either appear as black macroblocks or as macroblocks that belong to previous frames. Ghosting occurs when errors in reference frames are propagated by following P-frames or B-frames. These errors produce chaotic distortions and may spread over a frame region. These errors usually disappear at the next I-frame. Freeze frames happen when complete frames are lost. This occurs when H264 header packets are lost. Header packets contain meta-data that describe general frame characteristics. These packets are crucial to reconstruct the frame from the encoded information. Losses in I-frame headers cause significant artifacts for an entire frame sequence until the arrival of the next I-frame.
+
+Additionally \cite{Glavota2016} classifies H264 packet loss artifacts in two main categories: rectangular artifacts and irregular artifacts. They then define a series of artifact types that fall into these two categories. Non-concealed Artifact (NCA) are rectangular artifacts that appear black in the frame. These artifacts usually follow macroblock borders. Low spatial activity artifact (LSAA) are rectangular artifacts that contain some details from the surrounding frame region. High spatial activity artifact (HSAA) are rectangular artifacts that contain internal borders and considerable detail from the surrounding frame region. Temporally-concealed artifacts (TCA) are either rectangular or irregular artifacts that contain information from previous frames. Propagation artifacts (PA) are irregular artifacts caused by motion prediction on rectangular artifacts in previous frames. These artifacts cause dramatic distortions and do not follow predictable boundaries.
+
+\section{Packet Loss Simulation}
+\label{sec:simulation}
+
+\def\N8{\setN_\text{8-bit}}
+
+Mathematically, a video \mat{V} is a 4-tensor of pixel values $p$ and dimensions $N$, $C$, $H$, and $W$. $N$ is the number of video frames in \mat{V}. A video frame $\mat{F}_n$ at time $n$ has width $W$, height $H$, and number of color channels $C$. A pixel value is an unsigned positive 8-bit integer, which is modeled as
+
+\begin{equation}
+  \label{eq:PV}
+  p \in \N8
+\end{equation}
+
+where
+
+\begin{equation}
+  \label{eq:N8}
+  \N8 = \{ n \in \setN \mid 0 \le n < 2^8  \}
+\end{equation}
+
+\def\VA{\mat{V}_A}
+\def\VB{\mat{V}_B}
+
+A video with artefacts $\VA$ is generated from a base video $\VB$ (without artifacts) using
+
+\def\DEC{D_{H264}}
+\def\RPD{\text{RPD}_{P_d}}
+\def\ENC{E_{H264}}
+\begin{equation}
+  \label{eq:V_A}
+  \VA = \DEC\left(\RPD\left(\ENC\left(\VB\right)\right)\right)
+\end{equation}
+
+\def\ph264{\text{P}_{\text{H264}}}
+
+where $\ENC$ and $\DEC$ are the H264 encoding and decoding algorithms, respectively \cite{h264}. $\RPD$ is the Random H264 Packet Dropper with constant drop probability $P_d$. The $\RPD$ model is
+
+\def\H264PV{\vct{P_\text{H264}}}
+\def\XPD{\vct{X_{P_d}}}
+\begin{equation}
+  \label{eq:RPD}
+  \left[\RPD(\H264PV)\right]_{i} = \H264PV[i]\cdot\XPD[i]
+\end{equation}
+
+where $\H264PV$ is a vector consisting of the encoded H264 Packets and $\XPD[i]$ is a Bernoulli distributed random vector such that
+
+\begin{equation}
+  \label{eq:XPDSET}
+  \XPD[i] \in \{0,1\}
+\end{equation}
+
+and
+
+\begin{equation}
+  \label{eq:XPDPROB}
+  P\left(\XPD[i]=1\right)=P_d
+\end{equation}
+
+\section{Machine Learning}
+\label{sec:classicalML}
+
+Machine Learning (ML) is a field of study and development focused on designing algorithms that learn from a dataset and automatically improve some performance metric \cite{Jordan2015}. ML algorithms are described as functions with adjustable parameters. While training an ML model with a given dataset, these parameters are automatically adjusted or ``learned'' such that they improve at a chosen performance metric. A performance metric encodes the task to be performed by a given algorithm. For example, error detection is a classification problem, since input data can fall into an \emph{error} category or a \emph{non-error} category. An error detection performance metric then considers either high or low performance if the algorithm classifies the input data correctly or incorrectly, respectively.
+
+Three major paradigms of ML are supervised, unsupervised, and reinforcement learning. Supervised learning refers to ML algorithms that learn on a dataset where the desired output for each input is known. In these algorithms, the training data takes a form of an input-output pair. Unsupervised learning analyzes ML algorithms that learn from the input data alone. Reinforcement learning determines policies that agents can use to continuously improve on a reward metric within a controled environment.
+
+A popular machine learning approach is deep learning. Deep learning methods use artificial neural networks and backpropagation at their core. These methods can achieve high performance on a variety of tasks, provided a large enough training dataset. These methods also benefit from their capacity to automatically determine features from the input data that improve their performance metrics.
+
+There are machine learning algorithms besides neural networks. In this work, these approaches are considered Classical Machine Learning. The RDF classifier used in this work is a classical approach. RDF classifiers use a separate input feature selection strategy to perform well. For instance, the RDF classifier used in \cite{Sewak2018} outperforms a deep learning model at malware detection. This RDF classifier uses a Variance Threshold technique for feature selection.
+
+\subsection{Random Decision Forests}
+\label{sec:rdf_algorithm}
+
+Random Decision Forests (RDF) are widely used classifiers. Some important milestones in the development of Random Decision Forests are \cite{Freund1996, Freund1996, Ho1998,Bauer1999, Breiman1999, Breiman2000, Breiman2001, Breiman1996, Pedregosa2011}. The algorithm was first completely described mathematically by Breiman in 2001, even though the algorithm had already been around since the late 90s.
+
+The RDF classification or prediction algorithm aggregates the results from an ensemble of Decision Tree Classifiers \cite{Quinlan1986,Quinlan1987}. This ensemble is called a forest and the number of classifiers in the forest is $N_T$. A tree classifier is modeled by a root node that branches out into a left child node and a right child node. Each child node recursively branches out in binary fashion until they reach terminal ``leaf'' nodes. The non-terminal nodes store a feature index $i$, threshold $T_{H}$ pair. Leaf nodes store an output category. In the example of error detection, each leaf node is either assigned to the \emph{error} category or the \emph{non-error} category. To perform a prediction on an input feature vector $\vct{x}$, a tree evaluates the vector at the root node, and then recursively evaluates the vector on a single child node until a leaf node is reached. A node with a stored $(i,T_H)$ pair evaluates a vector by comparing its $i$-th component with $T_H$. If the vector value is less than the threshold, the tree evaluates the left child node. Otherwise, the tree evaluates the right child node. The prediction result is the category assigned to the final leaf node.
+
+Figure \ref{fig:rdf_example} displays an example of decision tree classification. The input $\vct{x}$ has two features of values 3 and 6. The root node compares the first feature against a threshold of 1. Since 3 is greater than 1, the tree evaluates the right child node. This node compares the second feature against a threshold of 7. Since 6 is less than 7, the tree evaluates the left child node. This node compares the first feature against a threshold of 4. Since 3 is less than 4, the tree evaluates the left child node. Since this node is a leaf node, the output $y$ is set to the leaf node's value of 1.
+
+\begin{figure} [!h]
+  \centering
+  \includegraphics{rdf_trainer}
+  \caption{Example of decision tree classification}
+  \label{fig:rdf_example}
+\end{figure}
+
+The RDF training algorithm generates the forest structure used in the prediction algorithm from a dataset of input-output pairs. The algorithm trains each tree in the forest on a different bootstrapped dataset. A bootstrapped dataset is a random sample of the input dataset with the possibility of data replacement. The method of training an ensemble of classifiers, each with a different bootstrapped dataset, and then aggregating the classifier results during prediction is called bagging \cite{Breiman1996}.
+
+Each tree in the forest trains by starting at the root node and recursively subpartitioning the dataset at each node until a minimum dataset size or a maximum tree depth $D_T$ is reached. Each node splits its dataset subpartition by testing a finite random set of index and threshold pairs on the dataset and determining the pair with the largest information gain. The algorithm then assigns the index and threshold pair with the highest information gain to the node.
+
+The information gain of an input index and threshold pair for a given dataset is calculated by the gini index (also called the gini impurity or gini criterion) \cite{Gini1936,Gelfand1991}. Given a dataset $\set{D}$ of input-output pairs, the Gini impurity is calculated as
+%
+\begin{equation}
+  \label{eq:gini}
+  Gini(\set{D}) = 1 - \sum_{i=1}^{k} p_i^2
+\end{equation}
+%
+where each dataset output belongs to one of $k$ classes and $p_i$ is the probability that an output belongs to the $i$-th class.
+
+An index-threshold pair $(i,T_H)$ partitions $\set{D}$ into subsets $\set{D}_1$ and $\set{D}_2$. $\set{D}_1$ consists of input-output pairs where inputs at index $i$ are less than $T_H$. $\set{D}_2$ consists of the remaining input-output pairs from $\set{D}$. The Gini impurity of the dataset split is
+%
+\begin{equation}
+  \label{eq:gini}
+  Gini_{(i,T_H)}(\set{D}) = \frac{N_1}{N}\cdot Gini(\set{D}_1) + \frac{N_2}{N}\cdot Gini(\set{D}_2)
+\end{equation}
+%
+where $N$ is the size of $\set{D}$, $N_1$ is the size of $\set{D}_1$, and $N_2$ is the size of $\set{D}_2$.
+
+Bootstrapping introduces randomization into the training of the model. Additionally, the RDF algorithm trains each tree on a different random subset of the input indices and thresholds. These three randomization mechanisms allow the RDF algorithm to perform well on classification tasks without overfitting to the training data.
+
+\section{2D High Pass Filter}
+\label{sec:2d_filter}
+
+2D high pass filters are used for border detection and the computation of features to detect video artifacts \cite{Glavota2016, Vranjes2018}. The filter used in this work applies an absolute horizontal and vertical adjacent pixel difference over an input frame $\mat{F}$. The horizontal and vertical filters are modeled by
+%
+\def\HFF{\text{HFF}}
+\def\VFF{\text{VFF}}
+\begin{equation}
+  \label{eq:hf}
+  \left[\HFF(\mat{F})\right]_{i,j} =
+  \begin{cases}
+    + \mat{F}[i,j] - \mat{F}[i-1,j] & \text{if \hspace{0.5cm}} \mat{F}[i,j] \ge \mat{F}[i-1,j] \\
+    - \mat{F}[i,j] + \mat{F}[i-1,j] & \text{otherwise}
+  \end{cases}
+\end{equation}
+%
+and
+%
+\begin{equation}
+  \label{eq:vf}
+  \left[\VFF(\mat{F})\right]_{i,j} =
+  \begin{cases}
+    + \mat{F}[i,j] - \mat{F}[i,j-1] & \text{if \hspace{0.5cm}} \mat{F}[i,j] \ge \mat{F}[i,j-1] \\
+    - \mat{F}[i,j] + \mat{F}[i,j-1] & \text{otherwise}
+  \end{cases}
+\end{equation}
+%
+respectively. The filtered frames have pixels with larger values in high contrast image locations and can be used to detect borders within frames. Another border detection method is the Sobel Filter \cite{Korhonen2018}, but this method requires more computation.
+
+High contrast artifact borders produce larger filtered values. Furthermore, these larger valued filtered borders lie close to the macroblock borders at a higher frequency than in the inner macroblock area due to the frequency of packet losses in I-frames \cite{Glavota2016, Vranjes2018}. The sum of the filtered values around macroblock borders provides useful information that is used to detect the presence of artifacts.
+
+\section{Summed-Area Tables}
+\label{sec:sat_calc}
+
+Summed-Area Tables (SAT) allow the efficient computation of image frame subregion pixel sums \cite{Crow1984}. For an input frame $\mat{F}$ each new value SAT$[i,j]$ is calculated as:
+%
+\def\SAT{\text{SAT}}
+\begin{equation}
+  \label{eq:satgen}
+  \left[\SAT(\mat{F})\right]_{i,j}=\mat{F}[i,j]+\SAT[i-1,j]+\SAT[i-1,j]-\SAT[i-1,j-1]
+\end{equation}
+%
+Each value of $\SAT[i,j]$ represents the summed pixels in the rectangular area from $\mat{F}[0,0]$ to $\mat{F}[i,j]$. Figure \ref{fig:sat} illustrates the terms in \equ{eq:satgen}.
+
+\begin{figure} [!h]
+  \centering
+  \includegraphics{sat}
+  \caption{SAT construction on position $(i,j)$.}
+  \label{fig:sat}
+\end{figure}
+
+The main advantage of using SATs is to efficently calculate frame subregion sums by
+%
+\begin{equation}
+  \label{eq:satuse}
+  A_r(i,j,H_r,W_r)=\text{SAT}[i,j]-\text{SAT}[i-H_r,j]-\text{SAT}[i,j-W_r]+\text{SAT}[i-H_r,j-W_r]
+\end{equation}
+%
+where the area $A_r$ with bottom right pixel $(i,j)$, height $H_r$, and width $W_r$ is computed from the arithmetic operation of four SAT values.
+
+Figure \ref{fig:satuse} illustrates the terms from \equ{eq:satuse}.
+\begin{figure} [!h]
+  \centering
+  \includegraphics{satuse}
+  \caption{Subregion sum calculation using SAT.}
+  \label{fig:satuse}
+\end{figure}
+
+A Squared SAT (SSAT) is calculated by
+%
+\def\SSAT{\text{SSAT}}
+\begin{equation}
+  \label{eq:ssat}
+  \left[\SSAT(\mat{F})\right]_{i,j}=\mat{F}^2[i,j]+\SSAT[i-1,j]+\SSAT[i-1,j]-\SSAT[i-1,j-1]
+\end{equation}
+%
+and is used to efficiently calculate means and variances \cite{Crow1984}.
+
+The mean of a frame subregion $\mu_r$, with pixel sum $A_r$, height $H_r$, and width $W_r$ is calculated as
+%
+\begin{equation}
+  \label{eq:mu_r}
+  \mu_r = \frac{A_r}{H_r\cdot W_r}
+\end{equation}
+%
+and given the squared pixel sum $SA_r$ for the same subregion, the variance is calculated as
+%
+\begin{equation}
+  \label{eq:var_r}
+  \sigma^2_r = \frac{SA_r - A^2_r}{H_r\cdot W_r}
+\end{equation}
+%
+
+\section{Loop Fusion}
+\label{sec:loop_unrolling}
+
+Loop fusion is a method to improve an algorithm's performance \cite{Kennedy1994}. Software loops translate into CPU branching instructions. In modern segmented architectures, branching instructions hinder instruction-level parallelism since new instructions cannot be loaded until the outcome of the branching operation is known. Branch prediction partially improves the hardware performance. However, by merging software loops into a single loop, the use of branching operations is reduced and the performance improves.
+
+\section{Multithreading}
+\label{sec:teo_multithreading}
+
+Multithreading allows a machine to run several tasks simultaneously \cite{Saavedra1990}. Each task runs on a thread. This technique improves the efficiency and performance of a program. On a machine with multiple cores, each thread runs on an indepedent core at maximum frequency. It is possible to run multiple threads within a single core, however the core has to switch between the threads, which reduces the performance improvement provided by multithreading.
+
+\section{The Nvidia Jetson TX2 System}
+\label{sec:tx2_simd}
+
+The Nvidia Jetson TX2 Embedded System \cite{tx2} provides 4 ARM processors, 2 Denver cores which are not generally used, and a 256-core GPU. With these resources, the TX2 can run a wide range of accelerated machine learning algorithms. For this work, only the CPU resources are considered. The TX2 CPU has four ARM cores that run at 2 GHz.
+
+The ARM CPU cores provide the Neon Single-Instruction Multiple-Data (SIMD) extension. SIMD allows repetitive data operations to be parallelized within a single CPU, which improves the time performance of a program.

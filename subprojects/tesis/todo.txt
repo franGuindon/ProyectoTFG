@@ -1,0 +1,5 @@
+1. Corregir lista de símbolos y abreviaciones dos veces en el índice
+2. En lísta de símbolos y abreviaciones para notación general se pega
+   la primera entrada.
+3. Agregar la licencia de creative commons, o una buena guía de cómo ponerla,
+   para que quede bien, ojalá en el config.txt

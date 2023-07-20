@@ -1,0 +1,207 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{
+%   % General
+%   > ={Latex[width=3mm, height=3mm]},
+%   % Node
+%   every picture/.style ={line width=0.4mm},
+%   block/.style         ={draw, rectangle, inner sep=15pt},
+%   image/.style         ={block, inner sep=0.1cm},
+%   icon/.style          ={block},
+%   mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+%   terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+%   nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+%   frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+%   missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+% }
+
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
+  
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \newsavebox\cmpbox
+  \newsavebox\dropbox
+
+  \begin{lrbox}{\cmpbox}
+    \begin{tikzpicture}
+      \draw[->] (-1.5,0.5cm) -- (-1.5,-2cm) ;
+      \node at (-1.8,-1.3cm) {$t$};
+      \node[frame] at (0,0cm)    (b0) {};
+      \node[frame] at (0,-0.3cm) (b1) {};
+      \node[frame] at (0,-0.6cm) (b2) {};
+      \node[frame] at (0,-0.9cm) (b3) {};
+      \node[frame] at (0,-1.2cm) (b4) {};
+      \node[frame] at (0,-1.5cm) (b5) {};
+
+      \node[frame] at (2,0cm)    (d0) {};
+      \node[frame] at (2,-0.3cm) (d1) {};
+      \node[frame] at (2,-0.6cm) (d2) {};
+      \node[missing_frame] at (2,-0.9cm) (d3) {};
+      \node[missing_frame] at (2,-1.2cm) (d4){};
+      \node[frame] at (2,-1.5cm) (d5) {};
+
+      \draw[] (b0) -- (d0);
+      \draw[] (b1) -- (d1);
+      \draw[] (b2) -- (d2);
+      \draw[] (b3.east) -- (d5.west);
+
+      \draw[line width=0.6mm] (d0.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+      \draw[line width=0.6mm] (d1.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+
+      \draw[line width=0.6mm] (d2.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+        \draw[line width=0.6mm] (d3.east) ++ (0.3,0cm) ++
+        (-0.08,0.08cm) -- ++ (0.16,-0.16cm) ++
+        (0,0.16cm) -- ++ (-0.16,-0.16cm);
+    \end{tikzpicture}
+  \end{lrbox}
+
+  \begin{lrbox}{\dropbox}
+    \begin{tikzpicture}
+      \draw[->] (-1.5,0.5cm) -- (-1.5,-2cm) ;
+      \node at (-1.8,-1.3cm) {$t$};
+      \node[frame] at (0,0cm)    (b0) {};
+      \node[frame] at (0,-0.3cm) (b1) {};
+      \node[frame] at (0,-0.6cm) (b2) {};
+      \node[frame, dashed] at (-0.2,-0.9cm) (b3) {};
+      \node[frame, dashed] at (-0.2,-1.2cm) (b4) {};
+      \node[frame] at (0,-1.5cm) (b5) {};
+
+      \node[frame] at (2,0cm)    (d0) {};
+      \node[frame] at (2,-0.3cm) (d1) {};
+      \node[frame] at (2,-0.6cm) (d2) {};
+      \node[missing_frame] at (2,-0.9cm) (d3) {};
+      \node[missing_frame] at (2,-1.2cm) (d4){};
+      \node[frame] at (2,-1.5cm) (d5) {};
+
+      \draw[] (b0) -- (d0);
+      \draw[] (b1) -- (d1);
+      \draw[] (b2) -- (d2);
+      \draw[] (b5) -- (d5);
+
+      \draw[line width=0.6mm] (d0.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+      \draw[line width=0.6mm] (d1.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+
+      \draw[line width=0.6mm] (d2.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+      \draw[line width=0.6mm] (d5.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+    \end{tikzpicture}
+  \end{lrbox}
+
+  \node[terminal] at (0,0cm) (src) {Base Video Frame};
+  \node[terminal, xshift=-0.5cm, right=of src] (src1) {Video Frame with Artifacts};
+  \coordinate[yshift=-1.5cm] (codo0) at ($(src)!0.5!(src1)$) {};
+  \node[nonterminal, yshift=0.3cm, below=of codo0, align=center] (cmp) {
+    Frame Timestamp Comparison \\ 
+    \vspace*{0.1cm} \\
+    \usebox\cmpbox
+  };
+  \node[nonterminal, right=of cmp, align=center] (drop) {
+    Unmatched Base Frame Drop \\ 
+    \vspace*{0.1cm} \\
+    \usebox\dropbox
+  };
+
+  \coordinate[mux, yshift=-3cm] (codo00) at ($(drop)!0.5!(cmp)$) {};
+
+  \coordinate[] (codo1) at ($(codo00.south)+(0,-0.5cm)$) {};
+  \coordinate[] (codo2) at ($(codo1)+(-2.8,0cm)$) {};
+  \coordinate[] (codo3) at ($(codo1)+(2.8,0cm)$) {};
+  \node[terminal, below=of codo2, align=center] (dst) {Synchronized \\ Base Video Frame};
+  \node[terminal, below=of codo3] (dst1) {Video Frame with Artifacts};
+
+  \draw (src) |- (codo0) -| (src1);
+  \draw[->] (codo0) -- (cmp);
+  \draw[->] (cmp) -- (drop);
+  \draw[->] (cmp) |- (codo00);
+  \draw[->] (drop) |- (codo00);
+  \draw (codo00) -- (codo1);
+  \draw[<->] (dst) |- (codo1) -| (dst1);
+
+  \draw[line width=0.6mm] ($0.5*(cmp)+0.5*(drop)$) ++ (0,0.3cm) ++
+        (-0.08,0.08cm) -- ++ (0.16,-0.16cm) ++
+        (0,0.16cm) -- ++ (-0.16,-0.16cm);
+  
+  \draw[line width=0.6mm] (cmp.south) ++ (-0.3,-0.4cm) ++ 
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+
+  \scoped[on background layer]{
+
+    \node [draw, rectangle, fit=(codo0)(cmp)(codo1)(drop), fill=orange!30,
+      inner sep=0.3cm] (system) {};
+
+    \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+      Video Synchronizer};
+      
+  }
+  
+  \end{tikzpicture}
+\end{document}

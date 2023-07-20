@@ -1,3 +1,13 @@
-option('developer-mode', type : 'boolean', value : true, yield : true, description: 'Enable developer mode')
-option('enable-docs', type : 'feature', value : 'enabled', yield : true, description : 'Build documentation with Doxygen')
-option('enable-tests', type : 'feature', value : 'enabled', yield : true, description : 'Build tests')
+option('developer-mode', type : 'boolean', value : true, yield : true,
+  description: 'Enable developer mode')
+option('enable-docs', type : 'feature', value : 'enabled', yield : true,
+  description : 'Build documentation with Doxygen')
+option('enable-tests', type : 'feature', value : 'enabled', yield : true,
+  description : 'Build tests')
+
+option('only-thesis', type : 'feature', value : 'disabled', yield : true,
+  description : 'Build only thesis')
+option('only-worklogs', type : 'feature', value : 'disabled', yield : true,
+  description : 'Build only worklogs (Bitácoras)')
+option('only-proposal', type : 'feature', value : 'disabled', yield : true,
+  description : 'Build only project proposal ("Anteproyecto")')
