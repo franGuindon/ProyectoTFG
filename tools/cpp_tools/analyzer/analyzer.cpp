@@ -86,6 +86,7 @@ skip_help:
   arg_handler.ntree = 10;
   arg_handler.nthreads = 12;
   arg_handler.predict = argv[1];
+  arg_handler.maxdepth = 10;
 
   const size_t features_per_block = 132;
   const size_t num_rows = 1;
