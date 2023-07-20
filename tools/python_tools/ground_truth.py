@@ -180,58 +180,6 @@ def generate_ground_truth(videos, config):
 
 class Namespace: pass
 
-class TypingError(Exception): pass
-
-def typing(*args_t, **kwargs_t):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            if len(args_t) != len(args):
-                raise TypingError("Typelist does not correndpond to arg list")
-            if len(kwargs_t) != len(kwargs):
-                raise TypingError("Typelist does not correndpond to kwarg list")
-            for i, (arg_t, arg) in enumerate(zip(args_t, args)):
-                if not isinstance(arg, arg_t):
-                    raise TypingError(f"Arg #{i+1} is not of type {arg_t}")
-            for k_t, v_t in kwargs_t.items():
-                if not isinstance(kwargs.get(k_t), v_t):
-                    raise TypingError(f"Kwarg k:{k_t} is not of type {v_t}")
-            func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-def test_typing(parser):
-    @typing(int, str)
-    def func(arg1, arg2): print("PASS")
-
-    func(1, "1")
-    try: func("1", 1)
-    except TypingError: print("PASS")
-
-class FunctionPipeline:
-
-    def __init__(self): self.func_list = []
-    
-    def add_func(self, func): self.func_list.append(func)
-
-    def apply(self, *args, **kwargs):
-        for func in self.func_list: args, kwargs = func(*args, **kwargs)
-        return args, kwargs
-
-def test_function_pipeline(parser):
-    pipe = FunctionPipeline()
-
-    arg_1 = 0
-    arg_2 = "0"
-    arg_3 = [0]
-    def func_1(a, b, c): return (a+1, b+"1", c+[1]), {}
-    def func_2(a, b, c): return (a+2, b+"2", c+[2]), {}
-    def func_3(a, b, c): return (a+3, b+"3", c+[3]), {}
-
-    pipe.add_func(func_1)
-    pipe.add_func(func_2)
-    pipe.add_func(func_3)
-    assert pipe.apply(arg_1, arg_2, arg_3) == ((6, "0123", [0,1,2,3]), {})
-
 def main(parser):
     parser.add_argument('ref_vid', help="")
     parser.add_argument('lossy_vid', help="")
