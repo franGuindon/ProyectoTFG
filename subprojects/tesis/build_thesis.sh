@@ -14,10 +14,12 @@ echo "bin/sh$ cd ${THESIS_DIRECTORY}"
 cd ${THESIS_DIRECTORY}
 
 echo "bin/sh$ make clean && make && make clean"
-make clean && make && make clean
+touch main.tex && make && make clean # 1. touch main.tex to activate make target
+                                     # 2. make to build
+                                     # 3. make clean to clean
 
 echo "bin/sh$ cd ${CURRENT_DIRECTORY}"
 cd ${CURRENT_DIRECTORY}
 
-echo "bin/sh$ cp main.pdf ${OUTPUT_DIRECTORY}"
+echo "bin/sh$ cp ${THESIS_DIRECTORY}/main.pdf ${OUTPUT_DIRECTORY}"
 cp "${THESIS_DIRECTORY}/main.pdf" ${OUTPUT_DIRECTORY}
