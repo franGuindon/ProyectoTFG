@@ -12,6 +12,7 @@ source_files = files([
   'resultados.tex',
   'resumen.tex',
   'glosario.tex',
+  'literatura.bib',
   'licencia.tex',
   'macros.tex',
   'apendice.tex',
