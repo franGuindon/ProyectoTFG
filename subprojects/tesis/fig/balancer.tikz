@@ -1,0 +1,174 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
+
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \newsavebox\classifierbox
+  \newsavebox\samplerbox
+
+  \begin{lrbox}{\classifierbox}
+    \begin{tikzpicture}
+      \draw[->] (-1.5,0.5cm) -- (-1.5,-2cm) ;
+      \node at (-1.8,-1.3cm) {$t$};
+      \node[frame] at (0,0cm)    (b0) {};
+      \node[frame] at (0,-0.3cm) (b1) {};
+      \node[frame] at (0,-0.6cm) (b2) {};
+      \node[frame] at (0,-0.9cm) (b3) {};
+      \node[frame] at (0,-1.2cm) (b4) {};
+      \node[frame] at (0,-1.5cm) (b5) {};
+
+      % \node[fill=white, fit=(b0)(b5)] {};
+
+      \node[plabel] at (1,0cm)    (d0) {};
+      \node[plabel] at (1,-0.3cm) (d1) {};
+      \node[nlabel] at (1,-0.6cm) (d2) {};
+      \node[nlabel] at (1,-0.9cm) (d3) {};
+      \node[plabel] at (1,-1.2cm) (d4){};
+      \node[nlabel] at (1,-1.5cm) (d5) {};
+
+      \draw[] (b0) -- (d0);
+      \draw[] (b1) -- (d1);
+      \draw[] (b2) -- (d2);
+      \draw[] (b3) -- (d3);
+      \draw[] (b4) -- (d4);
+      \draw[] (b5) -- (d5);
+      
+      % \scoped[on background layer]{
+
+      %   \node [draw, rectangle, fit=(b1)(b5), fill=orange!30,
+      %     inner sep=0.3cm] (features) {};
+
+      %   \node [anchor=south east, inner sep=0.3cm] at (features.north east) () {
+      %     Video Synchronizer};
+          
+      % }
+
+    \end{tikzpicture}
+  \end{lrbox}
+
+  \begin{lrbox}{\samplerbox}
+    \begin{tikzpicture}
+      \draw[->] (-1.5,0.5cm) -- (-1.5,-2cm) ;
+      \node at (-1.8,-1.3cm) {$t$};
+      \node[frame] at (0,0cm)    (b0) {};
+      \node[frame] at (0,-0.3cm) (b1) {};
+      \node[frame] at (0,-0.6cm) (b2) {};
+      \node[frame, dashed] at (-0.2,-0.9cm) (b3) {};
+      \node[frame, dashed] at (-0.2,-1.2cm) (b4) {};
+      \node[frame] at (0,-1.5cm) (b5) {};
+
+      \node[frame] at (2,0cm)    (d0) {};
+      \node[frame] at (2,-0.3cm) (d1) {};
+      \node[frame] at (2,-0.6cm) (d2) {};
+      \node[missing_frame] at (2,-0.9cm) (d3) {};
+      \node[missing_frame] at (2,-1.2cm) (d4){};
+      \node[frame] at (2,-1.5cm) (d5) {};
+
+      \draw[] (b0) -- (d0);
+      \draw[] (b1) -- (d1);
+      \draw[] (b2) -- (d2);
+      \draw[] (b5) -- (d5);
+
+      \draw[line width=0.6mm] (d0.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+      \draw[line width=0.6mm] (d1.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+
+      \draw[line width=0.6mm] (d2.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+      
+      \draw[line width=0.6mm] (d5.east) ++ (0.3,0cm) ++
+        (-0.1,-0.02cm) -- ++ (0.1,-0.08cm) -- ++ (0.1,0.2cm);
+    \end{tikzpicture}
+  \end{lrbox}
+
+  \node[terminal] at (0,0cm) (src) {Dataset};
+  \node[nonterminal, below=of src, align=center] (classifier) {
+    Dataset Example Sorter \\ 
+    \vspace*{0.1cm} \\
+    \usebox\classifierbox
+  };
+  \node[nonterminal, right=of classifier, align=center] (sampler) {
+    Random Sampler
+  };
+  \node[nonterminal, below=of classifier, align=center] (sampler2) {
+    Random Sampler
+  };
+  \node[nonterminal, anchor=north, align=center] at ($(sampler.north)!(sampler2.north)!(sampler.south)$) (mixer) {
+    Random Mixer
+  };
+  \node[terminal, below=of mixer, align=center] (dst) {Balanced Dataset};
+
+  \draw[->] (src) -- (classifier);
+  \draw[->] (classifier) -- (sampler);
+  \draw[->] (classifier) -- (sampler2);
+  \draw[->] (sampler) -- (mixer);
+  \draw[->] (sampler2) -- (mixer);
+  \draw[->] (mixer) -- (dst);
+
+  \node[plabel] at ($(classifier.east)!0.5!(sampler.west)+(0,0.5cm)$) {};
+  \node[nlabel] at ($(classifier.south)!0.5!(sampler2.north)+(-0.5,0cm)$) {};
+
+  \scoped[on background layer]{
+
+  \node [draw, rectangle, fit=(classifier)(sampler)(sampler2)(mixer), fill=orange!30,
+    inner sep=0.3cm] (system) {};
+
+  \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+    Randomized Balancer};
+    
+}
+  
+  \end{tikzpicture}
+\end{document}

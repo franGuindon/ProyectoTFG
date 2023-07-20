@@ -1,0 +1,140 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{every picture/.style={line width=0.4mm}}
+
+% \tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
+%                         line width=0.4mm, inner sep=15pt, align=center]
+% \tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
+%                            line width=0.4mm, inner sep=15pt, align=center]
+
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
+
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+\node[terminal] at (0,0cm) (src) {Base Video Files};
+\node[nonterminal, below=of src] (dataset_generator) {Dataset Generator};
+\node[storeblock, below=of dataset_generator] (dataset) {Dataset};
+\node[nonterminal, right=of dataset_generator] (balancer) {Randomized Balancer};
+\node[storeblock, below=of balancer] (bds) {Balanced dataset};
+\node[nonterminal, right=of balancer] (grower) {Forest Grower};
+\node[terminal, below=of grower] (model) {In-the-Bag};
+\node[terminal, below=of model] (oob) {Out-of-Bag};
+\node[nonterminal] at ($(oob)!(bds)!(oob.west)$) (boot) {Bootstrapper};
+\node[storeblock, yshift=-0.3cm, below=of oob] (confusion) {Forest Model};
+\node[nonterminal, left=of confusion] (predictor) {RDF Classifier};
+\node[terminal, below=of predictor] (prediction) {Prediction Vector};
+\node[nonterminal, xshift=-0.4cm, left=of predictor] (analyzer) {Confusion Analyzer};
+
+\node[terminal, below=of analyzer] (dst) {Detection Metrics};
+
+\draw ($(src.top left corner)+(-0.1,0.1)$) -- ($(src.bottom left corner)+(-0.1,0.1)$);
+\draw ($(src.top left corner)+(-0.1,0.1)$) -- ($(src.top right corner)+(-0.1,0.1)$);
+\draw ($(src.top left corner)+(-0.2,0.2)$) -- ($(src.bottom left corner)+(-0.2,0.2)$);
+\draw ($(src.top left corner)+(-0.2,0.2)$) -- ($(src.top right corner)+(-0.2,0.2)$);
+\draw[->] (src) -- (dataset_generator);
+\draw[->] (dataset_generator) -- (dataset);
+\draw[->] (dataset) -| ($(dataset_generator.south east)!0.5!(balancer.south west)$)  |- (balancer);
+\draw[->] (balancer) -- (bds);
+\draw[->] (bds) -- (boot);
+\draw[->] ($(boot.east)!0.5!(oob.west)$) |- (model);
+\draw[->] (boot) -- (oob);
+\draw[->] (model) -- (grower);
+\draw[->] (grower) -| ($(model.top right corner)+(0.6,0cm)$) |- (confusion);
+\draw[->] (confusion) -- (predictor);
+\coordinate[] (avg) at ($(oob)!0.5!(predictor)$);
+\draw[->] (oob) |- ($(predictor)!(avg)!(predictor.north)$) -- (predictor);
+\draw[->] (predictor) -- (prediction);
+\draw[->] ($(predictor)!(avg)!(predictor.north)$) -| (analyzer);
+\draw[->] (prediction) -| ($(analyzer.south east)!0.5!(predictor.south west)$) |- (analyzer.east);
+\draw[->] (analyzer) -- (dst);
+
+\coordinate [] (rightborder) at ($(model.top right corner)+(0.3,0cm)$) {};
+\node [] at ($(grower.west)!(rightborder)!(grower.east)$) (trainerright) {};
+\node [] at ($(confusion.west)!(rightborder)!(confusion.east)$) (testerright) {};
+
+\scoped[on background layer]{
+
+  \node [draw, rectangle, fit=(dataset_generator)(grower)(boot), fill=orange!30,
+    inner sep=0.45cm] (system) {};
+
+  \node [anchor=south east, inner sep=0.3cm] at (system.north east) (title) {
+    Art-FD Trainer};
+
+  \node [draw, rectangle, fit=(predictor)(analyzer), fill=orange!30,
+    inner sep=0.4cm] (cont) {};
+
+  \node [anchor=south, inner sep=0.2cm]
+        at ($(cont.north west)+(0.6,0cm)$) ()
+        {... and Tester};
+  
+  % \node [draw, rectangle, xshift=-0.1cm, fit=(title)(balancer)(cont),
+  %       inner sep=0.3cm]
+  %       (detection_improvements) {};
+  % \node [anchor=south west, inner sep=0.2cm]
+  %       at (detection_improvements.north west) ()
+  %       {Only explained generally in this section};
+}
+
+\end{tikzpicture}
+\end{document}

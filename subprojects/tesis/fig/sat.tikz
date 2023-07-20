@@ -1,0 +1,152 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+\tikzset{>={Latex[width=3mm, height=3mm]}}
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+  nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \newsavebox\satgenbox
+  \newsavebox\satusebox
+
+  \newsavebox\ulicon
+  \begin{lrbox}{\ulicon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.24,-0.32cm);
+    \filldraw[black] (0.34,0cm) rectangle ++ (0.08,-0.32cm);
+    \filldraw[black] (0,-0.42cm) rectangle ++ (0.24,-0.08cm);
+    \filldraw[black] (0.34,-0.42cm) rectangle ++ (0.08,-0.08cm);
+  \end{lrbox}
+
+  \newsavebox\uricon
+  \begin{lrbox}{\uricon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.24,-0.32cm);
+    \filldraw[orange!40!white] (0.34,0cm) rectangle ++ (0.08,-0.32cm);
+    \filldraw[black] (0,-0.42cm) rectangle ++ (0.24,-0.08cm);
+    \filldraw[black] (0.34,-0.42cm) rectangle ++ (0.08,-0.08cm);
+  \end{lrbox}
+
+  \newsavebox\dlicon
+  \begin{lrbox}{\dlicon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.24,-0.32cm);
+    \filldraw[black] (0.34,0cm) rectangle ++ (0.08,-0.32cm);
+    \filldraw[orange!40!white] (0,-0.42cm) rectangle ++ (0.24,-0.08cm);
+    \filldraw[black] (0.34,-0.42cm) rectangle ++ (0.08,-0.08cm);
+  \end{lrbox}
+
+  \newsavebox\dricon
+  \begin{lrbox}{\dricon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.24,-0.32cm);
+    \filldraw[orange!40!white] (0.34,0cm) rectangle ++ (0.08,-0.32cm);
+    \filldraw[orange!40!white] (0,-0.42cm) rectangle ++ (0.24,-0.08cm);
+    \filldraw[teal!40!white] (0.34,-0.42cm) rectangle ++ (0.08,-0.08cm);
+  \end{lrbox}
+
+  \newsavebox\ficon
+  \begin{lrbox}{\ficon}
+    \filldraw[black] (0,0cm) rectangle ++ (0.24,-0.32cm);
+    \filldraw[black] (0.34,0cm) rectangle ++ (0.08,-0.32cm);
+    \filldraw[black] (0,-0.42cm) rectangle ++ (0.24,-0.08cm);
+    \filldraw[teal!40!white] (0.34,-0.42cm) rectangle ++ (0.08,-0.08cm);
+  \end{lrbox}
+
+  \node[fill=teal!35!white, anchor=north west,
+        minimum width=1.5cm, minimum height=2cm] at (0,0cm) {};
+  \node[fill=teal!35!white, anchor=north west,
+        minimum width=0.5cm, minimum height=0.5cm] at (1.5,-2cm) {};
+  \node[fill=orange!35!white, anchor=north west,
+        minimum width=0.5cm, minimum height=2cm] at (1.5,0cm) {};
+  \node[fill=orange!35!white, anchor=north west,
+        minimum width=1.5cm, minimum height=0.5cm] at (0,-2cm) {};
+
+  \node[anchor=south] at (1.75,0cm) {$j$};
+  \node[anchor=east] at (0,-2.25cm) {$i$};
+
+  \foreach \i in {1,...,9} {
+    \draw[-,black!40!white] ($0.5*(\i,0cm)$) -- ++ (0,-4.6cm) ;
+    \draw[-,black!40!white] ($-0.5*(0cm,\i)$) -- ++ (4.6cm,0) ;
+  }
+
+  \node[draw, anchor=north west, minimum width=2cm, minimum height=2.5cm] at (0,0cm) {};
+  \draw[line width=0.05cm] (0,-2cm) -- (2cm,-2cm) ;
+  \draw[line width=0.05cm] (1.5,0cm) -- (1.5,-2.5cm) ;
+  \draw[->] (0,0cm) -- (5,0cm) ;
+
+  \draw[->] (0,0cm) -- (0,-5cm) ;
+  \draw[->] (0,0cm) -- (5,0cm) ;
+
+  \coordinate (a0c) at (2.6,-0.2cm) {};
+  \coordinate (a1c) at (2.6,-1.4cm) {};
+  \coordinate (a2c) at (2.6,-3.8cm) {};
+  \coordinate (a3c) at (2.6,-2.6cm) {};
+  \coordinate (eqc) at (7.2,0cm) {};
+
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=3.5cm, text width=3cm, anchor=north west]
+    at (a0c) (a0) {\hspace{0.4cm} SAT$[i-1,j-1]$};
+  \node at ($(a0c)+(0.2,-0.2cm)$) {\usebox\ulicon};
+  
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=3.5cm, text width=3cm, anchor=north west]
+    at (a1c) (a1) {\hspace{0.4cm} SAT$[i-1,j]$};
+  \node at ($(a1c)+(0.2,-0.2cm)$) {\usebox\uricon};
+  
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=3.5cm, text width=3cm, anchor=north west]
+    at (a2c) (a2) {\hspace{0.4cm} SAT$[i,j-1]$};
+  \node at ($(a2c)+(0.2,-0.2cm)$) {\usebox\dlicon};
+  
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=3.5cm, text width=3cm, anchor=north west]
+    at (a3c) (a3) {\hspace{0.4cm} F$[i,j]$};
+  \node at ($(a3c)+(0.2,-0.2cm)$) {\usebox\ficon};
+
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=3.5cm,
+    anchor=north west, align=left]
+    at (eqc) (eq) {
+      \begin{tabular}{lll}
+        & \usebox\ficon  & \\
+        & & \hspace{0.3cm} F$[i,j]$ \\
+        & \usebox\uricon & \\
+        $+$ & & \hspace{0.3cm} SAT$[i-1,j]$ \\
+        & \usebox\dlicon & \\
+        $+$ & & \hspace{0.3cm} SAT$[i,j-1]$ \\
+        & \usebox\ulicon & \\
+        $-$ & & \hspace{0.3cm} SAT$[i-1,j-1]$ \\ 
+        & & \\ \hline
+        & \usebox\dricon & \\
+        & & \hspace{0.3cm} SAT$[i,j]$
+      \end{tabular}
+    };
+
+  \coordinate (codo0) at ($(a0.east)!0.5!(a2.east)!0.5!(eq.west)$) {};
+  \draw (a0.east) -| (codo0) |- (a2.east);
+  \draw (a1.east) -- ($(a1.east)!(codo0)!(a1.west)$);
+  \draw (a3.east) -- ($(a3.east)!(codo0)!(a3.west)$);
+  \draw[->] (codo0) -- ($(eq.north west)!(codo0)!(eq.west)$);
+
+  \path[->] (1.25,-1.75) node[fill=black] edge [bend left] (a0.west);
+  \path[->] (1.75,-1.75) node[fill=black] edge (a1.west);
+  \path[->] (1.25,-2.25) node[fill=black] edge [bend right] (a2.west);
+  \path[->] (1.75,-2.25) node[fill=black] edge [bend right] (a3.west);
+  
+  \end{tikzpicture}
+\end{document}

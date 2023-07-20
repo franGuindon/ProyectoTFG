@@ -1,0 +1,58 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+  \tikzset{
+    % General
+    > ={Latex[width=3mm, height=3mm]},
+    % Node
+    every picture/.style ={line width=0.4mm},
+    block/.style         ={draw, rectangle, inner sep=15pt},
+    image/.style         ={block, inner sep=0.1cm},
+    icon/.style          ={block},
+    mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+    terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+    nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+    frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+    missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+  }
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  \def\cw{1.3cm}
+  \def\ns{2.3cm}
+
+  \node[draw, circle, minimum size=\cw, fill=orange!40] at (0,0cm) (1root) {$x_1 < 1$};
+  \node[above=of 1root] (input) {\begin{math}
+    \underline{\mathbf{x}} = \begin{bmatrix}3\\6\end{bmatrix}
+  \end{math}
+  };
+  \node[draw, circle, minimum size=\cw] at ($(1root)+(-120:\ns)$) (1child1) {$1$};
+  \node[draw, circle, minimum size=\cw, fill=orange!40] at ($(1root)+(-60:\ns)$) (1child2) {$x_2 < 7$};
+  \node[draw, circle, minimum size=\cw, fill=orange!40] at ($(1child2)+(-120:\ns)$) (1child3) {$x_1 < 4$};
+  \node[draw, circle, minimum size=\cw] at ($(1child2)+(-60:\ns)$) (1child4) {$0$};
+  \node[draw, circle, minimum size=\cw, fill=teal!40] at ($(1child3)+(-120:\ns)$) (1child5) {$1$};
+  \node[draw, circle, minimum size=\cw] at ($(1child3)+(-60:\ns)$) (1child6) {$0$};
+  \node[below=of 1child5] (output) {$y=1$};
+
+  \draw[->, dotted] (input) -- (1root);
+  \draw[->] (1root) -- (1child1);
+  \draw[->] (1root) -- (1child2);
+  \draw[->] (1child2) -- (1child3);
+  \draw[->] (1child2) -- (1child4);
+  \draw[->] (1child3) -- (1child5);
+  \draw[->] (1child3) -- (1child6);
+  \draw[->, dotted] (1child5) -- (output);
+
+\end{tikzpicture}  
+\end{document}

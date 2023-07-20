@@ -1,0 +1,215 @@
+\documentclass[class=article,border=0pt]{standalone}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit}
+
+  \tikzset{
+    % General
+    > ={Latex[width=3mm, height=3mm]},
+    % Node
+    every picture/.style ={line width=0.4mm},
+    block/.style         ={draw, rectangle, inner sep=15pt},
+    image/.style         ={block, inner sep=0.1cm},
+    icon/.style          ={block},
+    mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+    terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+    nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+    frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+    missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+  }
+
+\begin{document}
+\begin{tikzpicture}[node distance=1cm, line width=0.4mm]
+
+  % \newsavebox\satgenbox
+  % \newsavebox\satusebox
+
+  \newsavebox\detail
+  \begin{lrbox}{\detail}
+
+    \def\sep{0.3}
+    \def\mbsep{16*\sep}
+    \def\number{26}
+    \coordinate (gridpos) at (0.4,-0.4cm) {};
+    \coordinate (mbgrid_x) at ($(gridpos)+9*(\sep,0cm)$) {};
+    \coordinate (mbgrid_y) at ($(gridpos)-1*(0cm,\sep)$) {};
+    \coordinate (grid_w) at (7.8cm,0) {};
+    \coordinate (grid_h) at (0,2.1cm) {};
+    \coordinate (offset_x) at (0.2cm,0cm) {};
+    \coordinate (offset_y) at (0,0.2cm) {};
+    \coordinate (mboffset_x) at (0.3,0cm) {};
+    \coordinate (mboffset_y) at (0,0.3cm) {};
+    
+    \node[draw, fill=white, anchor=north west,
+    minimum width=8.6cm, minimum height=4.7cm] at (0,0cm) {};
+
+    \node[fill=orange!50!white, anchor=north west,
+    minimum width=2.4cm, minimum height=2.1cm] at ($(gridpos)+17*(\sep,0cm)-1*(0cm,\sep)$) {};
+    
+    \node[fill=teal!40!white, anchor=north west,
+    minimum width=1.2cm, minimum height=2.1cm] at ($(gridpos)+13*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!55!white, anchor=north west,
+    minimum width=0.6cm, minimum height=2.1cm] at ($(gridpos)+11*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!70!white, anchor=north west,
+    minimum width=0.3cm, minimum height=2.1cm] at ($(gridpos)+10*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!85!white, anchor=north west,
+    minimum width=0.3cm, minimum height=2.1cm] at ($(gridpos)+9*(\sep,0cm)-1*(0cm,\sep)$) {};
+    
+    \node[fill=teal!85!white, anchor=north west,
+    minimum width=0.3cm, minimum height=2.1cm] at ($(gridpos)+8*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!70!white, anchor=north west,
+    minimum width=0.3cm, minimum height=2.1cm] at ($(gridpos)+7*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!55!white, anchor=north west,
+    minimum width=0.6cm, minimum height=2.1cm] at ($(gridpos)+5*(\sep,0cm)-1*(0cm,\sep)$) {};
+    \node[fill=teal!40!white, anchor=north west,
+    minimum width=1.2cm, minimum height=2.1 cm] at ($(gridpos)+1*(\sep,0cm)-1*(0cm,\sep)$) {};
+
+    \foreach \i in {0,...,26} {
+      \draw[-,black!40!white] ($(gridpos)+\i*(\sep,0cm)+(offset_y)$) -- ++ ($-1*(grid_h)-2*(offset_y)-1*(0,0.1cm)$);
+    }
+    \foreach \i in {0,...,8} {
+      \draw[-,black!40!white] ($(gridpos)-\i*(0cm,\sep)-(offset_x)$) -- ++ ($(grid_w)+2*(offset_x)$);
+    }
+
+    \foreach \j in {0,...,1} {
+      \draw[-,line width=0.06cm,black!80!white] ($(mbgrid_x)+\j*(\mbsep,0cm)+(mboffset_y)$) -- ++ ($-1*(grid_h)-2*(mboffset_y)+(0,-0.2cm)$) ;
+    }
+
+    \foreach \j in {0,...,0} {
+      \draw[-,line width=0.06cm,black!80!white] ($(mbgrid_y)-\j*(0cm,\mbsep)-(mboffset_x)$) -- ++ ($(grid_w)+2*(mboffset_x)$) ;
+    }
+
+    \draw[dashed] ($(gridpos)+1*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.9cm); 
+    \draw[dashed] ($(gridpos)+5*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.5cm); 
+    \draw[dashed] ($(gridpos)+7*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.2cm); 
+    \draw[dashed] ($(gridpos)+8*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-2.9cm); 
+    \draw[dashed] ($(gridpos)+10*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-2.9cm);
+    \draw[dashed] ($(gridpos)+11*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.2cm); 
+    \draw[dashed] ($(gridpos)+13*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.5cm); 
+    \draw[dashed] ($(gridpos)+17*(\sep,0cm)-1*(0cm,\sep)$) -- ++(0,-3.9cm);
+
+    \draw[to-to] ($(gridpos)+1*(\sep,0cm)-13*(0cm,\sep)$) -- ++(4.8,0cm); 
+    \draw[to-to] ($(gridpos)+5*(\sep,0cm)-12*(0cm,\sep)$) -- ++(2.4,0cm); 
+    \draw[to-to] ($(gridpos)+7*(\sep,0cm)-11*(0cm,\sep)$) -- ++(1.2,0cm); 
+    \draw[to-to] ($(gridpos)+8*(\sep,0cm)-10*(0cm,\sep)$) -- ++(0.6,0cm); 
+    
+    % \coordinate[] (b2) at ($(gridpos)+8*(mboffset_x)-1*(mboffset_y)$);
+    % \draw ($(b2)+(0.05,-0.05cm)$) -- ++ (0,-2.05cm) (b2) -- ++ (0.5,0cm) -- ++ (0,-2.1cm);
+
+    
+
+  \end{lrbox}
+
+  %%%%%%%%%%%%%%%%
+  % MAIN PICTURE %
+  %%%%%%%%%%%%%%%%
+
+  \node[fill=orange!35!white, anchor=north west,
+  minimum width=9.85cm, minimum height=9.8cm] at (-0.45,0cm) {};
+  \foreach \j in {0,...,2} {
+    \draw[-,black!70!white] ($3*(\j,0cm)+(1,0cm)$) -- ++ ($(0,-9.8cm)$) ;
+    \draw[-,black!70!white] ($-3*(0cm,\j)+(-0.4,-2.1cm)$) -- ++ ($(9.8,0cm)$) ;
+  }
+
+  \node[fill=orange!50!white, anchor=north west,
+  minimum width=3cm, minimum height=3cm] at (3.98,-5.08cm) {};
+  \node[draw, orange, line width=0.1cm, anchor=north west,
+  minimum width=3cm, minimum height=3cm] at (3.95,-5.05cm) {};
+  \node[draw, dashed, fill=teal!50!white, opacity=0.8, anchor=north west,
+  minimum width=3cm, minimum height=3cm,xshift=-1.5cm] at (3.98,-5.08cm) {};
+ 
+  % border region node
+  \node[] at (0.2,-0cm) () {\usebox\detail};
+
+  
+  %\def\turnofftable{0}
+  \ifx\turnofftable\undefined
+  \begin{scope}
+
+  \newsavebox\ulicon
+  \begin{lrbox}{\ulicon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.15,-0.3cm);
+    \filldraw[orange!50!white] (0.25,0cm) rectangle ++ (0.3,-0.3cm);
+    % \filldraw[black] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    % \filldraw[black] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \newsavebox\uricon
+  \begin{lrbox}{\uricon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.1,-0.15cm);
+    \filldraw[orange!40!white] (0.2,0cm) rectangle ++ (0.15,-0.15cm);
+    \filldraw[black] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    \filldraw[black] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \newsavebox\dlicon
+  \begin{lrbox}{\dlicon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.1,-0.15cm);
+    \filldraw[black] (0.2,0cm) rectangle ++ (0.15,-0.15cm);
+    \filldraw[orange!40!white] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    \filldraw[black] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \newsavebox\dricon
+  \begin{lrbox}{\dricon}
+    \filldraw[teal!40!white] (0,0cm) rectangle ++ (0.1,-0.15cm);
+    \filldraw[orange!40!white] (0.2,0cm) rectangle ++ (0.15,-0.15cm);
+    \filldraw[orange!40!white] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    \filldraw[teal!40!white] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \newsavebox\ficon
+  \begin{lrbox}{\ficon}
+    \filldraw[black] (0,0cm) rectangle ++ (0.1,-0.15cm);
+    \filldraw[black] (0.2,0cm) rectangle ++ (0.15,-0.15cm);
+    \filldraw[black] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    \filldraw[teal!40!white] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \newsavebox\ficon
+  \begin{lrbox}{\ficon}
+    \filldraw[black] (0,0cm) rectangle ++ (0.1,-0.15cm);
+    \filldraw[black] (0.2,0cm) rectangle ++ (0.15,-0.15cm);
+    \filldraw[black] (0,-0.25cm) rectangle ++ (0.1,-0.25cm);
+    \filldraw[teal!40!white] (0.2,-0.25cm) rectangle ++ (0.15,-0.25cm);
+  \end{lrbox}
+
+  \coordinate (tablepos) at (3,-3cm) {};
+  \coordinate (a0c) at ($(0.0,-6cm)$) {};
+  \coordinate (a1c) at ($(2.9,-8.5cm)$) {};
+  \coordinate (a2c) at ($(7.5,-6.1cm)$) {};
+  \coordinate (a3c) at ($(2.9,-5.5cm)$) {};
+
+  \node[draw, fill=white, inner sep=0.3cm, minimum width=4cm,
+        anchor=north west, text width=4cm]
+    at (a0c) (a0) {Left Border Group};
+  % \node at ($(a0c)+(0.2,-0.25cm)$) {\usebox\ulicon};
+  
+  % \node[draw, fill=white, inner sep=0.3cm, minimum width=4cm,
+  %       anchor=north west, text width=4cm]
+  %   at (a1c) (a1) {\hspace{0.4cm} SAT$(i-H_r,j) $};
+  % \node at ($(a1c)+(0.2,-0.25cm)$) {\usebox\uricon};
+  
+  % \node[draw, fill=white, inner sep=0.3cm, minimum width=4cm,
+  %       anchor=north west, text width=4cm]
+  %   at (a2c) (a2) {\hspace{0.4cm} SAT$(i,j-W_R)$};
+  % \node at ($(a2c)+(0.2,-0.25cm)$) {\usebox\dlicon};
+  
+  % \node[draw, fill=white, inner sep=0.3cm, minimum width=4cm,
+  %       anchor=north west, text width=4cm]
+  %   at (a3c) (a3) {\hspace{0.4cm} SAT$(i,j)$};
+  % \node at ($(a3c)+(0.2,-0.25cm)$) {\usebox\dricon};
+  
+  \end{scope}
+  \else
+  \fi    
+% Uncoment (and comment other) to activate node picture
+\end{tikzpicture}  
+\end{document}
