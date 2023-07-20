@@ -242,7 +242,7 @@ $(MAINFILE).pdf: $(TEXFILES) $(PDFFILES)  $(BIBFILES)
 	fi ;\
 	echo "Running latex twice..." ;\
 	$(PDFLATEX) $(MAINFILE) >> pdf.log 2>&1 ;\
-	latex_count=5 ; \
+	latex_count=20 ; \
 	while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(MAINFILE).log && [ $$latex_count -gt 0 ] ;\
 	    do \
 	      echo "Rerunning latex...." ;\
