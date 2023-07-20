@@ -1,6 +1,32 @@
 \documentclass[class=article,border=0pt]{standalone}
 \usepackage{siunitx}
 \usepackage{tikz}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{
+%   % General
+%   > ={Latex[width=3mm, height=3mm]},
+%   % Node
+%   every picture/.style ={line width=0.4mm},
+%   block/.style         ={draw, rectangle, inner sep=15pt},
+%   image/.style         ={block, inner sep=0.1cm},
+%   icon/.style          ={block},
+%   mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+%   terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+%   nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+%   frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+%   missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+% }
+
 \usetikzlibrary{
   arrows,
   arrows.meta,
@@ -8,21 +34,44 @@
   calc,
   decorations.pathreplacing,
   backgrounds,
-  fit}
-
-\tikzset{>={Latex[width=3mm, height=3mm]}}
+  fit,
+  shapes.geometric
+}
+  
 \tikzset{
   % General
   > ={Latex[width=3mm, height=3mm]},
   % Node
   every picture/.style ={line width=0.4mm},
   block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
   image/.style         ={block, inner sep=0.1cm},
   icon/.style          ={block},
   mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
-  terminal/.style      ={block, minimum size=6mm, fill=teal!40},
-  nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
   frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
   missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
 }
 
@@ -108,9 +157,9 @@
   \end{lrbox}
 
   \node[terminal] at (0,0cm) (src) {Base Video Frame};
-  \node[terminal] at ($(src)+(4.6,0cm)$) (src1) {Distorted Video Frame};
-  \coordinate[] (codo0) at ($0.5*(src)+0.5*(src1)+(0,-2cm)$) {};
-  \node[nonterminal, anchor=north, align=center] at ($(codo0.south)+(0,-0.4cm)$) (cmp) {
+  \node[terminal, xshift=-0.5cm, right=of src] (src1) {Video Frame with Artifacts};
+  \coordinate[yshift=-1.5cm] (codo0) at ($(src)!0.5!(src1)$) {};
+  \node[nonterminal, yshift=0.3cm, below=of codo0, align=center] (cmp) {
     Frame Timestamp Comparison \\ 
     \vspace*{0.1cm} \\
     \usebox\cmpbox
@@ -121,13 +170,13 @@
     \usebox\dropbox
   };
 
-  \coordinate[mux] (codo00) at ($0.5*(drop)+0.5*(cmp)+(0,-3cm)$) {};
+  \coordinate[mux, yshift=-3cm] (codo00) at ($(drop)!0.5!(cmp)$) {};
 
   \coordinate[] (codo1) at ($(codo00.south)+(0,-0.5cm)$) {};
-  \coordinate[] (codo2) at ($(codo1)+(-2.3,0cm)$) {};
-  \coordinate[] (codo3) at ($(codo1)+(2.3,0cm)$) {};
+  \coordinate[] (codo2) at ($(codo1)+(-2.8,0cm)$) {};
+  \coordinate[] (codo3) at ($(codo1)+(2.8,0cm)$) {};
   \node[terminal, below=of codo2, align=center] (dst) {Synchronized \\ Base Video Frame};
-  \node[terminal, below=of codo3] (dst1) {Distorted Video Frame};
+  \node[terminal, below=of codo3] (dst1) {Video Frame with Artifacts};
 
   \draw (src) |- (codo0) -| (src1);
   \draw[->] (codo0) -- (cmp);

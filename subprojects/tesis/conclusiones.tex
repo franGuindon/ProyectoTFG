@@ -1,19 +1,20 @@
-\chapter{Conclusiones}
+\chapter{Conclusions and Future Work}
 \label{chp:conclusions}
 
-One improvement is the expansion of the training dataset to 12.7 million samples, from the previous 2.3 million samples. These new samples are categorized into 19 different video content types, which improves over the previous 2 categories. Rangerx also implements a new feature extraction strategy, which improves detection performance to almost 0 Out Of Bag (OOB) prediction error over the complete dataset. Finally, Rangerx improves over the previous RDF Detector by optimizing the feature extraction and modifying the RDF backend to the Ranger C++ Core Library.
+This work proposes Art-FD, an Artifact Detection System that runs on the Nvidia Jetson TX2 Embedded System at more than 30 frames per second, while achieving high performance on the detection task. This work first creates a dataset of nearly 40 million examples, manually inspected to display a variety of almost 60 content types. The Art-FD dataset improves over the dispTEC2 dataset, which consists of 1.5 million examples. Art-FD also implements and tests the creation of a new feature extraction strategy and training strategy, which achieves detection performance on both precision and recall metrics over $0.97$. These metrics improve over the performance of previous dispTEC2 classifiers, which do not reach high detection metrics. Finally, Art-FD is capable of running the whole system, including the feature extraction strategy, the RDF classification, and the mask generation, in $24.169$ ms on the TX2 hardware. This execution time improves over the time performance of previous dispTEC2 classifiers.
 
-Las conclusiones no son un resumen de lo realizado sino a lo que ha llevado el
-desarrollo de la tesis, no perdiendo de vista los objetivos planteados desde
-el principio y los resultados obtenidos.  En otras palabras, qué se concluye o
-a qué se ha llegado después de realizado la tesis de maestría.  Un error
-común es ``concluir'' aspectos que no se desarrollaron en la tesis, como
-observaciones o afirmaciones derivadas de la teoría directamente.  Esto último
-debe evitarse.
+Art-FD suggests the possibility of real-time accurate artifact detection for embedded systems. However, there are several challenges that Art-FD does not address.
 
-Es fundamental en este capítulo hacer énfasis y puntualizar los
-aportes específicos del trabajo.
+The Art-FD dataset is generated from 3 base videos and does not represent a realistic range of videos that may suffer from H264 packet loss. In future works, the number of base videos in the Art-FD dataset should be increased to test the performance of Art-FD on a larger variety of video content types. The selection of base videos presents a challenge. Videos may be compressed with a variety of standards, which introduces artifacts that Art-FD does not address. The manual selection of video locations represents an overhead in the expansion of the dataset, however this procedure can be replaced by automatic random sampling of frames from the video.
 
-Es usual concluir con lo que queda por hacer, o sugerencias para mejorar los
-resultados.
+Art-FD generates videos with artifacts using a Bernoullli distributed H264 packet loss model. However, this model can be improved to simulate realistic packet loss. In practice, each transmission packet may contain more than one H264 packet and packets are commonly lost in bursts. The loss of a transmission packet may create artifacts with different properties than the ones addressed in this work.
 
+The feature analysis of Art-FD suggests that variance features are not used as frequently as mean features. In future works, the feature extraction strategy should be optimized by removing the calculation of variances. In addition, a reduction in the number of features per training translates to a reduction in the memory size of the dataset, which would allow Art-FD to train on a dataset with more examples within similar memory restrictions.
+
+In the feature extraction strategy, the filtering calculation and the SAT calculation are executed in separate loops. These two loops can be merged through loop fusion to improve the execution speed. The feature extraction procedure is executed on a single CPU core and can be obtimized by using parallelization. Art-FD does not account for macroblocks that lie on the borders of a frame and the feature extraction strategy can be improved to consider these macroblocks.
+
+The Art-FD RDF classifier uses the Ranger library. This library provides RDF training and testing tools. However, Ranger is intended for the R programming language. Art-FD expands Ranger by allowing the dataset loading and the prediction procedure to use a dataset preloaded on memory. Art-FD also adds several analysis tools to Ranger. The Ranger training setup involves a series of operations that are not used during prediction and that add an appreciable overhead. Ranger executes this setup for both training and testing. Ranger can be further improved by separating the setup of the training and prediction procedures.
+
+Art-FD considers four important RDF hyperparameters. These parameters affect the detection performance of the RDF classifier. In Art-FD, the number of trees is chosen in accordance with the TX2 CPU resources and the number of features per tree is chosen according to an empirical rule. However, parameters such as the number of thresholds splits per tree and the maximum tree depth are chosen arbitrarily. The selection of these parameters should be optimized to improve the performance of the RDF classifier. The Art-FD performance metrics rely on prediction with the OOB dataset. However, results should also be cross-validated in order to generate more accurate performance metrics.
+
+Even though Art-FD still has room for improvement, this work fulfilled all the initial goals. Art-FD is evidence of the power that classical machine learning approaches can offer for prediction and time performance with limited computational resources.

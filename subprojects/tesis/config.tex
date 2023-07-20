@@ -9,13 +9,14 @@
 %%
 %%   Asegúrse de que esta variable sea false en la versión final y de haber
 %%   actualizado la fecha de la defensa, un poco más abajo.
-\setboolean{draftmode}{true}            % turn draft mode on
-%\setboolean{draftmode}{false}          % turn draft mode off
+%\setboolean{draftmode}{true}            % turn draft mode on
+\setboolean{draftmode}{false}          % turn draft mode off
 
 %% Esta es la fecha que se colocará en el modo borrador
 \defDraftDate{\today}
 %% Esta es la fecha que se usará en la versión final
-\defFinalDate{July 16, 2023}
+\def\FechaFinal{16 de Junio, 2023}
+\defFinalDate{\today}
 
 %% Este es el nombre del estudiante y el pronombre que utiliza, para cambiar
 %% las portadas como corresponde
@@ -39,9 +40,17 @@
 %% Este es el título completo del informe del trabajo final de graduación.
 %% Usted puede agregar \\ para forzar líneas nuevas en la portada y automática-
 %% mente el comando se encarga de eliminar eso cuando necesita el título
-% \defTitle{Detección de artefactos de video \\%
-% en tiempo real sobre un sistema embebido}
-\defTitle{Embedded soft real time video artifact detector}
+%\def\useSpanishTitle
+
+\def\spanishTitle{Detección de artefactos de video \\
+  en tiempo real sobre un sistema embebido}
+
+\ifx\useSpanishTitle\undefined
+  \defTitle{Embedded soft real-time video artifact detector}
+\else
+\defTitle{Detección de artefactos de video \\
+en tiempo real sobre un sistema embebido}
+\fi
 
 %% Palabras clave
 \defKeywords{}
@@ -53,7 +62,7 @@
 %%  [M]asculino,
 %%  [F]emenino,
 %%  persona [N]o binaria
-\defAsesor[M]{Dr.\,Pablo Alvarado}
+\defAsesor[M]{Dr.\,Pablo Alvarado Moya}
 \defLectorI[M]{Dr.\,Jorge Castro Godinez}
 \defLectorII[M]{Dr.\,Pablo Mendoza Ponce}
 

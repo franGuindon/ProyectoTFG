@@ -11,6 +11,33 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% New little license, perhaps I should ask possible legitimate contracts
+%
+% Engineering project idea:
+% Can AI build little predictors for psychometric measures?
+% We may build little auto psychometricians ...
+% 
+% I currently percieve myself to be building a bridge between a simple
+% statistical measure and another seemingly unrelated one at some higher level
+% of abstraction. (fancy way of saying means and vars of mb borders as simple
+% stat)
+%
+% And another,
+%
+%
+
+% TODO TFG:
+% Falta analisis de balance
+% ¿Cómo cambia precision y recall con balance?
+% Gráfica Balance vs Precision
+% Gráfica Balance vs Recall
+%
+% Falta elemento gstreamer
+% - Start by replicating dT2, with same modelpath, upscale properties
+% - Add output enumerator
+% - Move upscale property to enumerator
+% - 
+
 % \documentclass is book
 % If you want a printable two-side version of the thesis
 %\documentclass[12pt,twoside,letterpaper]{book}
@@ -59,10 +86,6 @@
 % allow equations to be splitted (breaked) into several pages
 \allowdisplaybreaks[3]
 
-% Added by francis
-%\usepackage{import}
-
-
 % --------------------------------------------------------------------------
 \begin{document}
   % where to look for graphics
@@ -75,8 +98,8 @@
   \pagestyle{empty}
 
   % select one of the following titlepages
-  %\include{titlepage_licel_es} % Titlepage in Spanish
-  \include{titlepage_licel_en} % Titlepage in English (only if thesis is in En)
+  \include{titlepage_licel_es} % Titlepage in Spanish
+  % \include{titlepage_licel_en} % Titlepage in English (only if thesis is in En)
 
   %\include{titlepage_msc_es}   % Titlepage in Spanish
   %\include{titlepage_msc_en}   % Titlepage in English (only if thesis is in En)
@@ -85,9 +108,6 @@
   
   % Hoja de depuración, con comandos definidos por la plantilla.
   % \include{debug}
-
-
-
   
   \include{disclaimer}
   %% -------------------------------------------------
@@ -108,15 +128,16 @@
   %%   Al acta firmada, en formato PDF (ya sea firmado con tabletas gráficas o
   %%   en papel y escaneada) la integra al documento con el comando para incluir
   %%   el pdf directamente \includepdf{archivo} 
-  \include{acta_aprob_licel}  % Remover en versión final
-  %\includepdf{acta_aprob_firmada} % Incluir el acta firmada acá.
+  % \include{acta_aprob_licel}  % Remover en versión final
+  \includepdf[offset=2.3cm -2.5cm]{230616_acta_aprobacion_Francis_Guindon_fPAM_fPMP_fJACG} % Incluir el acta firmada acá.
 
   %% El acta de evaluación usualmente la extrae del documento y
   %% la entrega al tribunal para que sea firmada, y ellos la hacen
   %% llegar al profesor del curso de TFG.  Ese documento no
   %% debe aparecer en la tesis final, así que esta línea deberá
   %% comentarla en la versión final:
-  \include{acta_eval_licel}   % >> Remover en versión final <<
+  % \include{acta_eval_licel}   % >> Remover en versión final <<
+  % \includepdf[offset=2.3cm -2.5cm]{230616_acta_evaluacion_Francis_Guindon_fPAM_fPMP_fJACG} % Incluir el acta firmada acá.
     
   %% Para la maestría en electrónica:
   %\include{acta_aprob_mscel}  % Remover en versión final
@@ -169,7 +190,7 @@
   % \bibliographystyle{sty/plainurl} % for english documents
   % \bibliography{literatura}
   % literature in biblatex/biber way
-  \printbibliography[title={Bibliografía},heading=bibintoc]
+  \printbibliography[title={References},heading=bibintoc]
   %----------------------------------------------------------------------------
 
   %----------------------------------------------------------------------------

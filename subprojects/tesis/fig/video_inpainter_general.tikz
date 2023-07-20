@@ -2,14 +2,54 @@
 \usepackage{siunitx}
 \usepackage{tikz}
 \usepackage{graphicx}
-\usetikzlibrary{arrows, arrows.meta, positioning, calc, decorations.pathreplacing}
 
-\tikzset{>={Latex[width=3mm, height=3mm]}}
-\tikzset{every picture/.style={line width=0.4mm, inner sep=15pt}}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
 
-\tikzstyle{image} = [draw, rectangle, inner sep=0.1cm]
-\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40]
-\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40]
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm, xcenter around = {}]
@@ -19,17 +59,17 @@
 \node[below=of src] (codo0) {};
 \node[nonterminal, right=of codo0] (inpainter) {Video Restoration System};
 \node[right=of inpainter] (codo1) {};
-\node[terminal, below=of codo1] (dst) {Restored Video Frame};
-\node[image, anchor=south] at ($(inpainter.north east) + (0, 0.4cm)$) (srcx) {\includegraphics[trim={50cm 10cm 10cm 20cm},clip, width=3cm]{imgs_with_loss_27.jpeg}};
-\node[image, anchor=north] at ($(inpainter.south west) - (0, 0.4cm)$) (dstx) {\includegraphics[trim={50cm 10cm 10cm 20cm},clip, width=3cm]{imgs_27.jpeg}};
+\node[terminal, below=of codo1] (dst) {Restored Video Frame}; %                                      l   b   r   t
+\node[image, anchor=south] at ($(inpainter.north east) + (0, 0.4cm)$) (srcx) {\includegraphics[trim={26cm 6cm 15cm 15cm},clip, width=3cm]{artifact_21.jpeg}};
+\node[image, anchor=north] at ($(inpainter.south west) - (0, 0.4cm)$) (dstx) {\includegraphics[trim={26cm 6cm 15cm 15cm},clip, width=3cm]{base_21.jpeg}};
 
 \draw[->] (src) |- (inpainter);
 \draw[->] (inpainter) -| (dst);
 
-\draw (srcx.north west) edge[dotted] (src.north east);
-\draw (srcx.south west) edge[dotted] (src.south east);
-\draw (dstx.north east) edge[dotted] (dst.north west);
-\draw (dstx.south east) edge[dotted] (dst.south west);
+\draw (srcx.north west) edge[dotted] (src.top right corner);
+\draw (srcx.south west) edge[dotted] (src.bottom right corner);
+\draw (dstx.north east) edge[dotted] (dst.top left corner);
+\draw (dstx.south east) edge[dotted] (dst.bottom left corner);
 
 \end{tikzpicture}
 \end{document}

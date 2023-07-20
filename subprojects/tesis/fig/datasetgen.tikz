@@ -1,6 +1,24 @@
 \documentclass[class=article,border=0pt]{standalone}
 \usepackage{siunitx}
 \usepackage{tikz}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{every picture/.style={line width=0.4mm}}
+
+% \tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
+%                         line width=0.4mm, inner sep=15pt, align=center]
+% \tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
+%                            line width=0.4mm, inner sep=15pt, align=center]
+
 \usetikzlibrary{
   arrows,
   arrows.meta,
@@ -8,47 +26,82 @@
   calc,
   decorations.pathreplacing,
   backgrounds,
-  fit}
+  fit,
+  shapes.geometric
+}
 
-\tikzset{>={Latex[width=3mm, height=3mm]}}
-\tikzset{every picture/.style={line width=0.4mm}}
-
-\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40, line width=0.4mm, inner sep=15pt]
-\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40, line width=0.4mm, inner sep=15pt]
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
 
-\node[terminal] at (0,0cm) (src) {Video File};
-\coordinate[anchor=north] (codo0) at ($(src.south)+(0,-2cm)$) {}
-\node[nonterminal, below=of codo0, align=center] (simulator) {Packet Loss Simulator};
-\node[terminal, below=of simulator] at ($(simulator)+(0,-3cm)$) (features) {Video with Artifacts};
-\node[nonterminal, right=of simulator, align=center] (rdf) {Frame Set Generator};
-\node[nonterminal, above=of rdf, align=center] (generator2) {Frame Set Generator};
-\node[nonterminal, below=of rdf, align=center] (extractor) {Feature Extractor};
-\node[terminal, below=of extractor] (predictions) {Feature Matrix};
-\node[nonterminal, right=of rdf, align=center] (maskgen) {Video Synchronizer};
+\node[terminal] at (0,0cm) (src) {Base Video File};
+\coordinate[anchor=src.south] (codo0) at ($(src.south)+(0,-2cm)$) {};
+\node[nonterminal, anchor=north, align=center] at ($(codo0.south)+(0,-1.6cm)$) (simulator) {Packet Loss Simulator};
+\node[storeblock, fill=teal!40, below=of simulator] (features) {Video with Artifacts};
+\node[nonterminal, right=of codo0, align=center] (generator2) {Video Synchronizer};
+\node[nonterminal, xshift=2cm, right=of generator2, align=center] (maskgen) {Frame Set Generator};
 \node[nonterminal, below=of maskgen, align=center] (labeler) {Video Labeler};
-\node[terminal, below=of labeler] (dst) {Label vector};
+\node[nonterminal, left=of labeler, align=center] (extractor) {Feature Extractor};
+\node[terminal, anchor=north] at ($(extractor.south)+(0,-2.1cm)$) (predictions) {Feature Matrix};
+\node[terminal, anchor=north] at ($(labeler.north)!(predictions.north)!(labeler.south)$) (dst) {Label Vector};
 
 \draw[->] (src) -- (codo0) -- (simulator);
 \draw[->] (codo0) -- (generator2);
 \draw[->] (simulator) -- (features);
-\draw[->] (simulator) -- (rdf);
-\draw[->] (rdf) -- (extractor);
+\draw[->] (features) -| (generator2);
+\draw[->] (generator2) -- (maskgen);
+\draw[->] ($(maskgen.south)!0.4!(labeler.north)$) -| (extractor);
 \draw[->] (extractor) -- (predictions);
-\draw[->] (rdf) -- (maskgen);
 \draw[->] (maskgen) -- (labeler);
 \draw[->] (labeler) -- (dst);
 
-\node [fit=(simulator)] (simulator_box) {};
-
 \scoped[on background layer]{
-  \node [draw, rectangle, fit=(simulator)(maskgen)(labeler), fill=orange!30,
-    inner sep=0.4cm] (system) {};
+  \node [draw, rectangle, fit=(simulator)(maskgen)(labeler)(generator2), fill=orange!30,
+    inner sep=0.3cm] (system) {};
 
   \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
-    Dataset Generator};
+      Dataset Generator};
+
+  \node [storeblock, aspect=0.05, fit=(predictions)(dst), fill=teal!30,
+    inner sep=0.4cm] (dataset) {};
+  \node [anchor=south west, inner sep=0.4cm] at (dataset.before top) () {
+    Dataset};
 }
 
 \end{tikzpicture}

@@ -1,6 +1,7 @@
 \documentclass[class=article,border=0pt]{standalone}
 \usepackage{siunitx}
 \usepackage{tikz}
+
 \usetikzlibrary{
   arrows,
   arrows.meta,
@@ -8,37 +9,95 @@
   calc,
   decorations.pathreplacing,
   backgrounds,
-  fit}
+  fit,
+  shapes.geometric
+}
+  
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40,
+    align=center
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
 
-\tikzset{>={Latex[width=3mm, height=3mm]}}
-\tikzset{every picture/.style={line width=0.4mm}}
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
 
-\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
-  line width=0.4mm, inner sep=15pt]
-\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
-  line width=0.4mm, inner sep=15pt]
+% \tikzset{>={Latex[width=3mm, height=3mm]}}
+% \tikzset{every picture/.style={line width=0.4mm}}
+
+% \tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40,
+%   line width=0.4mm, inner sep=15pt]
+% \tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40,
+%   line width=0.4mm, inner sep=15pt]
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
 
   \node[terminal] at (0,0cm) (src) {Video Frame with Artifacts};
   \node[nonterminal, below=of src, align=center] (filter) {2D High Pass Filter};
-  \node[terminal, dashed, below=of filter] (hfiltered) {Horizontally Filtered Frame};
-  \node[terminal, dashed, below=of hfiltered] (vfiltered) {Vertically Filtered Frame};
-  \node[nonterminal, right=of filter, align=center] (satcalc) {SAT Calculator};
-  \node[terminal, dashed, below=of satcalc] (sat) {SAT};
-  \node[terminal, dashed, below=of sat] (ssat) {Squared SAT};
-  \node[nonterminal, right=of satcalc, align=center] (stats) {Block Statistics Logic};
+  \node[terminal, below=of filter] (hfiltered) {Horizontally Filtered\\Frame};
+  \node[terminal, below=of hfiltered] (vfiltered) {Vertically Filtered\\Frame};
+  \node[nonterminal, xshift=0.3cm, right=of filter, align=center] (satcalc) {SAT Calculator};
+  \node[terminal, below=of satcalc] (sat) {SAT};
+  \node[terminal, anchor=north] at ($(vfiltered.north)!(sat)!(vfiltered.north east)$) (ssat) {Squared SAT};
+  \node[nonterminal, right=of satcalc, align=center] (stats) {Macroblock\\Statistics Calculator};
   \node[terminal, below=of stats] (dst) {Feature Matrix};
   
   \draw[->] (src) -- (filter);
-  \draw[->, dashed] (filter) -- (hfiltered);
-  \draw[->, dashed] ($(hfiltered.south)+(0,-0.3cm)$) -- (vfiltered);
-  \draw[->] (filter) -- (satcalc);
-  \draw[->, dashed] (satcalc) -- (sat);
-  \draw[->, dashed] ($(sat.south)+(0,-0.3cm)$) -- (ssat);
-  \draw[->] (satcalc) -- (stats);
+  \draw[->] (filter) -- (hfiltered);
+  \draw[->] (filter) ++ (0,-1cm) -| ($(hfiltered.bottom left corner)+(-0.2,0cm)$) |- ($(vfiltered.north)+(0,0.6cm)$) -- (vfiltered);
+  \coordinate[] (satin) at ($(filter.south east)!0.6!(satcalc.south west)$);
+  \draw[-] (hfiltered) -- ($(hfiltered)!(satin)!(hfiltered.east)$);
+  \draw[->] (vfiltered) -| (satin) |- (satcalc);
+  \draw[->] (satcalc) -- (sat);
+  \draw[->] (satcalc) ++ (0,-1cm) -| ($(sat.bottom left corner)+(-0.4,0cm)$) |- ($(ssat.north)+(0,0.6cm)$) -- (ssat);
+  \coordinate[] (statsin) at ($(satcalc.south east)!0.4!(stats.south west)$);
+  \draw[-] (sat) -- ($(sat)!(statsin)!(sat.east)$);
+  \draw[->] (ssat) -| (statsin) |- (stats);
   \draw[->] (stats) -- (dst);
+  
+  \draw[] ($(sat.bottom left corner) + (-0.1,-0.074cm)$) -- ($(sat.top left corner) + (-0.1,-0.074cm)$);
+  \draw[] ($(sat.bottom left corner) + (-0.1,-0.074cm)$) -- ($(sat.bottom right corner) + (-0.1,-0.074cm)$);
+  \draw[] ($(ssat.bottom left corner) + (-0.1,-0.074cm)$) -- ($(ssat.top left corner) + (-0.1,-0.074cm)$);
+  \draw[] ($(ssat.bottom left corner) + (-0.1,-0.074cm)$) -- ($(ssat.bottom right corner) + (-0.1,-0.074cm)$);
   
   \node [fit=(filter)] (filter_box) {};
   
@@ -46,7 +105,7 @@
     \node [draw, rectangle, fit=(filter_box)(stats), fill=orange!30,
       inner sep=0.3cm] (system) {};
   
-    \node [anchor=south east, inner sep=0.3cm] at (system.north east) () {
+    \node [anchor=south east, inner sep=0.2cm] at (system.north east) () {
       Feature Extractor};
   }
   

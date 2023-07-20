@@ -1,13 +1,54 @@
 \documentclass[class=article,border=0pt]{standalone}
 \usepackage{siunitx}
 \usepackage{tikz}
-\usetikzlibrary{arrows, arrows.meta, positioning, calc, decorations.pathreplacing}
 
-\tikzset{>={Latex[width=3mm, height=3mm]}}
-\tikzset{every picture/.style={line width=0.4mm, inner sep=15pt}}
+\usetikzlibrary{
+  arrows,
+  arrows.meta,
+  positioning,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  fit,
+  shapes.geometric
+}
 
-\tikzstyle{terminal} = [draw, rectangle, minimum size=6mm, fill=teal!40, line width=0.4mm]
-\tikzstyle{nonterminal} = [draw, rectangle, minimum size=6mm, fill=orange!40, line width=0.4mm]
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},  
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
@@ -22,9 +63,6 @@
 \draw[->] (encoder) -- (channel);
 \draw[->] (channel) -- (decoder);
 \draw[->] (decoder) -- (dst);
-
-% Method to draw (down right down) or (down left down) arrows between nodes:
-%\draw[->] (channel.south) |- ($0.5*(channel.south)+0.5*(decoder.north)$) -| (decoder.north);
 
 \end{tikzpicture}
 \end{document}

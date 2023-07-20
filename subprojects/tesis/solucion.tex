@@ -1,17 +1,17 @@
-\chapter{The Rangerx Artifact Detection System}
+\chapter{The Art-FD System}
 \label{ch:solucion}
 
 \section{Artifact Detection System Structure}
 \label{sec:sol_struct}
 
-The Artifact Detection System generates detection masks from frames with artifacts. These masks are white on macroblocks which contain artifacts and black on the remaining artifacts. Figure \ref{fig:detector_overview} illustrates the input frame with artifacts, which is processed by the system, and finally produces the detection masks.
+The Artifact Detection System generates detection masks from frames with artifacts. These masks are white on macroblocks which contain artifacts and black on the remaining macroblocks. Figure \ref{fig:detector_overview} illustrates the input frame with artifacts, which is processed by the system, and finally produces the detection masks.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{detector_general}
   
-  \caption{General Artifact Detection System Overview. }
+  \caption{Artifact Detection System overview.}
   \label{fig:detector_overview}
 
 \end{figure}
@@ -23,26 +23,41 @@ In order to achieve this, the Artifact Detection System must first extract featu
   
   \includegraphics{detector_steps}
   
-  \caption{Artifact Detection process. }
+  \caption{Artifact Detection procedure. }
   \label{fig:detector_steps}
 
 \end{figure}
 
-This structure was used in the dispTEC2-2022 RDF system. The Rangerx system maintains this structure and improves over the previous system by increasing the training dataset size, by redesigning the Feature Extractor and by replacing the previous RDF library with the Ranger C++ Core Library.
+This structure was used in the dispTEC2 RDF system. The Art-FD system maintains this structure and improves over the previous system by increasing the training dataset size, by redesigning the Feature Extractor, and by replacing the previous RDF library with the Ranger C++ Core Library.
 
-Section \ref{sec:sol_dataset} details the dataset construction and expansion procedure. Section \ref{sec:sol_metrics} explains the main strategies Rangerx uses to improve performance on the detection task, as measured by the Precision and Recall Metrics. This section details out the Rangerx Feature Extractor design. Section \ref{sec:sol_speed} discusses the optimizations used in Rangerx to improve on the previous system's speed. This section justifies the use of Ranger as the new RDF backend. Section \ref{sec:sol_maskgen} is a brief explanation of the Rangerx Mask Generator (This Generator is identical to the one used in dispTEC2-2022). Finally, Section \ref{sec:sol_traintest} elaborates on the training and testing procedures.
+Section \ref{sec:sol_train_procedure} details the training procedure. Section \ref{sec:sol_dataset} describes dataset generation steps, aimed at tackling this work's dataset expansion goal. Section \ref{sec:sol_metrics} explains Art-FD's strategies to improve performance on the detection task, as measured by the Precision and Recall Metrics. It also explains the Art-FD Feature Extractor design, the dataset balancing procedure, the RDF Classifier, and the Mask Detector, both introduced in Figure \ref{fig:detector_steps}. Section \ref{sec:sol_speed} discusses the Art-FD optimizations used to improve over the previous system's speed.
+
+\section{Training and Testing Environment}
+\label{sec:sol_train_procedure}
+
+The training procedure generates the forest models used in the artifact detection system from the base videos. Figure \ref{fig:trainer} details the training steps. The Dataset Generator constructs a training dataset from the base videos. The Randomized Balancer processes the dataset into a balanced dataset, with the aim of improving RFD Classifier detection performance. The Bootstrapper divides the dataset into an In-the-Bag set, used for training, and an Out-of-Bag set, used for testing. The Forest Grower generates a Forest Model from the In-the-Bag dataset. The Art-FD RDF Classifier then generates predictions for the Out-of-Bag dataset using the Forest Model. The Confusion Analyzer compares the results from the RDF Classifier and the expected results from the Out-of-Bag dataset. From this comparison, the analyzer outputs the detection performance metrics.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{trainer}
+  
+  \caption{Training and Testing procedure.}
+  \label{fig:trainer}
+
+\end{figure}
 
 \section{Building and Expanding the Dataset}
 \label{sec:sol_dataset}
 
-The first step in expanding the training dataset is to obtain more base videos. These base videos are then processed by the Dataset Generator to produce the training feature and label dataset. Figure \ref{fig:datasetgen} enumerates the general steps in dataset generation. The video file is first processed by a Packet Loss Simulator, which produces a corresponding video with artifacts. 
+The first step in expanding the training dataset is to obtain base videos. These base videos are then processed by the Dataset Generator to produce the training feature and label dataset. Figure \ref{fig:datasetgen} lays out the general steps in the dataset generation. A video file is first processed by a Packet Loss Simulator, which produces a corresponding video with artifacts. The Video Synchronizer synchronizes the frames from the base video and the video with artifacts. Both the base video and the video with artifacts are then processed by a Frame Set Generator that extracts sets of 200 frames from specified locations along the video. The frame sets obtained from the video with artifacts are then processed by the same feature extractor introduced in Figure \ref{fig:detector_steps} to produce a feature matrix, which is used as part of the final dataset. The Video Labeler produces a label vector from the set of synchronized frames, which completes the generation of the dataset.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{datasetgen}
   
-  \caption{Dataset Generation procedure}
+  \caption{Dataset generation procedure.}
   \label{fig:datasetgen}
 
 \end{figure}
@@ -50,93 +65,418 @@ The first step in expanding the training dataset is to obtain more base videos. 
 \subsection{The Packet Loss Simulator}
 \label{sec:sol_simulation}
 
-The base videos are processed by a Packet Loss Simulator to produce corresponding videos with artefacts. Figure \ref{fig:simulator} illustrates the simulator procedure. Base video frames are encoded into H264 packets, then they are processed by a Random H264 Packet Drop system, which uses a constant drop probability. Finally, the H264 Bitstream with losses is decoded into frames with artifacts.
+The base videos are processed by a Packet Loss Simulator to produce corresponding videos with artifacts. Figure \ref{fig:simulator} illustrates the simulator procedure. Base video frames are encoded into H264 packets, then they are processed by a Random H264 Packet Dropper, which uses a constant drop probability. The Packet Dropper probability $P_d$ is a dataset parameter and affects how well the system simulates a real case scenario. Finally, the H264 Bitstream with losses is decoded into frames with artifacts. This work uses Gstreamer to simulate H264 packet losses in input video. Gstreamer is a tool for video and audio processing that provides the $\ENC$, $\DEC$ and $\RPD$ algorithms and can simulate H264 packet loss on input video \cite{gstreamer}.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{simulator}
   
-  \caption{H264 Packet Loss Simulation procedure}
+  \caption{H264 packet loss simulation procedure.}
   \label{fig:simulator}
 
 \end{figure}
 
-\subsection{The Frame Set Generator}
-\label{sec:sol_framesetgen}
-
-In order to ensure that the new dataset reduces the risk of overfitting, each new video is inspected manually and several locations of interest within the video are then described in a Video Snipping Specification File. This file is used by a Video Snipper system to then snip sets of 200 frames from each specified video location. Figure \ref{fig:framesetgen} describes the creation of the frame sets.
-
-\begin{figure} [!h]
-  \centering
-  
-  \includegraphics{framesetgen}
-  
-  \caption{Frame Set Generation procedure.}
-  \label{fig:framesetgen}
-
-\end{figure}
-
-The locations of interest are chosen according to a subjective assessment of video content type. The project's dataset expansion goal is to have at least 18 different frame sets, each with their unique video content type, and the dataset must at least include video in 3 different lighting scenarios.
-
 \subsection{The Video Synchronizer}
 \label{sec:sol_synch}
 
-The next step in dataset generation is to synchronize the base video with the video with artifacts. Some H264 packets encode vital metadata for the decoding of frames. When these packets are dropped, a complete frame is lost and the distorted video becomes unsynchronized with the base video. By reading the base and distorted frame timestamps in pairs, the Video Synchronizer detects when the distorted frame timestamp jumps forward, it then dumps the unmatched base frames. The next base frame timestamp should match the distorted frame. The Synchronizer outputs base frame and distorted frame pairs with matching timestamps. \ref{fig:synch} illustrates the Video Synchronization procedure.
+The next step in the dataset generation is to synchronize the base video with the video with artifacts. Some H264 packets encode metadata for the decoding of frames. When these packets are dropped, a complete frame is lost and the distorted video becomes unsynchronized with the base video. By reading the base and distorted frame timestamps in pairs, the Video Synchronizer detects when the distorted frame timestamp jumps forward, it then dumps the unmatched base frames. The next base frame timestamp should match the distorted frame. The Synchronizer outputs base frame and distorted frame pairs with matching timestamps. Figure \ref{fig:synch} illustrates the Video Synchronization procedure.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{synch}
   
-  \caption{Video Synchronization procedure.}
+  \caption{Video synchronization procedure.}
   \label{fig:synch}
 
 \end{figure}
 
+\subsection{The Frame Set Generator}
+\label{sec:sol_framesetgen}
+
+In order to increase the variance in the dataset and reduce the risk of overfitting, each new video is inspected manually and several locations of interest within the video are then described in a Video Snipping Specification File. This file is used by a Video Snipper system to then snip sets of 200 frames from each specified video location. Figure \ref{fig:framesetgen} describes the creation of the frame sets. The locations of interest are chosen according to a subjective assessment of video content type. Table \ref{tab:dataset-req} lists the dataset requirements.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{framesetgen}
+  
+  \caption{Frame set generation procedure.}
+  \label{fig:framesetgen}
+
+\end{figure}
+
+\begin{table}[htbp]
+  \caption{Minimum Dataset Requirements}
+  \label{tab:dataset-req}
+  \centering
+  \begin{tabular}{lr}
+    \hline
+    \textbf{Speficifaction} & \textbf{Value} \\
+    \hline
+    Frame width & 1280 \\
+    Frame height & 720 \\
+    Number of frame sets & 18 \\
+    Number of frames per set & 200 \\    
+    Number of video content types & 18 \\
+    Number of lighting types & 3 \\
+    \hline
+  \end{tabular}
+\end{table}
+
 \subsection{The Label Generator}
 \label{sec:sol_labeler}
+
+The dataset labels are used to later grow the forest models and test forest performance on the artifact detection task.  In this work, labels are constructed by the Macroblock Average Threshold ground truth metric explained in \cite{Brenes2022}.
+
+Figure \ref{fig:labeler} describes the general labeling procedure. The Labeler converts a set of synchronized base and artifact video frames into a dataset label vector. The Absolute Difference Operator calculates the absolute value of the difference of the two frames. The Macroblock Averager divides the difference frame into macroblocks and calculates each macroblock's average absolute difference. The Discretizer then compares each average with the dicretization threshold $D_{TH}$. All macroblocks with an average absolute difference greater than $D_{TH}$ are labeled as artifact macroblocks, with a $255$ label. All other macroblocks are labeled as non-artifact macroblocks, with a $0$ label.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{labeler}
   
-  \caption{Video Labeling procedure.}
+  \caption{Video labeling procedure.}
   \label{fig:labeler}
 
 \end{figure}
+ 
+\def\FA{\mat{F}_A}
+\def\FB{\mat{F}_B}
 
-\section{Improving the Detection Metrics}
+Given a synchronized base frame $\FB$ and artifact frame $\FA$ pair of width $W$ and height $H$, the label vector $\vct{Y}$ is modeled by
+
+\def\ADO{\text{ADO}}
+\def\MA{\text{MA}}
+\def\D{\text{D}_{D_{TH}}}
+\def\d{\text{d}_{D_{TH}}}
+\def\MU{\mu_{\text{MB}}}
+\def\VMU{\vct{\mu_{\text{MB}}}}
+\begin{equation}
+  \label{eq:Y}
+  \vct{Y} = \D(\VMU)
+\end{equation}
+
+where the discretization function $\D$ is modeled by
+%
+\begin{equation}
+  \label{eq:D}
+  \left[\D(\VMU)\right]_i = \begin{cases}
+    255 & \text{if\hspace{0.4cm}} \VMU[i] \ge D_{TH} \\
+    0   & \text{otherwise}
+  \end{cases}
+\end{equation}
+%
+and the macroblock average vector $\VMU$ is modeled by
+%
+\def\FD{\mat{F_\triangle}}
+\def\MBL{L_{\text{MB}}}
+\def\MBW{W_{\text{MB}}}
+\def\MBH{H_{\text{MB}}}
+\begin{equation}
+  \label{eq:MDA}
+  \left[\VMU\right]_i = \frac{\sum_{m=j}^{j+\MBL-1} \sum_{n=k}^{k+\MBL-1} \FD(m,n)}{\MBL^2}
+\end{equation}
+%
+where $\FD$ is the absolute difference between $\FA$ and $\FB$ ($\FD=| \FB - \FA |$), $\MBL$ is the macroblock length ($\MBL=16$ in H264 encoding \cite{h264}), $j$ and $k$ are the frame indices for the top left corner of the $i$-th macroblock. These are calculated as
+%
+\begin{equation}
+  \label{eq:mbj}
+  j= \MBL \cdot \left\lfloor \frac{i}{\MBW} \right\rfloor
+\end{equation}
+%
+and
+%
+\begin{equation}
+  \label{eq:mbk}
+  k = \MBL \cdot \left(i \mod{\MBW}\right)
+\end{equation}
+%
+where $\MBW$ is the integer number of macroblocks in a frame row. This value can also be thought of as the frame width in macroblock length units. $\MBW$ is calculated from $\MBL$ and $W$ as
+%
+\begin{equation}
+  \label{eq:mbw}
+  \MBW = \left\lfloor \frac{W}{\MBL} \right\rfloor
+\end{equation}
+%
+A macroblock labeled with $0$ is considered to contain no artifacts and will appear black in a I420 mask frame. A macroblock labeled with $255$ is considered to contain artifacts and will appear white in a I420 mask frame.
+
+\section{Detection Task}
 \label{sec:sol_metrics}
 
-\subsection{The Feature Extractor}
+This section explains the feature extractor mentioned in both Figures \ref{fig:detector_steps} and \ref{fig:datasetgen}. Its design is mainly focused on improving the performance of the Artifact Detection System on the detection task. This section also explains the Randomized Balancer, Forest Grower, and Confusion Analyzer introduced in Figure \ref{fig:trainer}, as well as the RDF Classifier and the Mask Generator introduced in Figure \ref{fig:detector_steps}.
+
+\subsection{Feature Extraction}
 \label{sec:sol_features}
 
-Input frames follow the I420 format. Rangerx only considers the luma component of the frame, since luma statistics correlate with artifacts much better than chroma statistics.
+RDF Classification is a classical machine learning algorithm and it is incapable of automatically learning latent features from raw input frames. When fed a raw image as an input feature vector, the RDF Classifier learns how to predict artifact macroblocks only by comparing raw pixel values against a set of thresholds. The dispTEC2 research suggests that raw pixel values may offer some predictive value on the detection task. However, this approach has two main drawbacks: its sensitivity to input image brightness and the failure to consider the predictive value of artifact statistical properties. In contrast, the Art-FD feature extraction strategy allows the RDF Classifier to learn from a set of macroblock pixel statistics that aim at detecting artifacts by vertical and horizontal artifact border detection. Input frames follow the I420 format. Art-FD only considers the luma component of each frame, since luma macroblock statistics correlate with artifacts at a higher rate than chroma statistics \cite{Glavota2016}.
 
-Figure \ref{fig:extractor_steps} describes the feature extraction strategy used in Rangerx. The new feature extractor applies a 2D High Pass Filter on the input image, which outputs a horizontally filtered frame and a vertically filtered frame.
+Figure \ref{fig:extractor_steps} describes the feature extraction strategy used in Art-FD. The new feature extractor applies a 2D High Pass Filter on the input image, which outputs a horizontally filtered frame and a vertically filtered frame. The SAT Calculator builds the SAT and Squared SAT for both the horiziontally filtered frame and the vertically filtered frame. The Macroblock Statistic Calculator runs a set of 132 mean and variance computations for each macroblock, then assembles the computations into an output Feature Matrix.
 
 \begin{figure} [!h]
   \centering
   
   \includegraphics{extractor_steps}
   
-  \caption{Feature extraction process. }
+  \caption{Feature extraction procedure. }
   \label{fig:extractor_steps}
 
 \end{figure}
 
+\subsubsection{Macroblock Statistics Calculator}
+\label{sec:sol_stats}
+
+The Macroblock Statistics Calculator computes a set of 132 statistics for almost every macroblock in the image. Given a macrobock, this set composes the corresponding feature vector. The calculator assembles all frame macroblock feature vectors into a feature matrix for a given video frame.
+
+The macroblock statistics calculation procedure considers 17 regions around the macroblock: the single $16\times16$ macroblock region and 16 border regions (4 regions per border). This procedure computes a $(\mu_r,\,\sigma^2_r)$ pair for each region in both the horizontally filtered frame and the vertically filtered frame. The border regions are expected to yield larger mean and variance values on macroblocks labeled with artifacts than on those labeled without.
+
+Additionally, the procedure computes the difference between all border region $(\mu_r,\,\sigma^2_r)$ pairs and the macroblock region $(\mu_r,\,\sigma^2_r)$ pairs. If artifacts do mostly ocurr around macroblock borders, these differences are also expected to yield larger mean and variance values on macroblocks labeled with artifacts than on those labeled without.
+
+The set of statistics that compose each feature vector are specified by feature group in Table \ref{tab:feature_vector_spec}, with their corresponding feature vector index range, group code, and group description.
+
+\begin{table}[htbp]
+  \caption{Feature Vector Specification By Group}
+  \label{tab:feature_vector_spec}
+  \centering
+  \begin{tabular}{lll}
+  \hline
+  \textbf{Index} & \textbf{Group Code} & \textbf{Group Description} \\
+  \hline
+  0 - 1 & vblock & Vertically filtered macroblock mean and variance \\
+  2 - 3 & hblock & Horizontally filtered macroblock mean and variance \\
+  4 - 19 & vtop & Vertically filtered top macroblock border \\
+  20 - 35 & vleft & Vertically filtered left macroblock border \\
+  36 - 51 & vbot & Vertically filtered bottom macroblock border \\
+  52 - 67 & vright & Vertically filtered right macroblock border \\
+  68 - 83 & htop & Horizontally filtered top macroblock border \\
+  84 - 99 & hleft & Horizontally filtered left macroblock border \\
+  100 - 115 & hbot & Horizontally filtered bottom macroblock border \\
+  116 - 131 & hright & Horizontally filtered right macroblock border \\
+  \hline
+  \end{tabular}
+\end{table}
+
+The two initial vblock and hblock groups correspond to the $(\mu_r,\,\sigma^2_r)$ pairs for the macroblock region in vertically and horizontally filtered macroblocks, respectively. The following border groups calculate 16 features each, which correspond to the $(\mu_r,\,\sigma^2_r)$ pairs for each of the 4 border regions, as well as the difference between each region's $(\mu_r,\,\sigma^2_r)$ pair with the corresponding macroblock pair. Table \ref{tab:feature_group_spec} details the feature specifications for each macroblock border feature group, including each border region's area.
+
+\begin{table}[htbp]
+  \caption{Macroblock Border Feature Group Specification}
+  \label{tab:feature_group_spec}
+  \centering
+  \begin{tabular}{lllll}
+  \hline
+  \textbf{Subindex} & \textbf{Value type} & \textbf{Subindex} &
+  \textbf{Value type} & \textbf{Region size} \\
+  \hline
+  0 & Mean & 8 & Mean difference & $2\times\MBL$ \\  
+  1 & Mean & 9 & Mean difference & $4\times\MBL$ \\  
+  2 & Mean & 10 & Mean difference & $8\times\MBL$ \\  
+  3 & Mean & 11 & Mean difference & $16\times\MBL$ \\
+  4 & Variance & 12 & Variance difference & $2\times\MBL$ \\  
+  5 & Variance & 13 & Variance difference & $4\times\MBL$ \\  
+  6 & Variance & 14 & Variance difference & $8\times\MBL$ \\
+  7 & Variance & 15 & Variance difference & $16\times\MBL$ \\
+  \hline
+  \end{tabular}
+\end{table}
+
+Figure \ref{fig:featcalc} illustrates how a left border region (highlighted in teal) is layed out with respect to its macroblock (highlighted in orange). This left border region layout applies for both vleft and hleft feature groups when considering horizontally and vertically filtered frames, respectively. The top, right, and bottom border region layouts are rotationally symmetrical to the left border layout about the macroblock's center.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{featcalc}
+  
+  \caption{Left macroblock border region layout.}
+  \label{fig:featcalc}
+\end{figure}
+
+Since the feature vectors for each macroblock also require values that lie outside of the macroblock region, these vectors are not calculated for macroblocks in the original frame's borders. The set of macroblocks considered in the feature matrix are refered to as the inner macroblocks.
+
+\subsection{Balancing and Randomizing the Dataset}
+\label{sec:sol_balancer}
+
+
+The Randomized Balancer, introduced in Figure \ref{fig:trainer}, is a method of improving the dataset (and consecuently, the performance of the resulting forest models) by adjusting the proportion of positive to negative dataset samples in the dataset. Figure \ref{fig:balancer} describes the dataset randomizing and balancing procedure.
+
+\begin{figure} [!h]
+  \centering
+  
+  \includegraphics{balancer}
+  
+  \caption{Dataset randomizing and balancing procedure.}
+  \label{fig:balancer}
+
+\end{figure}
+
+\def\DS{\mat{}}
+\def\DSF{\mat{X}}
+\def\DSL{\vct{y}}
+\def\DSE{\mat{DS}_i}
+%\def\DSF{\mat{DS_p}}
+\def\DSP{\set{P}_{\DS}}
+\def\DSN{\set{N}_{\DS}}
+
+The dataset is a feature matrix $\DSF$ and label vector $\DSL$ pair. A dataset example is a feature matrix row $\vct{x}^T_i$ and label $y_i$ pair at a given macroblock index $i$. Each feature matrix row $\vct{x}^T_i$ corresponds to the feature vector for macroblock $i$ and the corresponding label $y_i$ indicates whether the macroblock is an artifact block (255) or a non-artifact block (0). The Data Example Sorter operates over each dataset example and collects all examples with $255$ and $0$ labels into a set of positive examples $\DSP$ and negative examples $\DSN$, respectively.
+
+\def\DSPS{\set{S}_{\DSP}}
+\def\DSNS{\set{S}_{\DSN}}
+\def\DSB{B}
+\def\BPN{B_{PN}}
+\def\DST{T_{\DS}}
+
+The Random Sampler generates random subsets $\DSPS \subset \DSP$ and $\DSNS \subset \DSN$ by simple random sampling \cite{Meng2013} of $\DSP$ and $\DSN$. The size of the positive random sample $|\DSNS|$ and the size of the negative random sample $|\DSNS|$ are related through the Dataset Balance parameter $\DSB$ (the desired ratio of positive to negative examples in the balanced dataset) by
+%
+\begin{equation}
+  \label{eq:pos2neg}
+  |\DSPS| = |\DSNS|\cdot\BPN
+\end{equation}
+%
+where $\BPN$ is the positive to negative subset size conversion factor calculated by
+%
+\begin{equation}
+  \label{eq:pos2neg_factor}
+  \BPN = \frac{\DSB}{1-\DSB}
+\end{equation}
+
+In order to maximize the size of the balanced dataset, the positive random sample size is set to the total size of the positive example subset, provided the corresponding negative random sample size does not exceed the size of the negative example set. Otherwise, the negative random sample size is set to the total size of the negative example set and the positive random sample size is set accordingly. The positive random sample size is modeled by
+%
+\begin{equation}
+  \label{eq:possubsetsize}
+  |\DSPS| = \begin{cases}
+    |\DSP| & \text{if\hspace{0.4cm}} |\DSP|\cdot\BPN \le |\DSN| \\
+    |\DSN|\cdot\BPN^{-1} & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+
+and the corresponding negative random sample size is calculated from \equ{eq:pos2neg} and \equ{eq:possubsetsize}.
+
+\def\BDS{\mat{BDS}}
+Finally, the Random Mixer assembles the union of the positive and negative random samples $\DSPS\cup\DSNS$ into a balanced dataset. The Mixer assembles the dataset in uniform random order.
+
+\subsection{Growing the Forest Models}
+
+The RDF algorithm is a bagging technique, which begins with a bootstrapping step. The algorithm generates a bootstrapped dataset for each tree. A bootstrapped dataset is a random sample with replacement of the input dataset. The set of all dataset examples that are also in the bootstrapped dataset is called the in-the-bag (ITB) dataset, while the set of all dataset samples that are not in the bootstrapped dataset is called the out-of-bag (OOB) dataset. 
+
+\todo{Add Bootstrapping diagram}
+
+The Forest Grower, first introduced in Figure \ref{fig:trainer}, runs the RDF training algorithm on the ITB dataset and generates a Forest Model. The Ranger C++ Core Library, also used for constructing the work's RDF Classifier, provides an RDF training algorithm for this purpose \cite{Wright2017}.
+
+\todo{Add Forest Grower diagram}
+
+Table \ref{tab:rdf-parameters} lists the main RDF algorithm parameters.
+
+\def\NT{N_T}
+\def\DT{D_T}
+\def\TH{T_H}
+\def\STH{S_{\TH}}
+\def\FT{F_T}
+
+\begin{table}[htbp]
+  \caption{RDF Training Algorithm Parameters}
+  \label{tab:rdf-parameters}
+  \centering
+  \begin{tabular}{ll}
+  \hline
+  \textbf{Symbol} & \textbf{Description} \\
+  \hline
+  $\NT$ & Trees in forest \\
+  $\DT$ & Maximum tree depth \\
+  $\STH$ & Random Threshold Splits per Tree \\
+  $\FT$ & Random Features per Tree \\
+  \hline
+  \end{tabular}
+\end{table}
+
+$\NT$ is the number of decision tree classifiers in the forest model. The forest performance on classification tasks increases as the the number of trees in a forest at the cost of increased computation \cite{Breiman2001}. $\DT$ is the maximum tree depth that the tree classifiers are allowed to reach during the training procedure. $\STH$ is the number of random thresholds $\TH$ that are tested during the node split procedure of the RDF training algorithm. $\FT$ is the number of random features that are assigned to each tree during training, meaning that each tree only considers a subset of the 132 dataset features.
+
+As $\STH$ increases, each node tests a larger set of thresholds and the maximum information gain for each node feature-threshold pair increases. In turn, the final forest model is expected to improve in performance at the cost of a longer training duration.
+
+The $\FT$ parameter is adjusted to the square root of the total number of features in order to optimize bagging performance \cite{Breiman2001}. However, by setting $\FT=132$ (the total number of features), each tree in the forest independently evaluates each feature against the random threshold set. Then, an analysis of the frequency of different features assigned to each node in the forest model provides insight as to what features provide information gain for artifact detection.
+
+\subsubsection{The RDF Classifier}
+\label{sec:sol_maskgen}
+
+The RDF Classifier, first introduced in Figure \ref{fig:detector_steps}, is implemented with the Ranger C++ Core Library \cite{Wright2017}, which provides a classifier capable of producing a prediction vector output from an input feature matrix and a forest model file. The prediction vector output has the same structure as the label vector, with either a $0$ or $255$ value for every feature vector in the corresponding feature matrix.
+
+\todo{Add RDF Classifier diagram}
+
+To test the detection performance of the RDF Classifier and the forest model, each tree of the model is tested on its corresponding OOB dataset. The resulting OOB prediction vector is compared with the OOB label vector to determine the performance metrics.
+
+\subsection{Analysis of Forest Model Results}
+
+\subsubsection{The Confusion Analyzer}
+
+\def\FCM{C_{RDF}}
+The Confusion Analyzer generates performance metrics for a given forest model by comparing the model's OOB prediction vector with its OOB label vector. Correct classifications of positive and negative samples are called true positive and true negative results, respectively. Conversely, incorrect classifications of positive and negative samples are called false positive and false negative results, respectively. The confusion matrix $\FCM$ arranges the comparison results as follows \cite{Stehman1997}:
+
+\begin{equation}
+  \label{eq:confusion}
+  \FCM = \left[\begin{matrix}
+    TP & FP \\
+    FN & TN
+  \end{matrix}\right]
+\end{equation}
+
+where, $TP$, $TN$, $FP$, and $FN$ is the total number of true positive, true negative, false positive, and false negative results, respectively.
+
+The OOB error metric represents the fraction of missclassified samples:
+
+\def\OOBE{E_{\text{OOB}}}
+\begin{equation}
+  \label{eq:oob_error}
+  \OOBE = \frac{FP+FN}{TP+TN+FP+FN}
+\end{equation}
+
+The precision metric represents the fraction of correctly classified samples considering only the set of positive predictions:
+
+\def\PRED{P}
+\begin{equation}
+  \label{eq:oob_error}
+  \PRED = \frac{TP}{TP+FP}
+\end{equation}
+
+The recall metric represents the fraction of correctly classified samples considering only the set of positive samples:
+
+\def\REC{R}
+\begin{equation}
+  \label{eq:oob_error}
+  \REC = \frac{TP}{TP+FN}
+\end{equation}
+
+In Art-FD, the precision and recall metrics are used to measure artifact detection performace. For both metrics, a value near $1$ represents high detection performance and a value near $0$ represents low detection performance.
+
+\subsubsection{The Mask Generator}
+\label{sec:sol_maskgen}
+
+The Mask Generator, first introduced in Figure \ref{fig:detector_steps}, arranges the input prediction vector into an output detection mask. Every value in the input prediction vector corresponds to a corresponding feature vector extracted from each inner macroblock of an input frame. The detection mask is a new video frame, where each macroblock's pixel values are set to the corresponding prediction for that macroblock. This mask represents the output to the complete Artifact Detection System.
+
 \section{Improving the Detection Speed}
 \label{sec:sol_speed}
 
-\subsection{The Ranger C++ Core Library}
+\subsection{Feature Extractor Optimizations}
+The bi-linear high pass filter used in feature extraction finds neighboring pixel differences without making use of negative numbers, which allows the calculation to use unsigned 8-bit pixel values. This memory optimization avoids the use of a new frame with larger signed pixel sizes, thus larger memory consumption. This also fits more pixel values into the cache at once, which reduces the cache fetches per frame (and thus reduces the time costs of cache misses).
+
+This filter sweeps over the frame in two nested loops, one for every row in the frame and one for every pixel in the row. The vertical and horizontal filtering are calculated in the same nested loop, making use of loop fusion to optimize the calculation and reducing the number of branching operations.
+
+The SAT and Squared SAT calculations optimize the frame subregion sum calculations down to a single squared-time frame sweep and a single linear-time arithmetic operation per calculated subregion sum. Both tables are calculated for vertically and horizontally filtered frames, which generates four tables in total. All four tables are computed in the same nested loop through loop fusion.
+
+\subsection{Ranger C++ Core Library Optimizations}
 \label{sec:sol_rdf}
 
-\section{The Mask Generator}
-\label{sec:sol_maskgen}
+The Ranger C++ Core Library is optimized to use multithreading in the execution of the forest model. This optimization allows several tree classifiers to run independently and concurrently on the separate four CPU cores available in the TX2 system, thereby making a better use of the available resources. In this way, Ranger improves over the dispTEC2 RDF Classifier, which ran its tree classifiers sequentially.
 
-\section{Training and Testing}
-\label{sec:sol_traintest}
+\subsection{Compiler and Hardware Optimizations}
+\label{sec:sol_compiler}
 
+This work trains the multithreaded RDF models on Amdahl, which is a 32 core x86 2 GHz virtual machine with 62.8 GB of memory available to the main running process. Amdahl provides an optimized CPU environment to train up to 32 simultaneous trees.
 
+This work makes use of the following low level optimizations:
+\begin{enumerate}
+  \item Maximum optimization permitted by the TX2 GCC C++ Compiler
+  \item Neon SIMD extensions provided by the 4 ARM cores
+  \item TX2 CPU Clock Frequency locked at the highest value of $2.04\si{GHz}$
+  \item TX2 power consumption set at the maximum value of $15 W$
+  \item All 4 ARM CPU cores activated on the TX2
+\end{enumerate}

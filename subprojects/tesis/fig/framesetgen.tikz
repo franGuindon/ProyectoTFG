@@ -2,6 +2,29 @@
 \usepackage{siunitx}
 \usepackage{tikz}
 \usepackage{graphicx}
+
+% \usetikzlibrary{
+%   arrows,
+%   arrows.meta,
+%   positioning,
+%   calc,
+%   decorations.pathreplacing,
+%   backgrounds,
+%   fit}
+
+%   \tikzset{
+%     % General
+%     > ={Latex[width=3mm, height=3mm]},
+%     % Node
+%     every picture/.style ={line width=0.4mm},
+%     block/.style         ={draw, rectangle, inner sep=15pt},
+%     image/.style         ={block, inner sep=0.1cm},
+%     icon/.style          ={block},
+%     terminal/.style      ={block, minimum size=6mm, fill=teal!40},
+%     nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
+%   }
+
+
 \usetikzlibrary{
   arrows,
   arrows.meta,
@@ -9,29 +32,55 @@
   calc,
   decorations.pathreplacing,
   backgrounds,
-  fit}
-
-  \tikzset{
-    % General
-    > ={Latex[width=3mm, height=3mm]},
-    % Node
-    every picture/.style ={line width=0.4mm},
-    block/.style         ={draw, rectangle, inner sep=15pt},
-    image/.style         ={block, inner sep=0.1cm},
-    icon/.style          ={block},
-    terminal/.style      ={block, minimum size=6mm, fill=teal!40},
-    nonterminal/.style   ={block, minimum size=6mm, fill=orange!40},
-  }
+  fit,
+  shapes.geometric
+}
+    
+\tikzset{
+  % General
+  > ={Latex[width=3mm, height=3mm]},
+  % Node
+  every picture/.style ={line width=0.4mm},
+  block/.style         ={draw, rectangle, inner sep=15pt},
+  ioblock/.style       ={
+    draw, trapezium,
+    trapezium left angle = 75,
+    trapezium right angle = -75,
+    trapezium stretches,
+    inner sep=15pt
+  },
+  storeblock/.style    ={
+    draw, cylinder, aspect=0.10,
+    inner sep=15pt,
+    shape border rotate=90
+  },
+  image/.style         ={block, inner sep=0.1cm},
+  icon/.style          ={block},
+  mux/.style           ={draw, circle, inner sep=5pt, fill=teal!40},
+  terminal/.style      ={
+    ioblock,
+    minimum size=6mm,
+    fill=teal!40
+  },
+  nonterminal/.style   ={
+    block,
+    minimum size=6mm,
+    fill=orange!40
+  },
+  frame/.style   ={draw, rectangle, minimum width=1.2cm, minimum height=0.05cm, fill=teal!40},
+  plabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=white},
+  nlabel/.style   ={draw, rectangle, minimum width=0.05cm, minimum height=0.05cm, fill=black},
+  missing_frame/.style   ={minimum width=1.2cm, minimum height=0.05cm},
+}
 
 \begin{document}
 \begin{tikzpicture}[node distance=1cm, line width=0.4mm]
 
   
-  \node[terminal] at (0,0cm) (src) {Base Video File};
-  \node[terminal, dashed, anchor=south] at ($(src.north)+(0,0.6cm)$) (src1) {Video File with Artifacts};
+  \node[terminal] at (0,0cm) (src) {Video File};
   \node[below=of src] (codo0) {};
   \node[nonterminal, below=of codo0, align=center] (inspector) {Human inspection};
-  \node[terminal, dashed, below=of inspector, align=center] (snip_spec) {
+  \node[storeblock, aspect=0.05, fill=teal!40, below=of inspector, align=center] (snip_spec) {
     Video Snipping Specification File \\ \\
     \begin{tabular}[!h]{|c|c|c|}
       \hline
@@ -45,16 +94,13 @@
   };
   \node[right=of inspector] (codo1) {\hspace*{2 cm}};
   \node[nonterminal, right=of codo1, align=center] (snipper) {Video Snipper};
-  \node[terminal, below=of snipper] (dst) {Base Frame Sets};
-  \node[terminal, dashed, anchor=north] at ($(dst.south)+(0,-0.6cm)$) (dst1) {Frame Sets with Artifacts};
+  \node[terminal, below=of snipper] (dst) {Frame Sets};
   
-  \draw[->, dashed] (src1) -- (src);
   \draw[->] (src) -- (inspector);
   \draw[->] (codo0.center) -| (snipper);
-  \draw[->, dashed] (inspector) -- (snip_spec);
-  \draw[->] (inspector) -- (snipper);
+  \draw[->] (inspector) -- (snip_spec);
+  \draw[->] (snip_spec) -| ($(inspector.south east)!0.7!(snipper.south west)$) |- (snipper);
   \draw[->] (snipper) -- (dst);
-  \draw[->, dashed] (dst) -- (dst1);
   
   \node [fit=(inspector)(codo0)] (inspector_box) {};
 
