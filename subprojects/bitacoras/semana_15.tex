@@ -1,0 +1,865 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 15}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      %wed
+      31/5/23 & 1 h & Reunión de avance 15 & \\
+      31/5/23 & 4 h & Tesis & Revisando 2 \\
+      %thurs
+      1/6/23 & 4 h & & Revisando 3 \\
+      %fri
+      2/6/23 & 4 h & & Revisando 3 \\
+      %sat
+      3/6/23 & 8 h & & Actualizando 2, revisando 4 y 5 \\
+      %sun
+      4/6/23 & 2 h & & Terminando últimos detalles de la tesis \\
+      %mon
+      5/6/23 & 6 h & & Última revisión de tesis \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Wednesday:}
+
+  \begin{lstlisting}
+    Meeting:
+    - Thesis Chapters 2,3,4,5. Update 1.
+    - Experiments with new dataset (add to resultados)
+  \end{lstlisting}
+
+  \subsection*{Thursday:}
+
+  \subsection*{Friday:}
+
+  \subsection*{Saturday:}
+
+  \subsection*{Sunday:}
+
+\subsection*{Appendix A}
+
+\begin{lstlisting}
+  fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+Using output prefix: models//06_04_2023_09:23:38
+Writting model specification data
+Loading feature file: dataset/loss0.01_dataset/0//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//07/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//07/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//08/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//08/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//09/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//09/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//10/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//10/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//11/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//11/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//12/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//12/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//13/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//13/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//14/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//14/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//15/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//15/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//16/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//16/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//17/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//17/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//18/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//18/block.bytes
+Building label memory
+Dataset loading duration: 23288785
+Measuring raw dataset balance
+Negatives: 11956398, Positives: 788802, Total: 670800, Balance: 0.94 : 0.06
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.01% pos
+Balanced neg cnt: 11956398, pos cnt: 120771
+Dataset balancing duration: 32438112
+Converting feature memory from row major to column major
+Initializing Rangerx
+Loading from memory: 0x7fd143cd0010 0x7fd2c5a4c010
+Rangerx init duration: 452397241
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 3%. Estimated remaining time: 4 hours, 36 minutes, 25 seconds.
+Growing trees.. Progress: 63%. Estimated remaining time: 5 minutes, 42 seconds.
+Growing trees.. Progress: 94%. Estimated remaining time: 40 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file models//06_04_2023_09:23:38.forest.
+Rangerx training duration: 669628774
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   32
+Sample size:                       12077169
+Number of independent variables:   132
+Mtry:                              132
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      1.48214e-05
+
+Saved confusion matrix to file models//06_04_2023_09:23:38.confusion.
+\end{lstlisting}
+
+\begin{lstlisting}
+fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+Using output prefix: models//06_04_2023_10:12:13
+Writting model specification data
+Loading feature file: dataset/loss0.01_dataset/2//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//07/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//07/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//08/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//08/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//09/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//09/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//10/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//10/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//11/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//11/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//12/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//12/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//13/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//13/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//14/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//14/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//15/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//15/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//16/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//16/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//17/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//17/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//18/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//18/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//19/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//19/block.bytes
+Building label memory
+Dataset loading duration: 8431385
+Measuring raw dataset balance
+Negatives: 13315266, Positives: 100734, Total: 670800, Balance: 0.99 : 0.01
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.01% pos
+Balanced neg cnt: 9972666, pos cnt: 100734
+Dataset balancing duration: 25978467
+Converting feature memory from row major to column major
+Initializing Rangerx
+Loading from memory: 0x7f4cd28d7010 0x7f4e1460f010
+Rangerx init duration: 325601941
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 3%. Estimated remaining time: 4 hours, 14 minutes, 43 seconds.
+Growing trees.. Progress: 19%. Estimated remaining time: 38 minutes, 25 seconds.
+Growing trees.. Progress: 28%. Estimated remaining time: 24 minutes, 3 seconds.
+Growing trees.. Progress: 41%. Estimated remaining time: 14 minutes, 31 seconds.
+Growing trees.. Progress: 56%. Estimated remaining time: 8 minutes, 14 seconds.
+Growing trees.. Progress: 78%. Estimated remaining time: 3 minutes, 12 seconds.
+Growing trees.. Progress: 84%. Estimated remaining time: 2 minutes, 15 seconds.
+Growing trees.. Progress: 91%. Estimated remaining time: 1 minute, 19 seconds.
+Growing trees.. Progress: 97%. Estimated remaining time: 26 seconds.
+Growing trees.. Progress: 100%. Estimated remaining time: 0 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file models//06_04_2023_10:12:13.forest.
+Rangerx training duration: 1022265029
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   32
+Sample size:                       10073400
+Number of independent variables:   132
+Mtry:                              132
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      6.64126e-05
+
+Saved confusion matrix to file models//06_04_2023_10:12:13.confusion.
+\end{lstlisting}
+
+\begin{lstlisting}
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/tfg/subprojects/tesis (master)$\$$ python3
+Python 3.8.10 (default, Mar 13 2023, 10:26:41) 
+[GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 669628774
+669628774
+>>> 669628774/1e6
+669.628774
+>>> 669628774/1e6/60
+11.160479566666668
+>>> 
+\end{lstlisting}
+
+\begin{lstlisting}
+francis@francis-laptop:~/Documents/2023_S1/Proyecto/tfg/subprojects/tesis (master)$\$$ python3
+Python 3.8.10 (default, Mar 13 2023, 10:26:41) 
+[GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 1022265029/1e6/60
+17.037750483333333
+>>> 
+\end{lstlisting}
+
+\begin{lstlisting}
+Total tree:
+Feature id: 8, count: 1
+Feature id: 112, count: 1
+Feature id: 61, count: 1
+Feature id: 116, count: 1
+Feature id: 27, count: 1
+Feature id: 47, count: 4
+Feature id: 29, count: 1
+Feature id: 10, count: 1
+Feature id: 19, count: 1
+Feature id: 9, count: 2
+Feature id: 66, count: 1
+Feature id: 104, count: 1
+Feature id: 93, count: 4
+Feature id: 33, count: 2
+Feature id: 86, count: 7
+Feature id: 103, count: 3
+Feature id: 6, count: 5
+Feature id: 78, count: 4
+Feature id: 90, count: 2
+Feature id: 21, count: 1
+Feature id: 35, count: 4
+Feature id: 65, count: 1
+Feature id: 96, count: 3
+Feature id: 110, count: 3
+Feature id: 76, count: 5
+Feature id: 43, count: 1
+Feature id: 102, count: 2
+Feature id: 17, count: 1
+Feature id: 118, count: 5
+Feature id: 109, count: 7
+Feature id: 108, count: 3
+Feature id: 63, count: 8
+Feature id: 62, count: 4
+Feature id: 67, count: 3
+Feature id: 32, count: 4
+Feature id: 55, count: 12
+Feature id: 101, count: 2
+Feature id: 99, count: 3
+Feature id: 80, count: 2
+Feature id: 94, count: 7
+Feature id: 12, count: 4
+Feature id: 23, count: 7
+Feature id: 79, count: 5
+Feature id: 50, count: 3
+Feature id: 49, count: 1
+Feature id: 48, count: 5
+Feature id: 107, count: 1
+Feature id: 119, count: 17
+Feature id: 60, count: 3
+Feature id: 128, count: 2
+Feature id: 1, count: 13
+Feature id: 3, count: 14
+Feature id: 131, count: 2
+Feature id: 4, count: 6
+Feature id: 91, count: 2
+Feature id: 15, count: 8
+Feature id: 13, count: 6
+Feature id: 5, count: 5
+Feature id: 64, count: 2
+Feature id: 123, count: 2
+Feature id: 38, count: 8
+Feature id: 97, count: 2
+Feature id: 81, count: 2
+Feature id: 22, count: 5
+Feature id: 52, count: 2
+Feature id: 111, count: 5
+Feature id: 39, count: 14
+Feature id: 16, count: 5
+Feature id: 117, count: 4
+Feature id: 30, count: 2
+Feature id: 69, count: 6
+Feature id: 37, count: 12
+Feature id: 124, count: 9
+Feature id: 7, count: 12
+Feature id: 125, count: 7
+Feature id: 84, count: 2
+Feature id: 14, count: 2
+Feature id: 73, count: 2
+Feature id: 51, count: 2
+Feature id: 46, count: 9
+Feature id: 45, count: 9
+Feature id: 68, count: 3
+Feature id: 0, count: 47
+Feature id: 127, count: 4
+Feature id: 126, count: 5
+Feature id: 87, count: 16
+Feature id: 71, count: 14
+Feature id: 42, count: 1
+Feature id: 82, count: 3
+Feature id: 18, count: 5
+Feature id: 41, count: 3
+Feature id: 24, count: 3
+Feature id: 2, count: 94
+Feature id: 129, count: 3
+Feature id: 70, count: 3
+Feature id: 36, count: 8
+Feature id: 44, count: 6
+Feature id: 115, count: 3
+Feature id: 54, count: 4
+Feature id: 85, count: 5
+Feature id: 34, count: 5
+Feature id: 92, count: 5
+Feature id: 31, count: 4
+\end{lstlisting}
+
+\begin{lstlisting}
+  fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+  Using output prefix: models//06_04_2023_10:49:05
+  Writting model specification data
+  Loading feature file: dataset/loss0.01_dataset/0//00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//00/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//01/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//01/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//02/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//02/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//03/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//03/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//04/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//04/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//05/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//05/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//06/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//06/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//07/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//07/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//08/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//08/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//09/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//09/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//10/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//10/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//00/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//01/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//01/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//02/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//02/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//03/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//03/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//04/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//04/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//05/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//05/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//06/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//06/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//07/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//07/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//08/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//08/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//09/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//09/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//10/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//10/block.bytes
+  Building label memory
+  Dataset loading duration: 15822837
+  Measuring raw dataset balance
+  Negatives: 14366468, Positives: 391132, Total: 670800, Balance: 0.97 : 0.03
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.01% pos
+  Balanced neg cnt: 14366468, pos cnt: 145115
+  Dataset balancing duration: 37701671
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f680a0a9010 0x7f69d9a8a010
+  Rangerx init duration: 527159689
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 3%. Estimated remaining time: 5 hours, 53 minutes, 55 seconds.
+  Growing trees.. Progress: 31%. Estimated remaining time: 26 minutes, 17 seconds.
+  Growing trees.. Progress: 53%. Estimated remaining time: 11 minutes, 0 seconds.
+  Growing trees.. Progress: 66%. Estimated remaining time: 6 minutes, 49 seconds.
+  Growing trees.. Progress: 84%. Estimated remaining time: 2 minutes, 32 seconds.
+  Growing trees.. Progress: 91%. Estimated remaining time: 1 minute, 31 seconds.
+  Growing trees.. Progress: 100%. Estimated remaining time: 0 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file models//06_04_2023_10:49:05.forest.
+  Rangerx training duration: 995024052
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       14511583
+  Number of independent variables:   132
+  Mtry:                              132
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      2.48078e-05
+  
+  Saved confusion matrix to file models//06_04_2023_10:49:05.confusion.  
+\end{lstlisting}
+
+\begin{lstlisting}
+fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+Using output prefix: models//06_04_2023_11:20:10
+Writting model specification data
+Loading feature file: dataset/loss0.01_dataset/3//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//07/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//07/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//08/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//08/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//09/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//09/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//10/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//10/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//11/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//11/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//12/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//12/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//13/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//13/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//14/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//14/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//15/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//15/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//16/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//16/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//17/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//17/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//18/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//18/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//19/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//19/block.bytes
+Building label memory
+Dataset loading duration: 36550374
+Measuring raw dataset balance
+Negatives: 13405090, Positives: 10910, Total: 670800, Balance: 1.00 : 0.00
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.01% pos
+Balanced neg cnt: 1080090, pos cnt: 10910
+Dataset balancing duration: 3592465
+Converting feature memory from row major to column major
+Initializing Rangerx
+Loading from memory: 0x7f05b7132010 0x7f05d9ee2010
+Rangerx init duration: 30205967
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 3%. Estimated remaining time: 16 minutes, 32 seconds.
+Growing trees.. Progress: 100%. Estimated remaining time: 0 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file models//06_04_2023_11:20:10.forest.
+Rangerx training duration: 67192701
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   32
+Sample size:                       1091000
+Number of independent variables:   132
+Mtry:                              132
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      1.83318e-06
+
+Saved confusion matrix to file models//06_04_2023_11:20:10.confusion.
+\end{lstlisting}
+
+\begin{lstlisting}
+  fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+  Using output prefix: models//06_04_2023_11:25:00
+  Writting model specification data
+  Loading feature file: dataset/loss0.01_dataset/0//00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//00/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//01/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//01/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//02/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//02/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//03/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//03/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//04/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//04/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//05/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//05/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/0//06/features.bytes
+  Loading label file: dataset/loss0.01_dataset/0//06/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//00/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//01/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//01/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//02/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//02/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//03/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//03/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//04/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//04/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//05/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//05/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/2//06/features.bytes
+  Loading label file: dataset/loss0.01_dataset/2//06/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//00/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//01/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//01/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//02/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//02/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//03/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//03/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//04/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//04/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//05/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//05/block.bytes
+  Building label memory
+  Loading feature file: dataset/loss0.01_dataset/3//06/features.bytes
+  Loading label file: dataset/loss0.01_dataset/3//06/block.bytes
+  Building label memory
+  Dataset loading duration: 27140007
+  Measuring raw dataset balance
+  Negatives: 13864842, Positives: 221958, Total: 670800, Balance: 0.98 : 0.02
+  Randomizing negative and positive ids separately
+  Adjusting dataset balance to 0.01% pos
+  Balanced neg cnt: 13864842, pos cnt: 140048
+  Dataset balancing duration: 36132895
+  Converting feature memory from row major to column major
+  Initializing Rangerx
+  Loading from memory: 0x7f8ca8836010 0x7f8e67f16010
+  Rangerx init duration: 489782695
+  Running Rangerx
+  Growing trees ..
+  Growing trees.. Progress: 3%. Estimated remaining time: 7 hours, 14 minutes, 31 seconds.
+  Growing trees.. Progress: 25%. Estimated remaining time: 43 minutes, 42 seconds.
+  Growing trees.. Progress: 34%. Estimated remaining time: 28 minutes, 49 seconds.
+  Growing trees.. Progress: 38%. Estimated remaining time: 26 minutes, 8 seconds.
+  Growing trees.. Progress: 56%. Estimated remaining time: 12 minutes, 39 seconds.
+  Growing trees.. Progress: 75%. Estimated remaining time: 5 minutes, 36 seconds.
+  Growing trees.. Progress: 84%. Estimated remaining time: 3 minutes, 23 seconds.
+  Growing trees.. Progress: 97%. Estimated remaining time: 38 seconds.
+  Computing prediction error ..
+  Saving model to file
+  Saved forest to file models//06_04_2023_11:25:00.forest.
+  Rangerx training duration: 1257276420
+  Writting output
+  
+  Tree type:                         Classification
+  Dependent variable name:           y
+  Number of trees:                   32
+  Sample size:                       14004890
+  Number of independent variables:   132
+  Mtry:                              132
+  Target node size:                  1
+  Variable importance mode:          0
+  Memory mode:                       0
+  Seed:                              0
+  Number of threads:                 32
+  
+  Overall OOB prediction error:      2.442e-05
+  
+  Saved confusion matrix to file models//06_04_2023_11:25:00.confusion.  
+\end{lstlisting}
+
+\begin{lstlisting}
+  fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+Using output prefix: models//06_04_2023_12:05:25
+Writting model specification data
+Loading feature file: dataset/loss0.01_dataset/0//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/0//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/0//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/3//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/3//06/block.bytes
+Building label memory
+Dataset loading duration: 45525593
+Measuring raw dataset balance
+Negatives: 13864842, Positives: 221958, Total: 670800, Balance: 0.98 : 0.02
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.01% pos
+Balanced neg cnt: 13864842, pos cnt: 140048
+Dataset balancing duration: 40864521
+Converting feature memory from row major to column major
+Initializing Rangerx
+Loading from memory: 0x7f637af80010 0x7f653a660010
+Rangerx init duration: 486933855
+Running Rangerx
+Growing trees ..
+Growing trees.. Progress: 25%. Estimated remaining time: 3 minutes, 33 seconds.
+Growing trees.. Progress: 50%. Estimated remaining time: 1 minute, 43 seconds.
+Growing trees.. Progress: 100%. Estimated remaining time: 0 seconds.
+Computing prediction error ..
+Saving model to file
+Saved forest to file models//06_04_2023_12:05:25.forest.
+Rangerx training duration: 151797388
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   4
+Sample size:                       14004890
+Number of independent variables:   132
+Mtry:                              11
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      0.000243853
+
+Saved confusion matrix to file models//06_04_2023_12:05:25.confusion.
+\end{lstlisting}
+
+\end{document}

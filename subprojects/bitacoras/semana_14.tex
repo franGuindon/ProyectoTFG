@@ -1,0 +1,1915 @@
+\documentclass[12pt,oneside]{book}
+\usepackage[letterpaper, total={19cm, 20cm}]{geometry}
+
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage[backend=biber,              % Use biber/biblatex
+            style=ieee,
+            sorting=none,
+            citestyle=numeric-comp]{biblatex}
+\usepackage{array, multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\addbibresource{../tesis/literatura.bib}
+\input{../tesis/code_blocks.tex}
+
+\begin{document}
+ \graphicspath{{./}{../tesis/fig/}}
+  Tecnológico de Costa Rica
+  \par\vspace{1mm}
+  Escuela de Ingeniería Electrónica
+  \par\vspace{1mm}
+  Programa de Licenciatura en Ingeniería Electrónica
+  \par\vspace{10mm}
+  Trabajo Final de Graduación
+  \par\vspace{1mm}
+  Francis Guindon Badilla
+  \par\vspace{1mm}
+  2018259419
+  \par\vspace{10mm}
+  \large\textbf{Bitácora - Semana 14}
+  \par\vspace{10mm}
+  \small
+
+  \begin{table} [!h]
+    \centering
+    \small
+    \begin{tabular}{p{1.5 cm} p{2.1 cm} p{5 cm} p{8 cm}}
+      \hline
+      Fecha & Duración & Actividad & Descripción \\
+      \hline
+      %wed
+      24/5/23 & 1 h & Reunión de avance 14 & \\
+      24/5/23 & 4 h & Tesis & Terminando Solución \\
+      %thurs
+      25/5/23 & 4 h & & Trabajando Solución \\
+      %sat
+      27/5/23 & 4 h & & Terminando Solución \\
+      %sun
+      28/5/23 & 4 h & & Trabajando Resultados \\
+      %mon
+      29/5/23 & 2 h & & Terminando Resultados \\
+      %tues
+      30/5/23 & 2 h & & Revisando capítulo 1 \\
+      \hline
+      \textbf{Total} & 21 h \\
+      \hline
+    \end{tabular}
+  \end{table}
+  
+  \vfill
+
+  \begin{tabular}{p{3 cm} p{10 cm}}
+    Firma profesor: & \\
+    \cline{2-2}
+  \end{tabular}
+
+  \newpage
+
+  \section*{Notes}
+  \setlength\parindent{0pt}
+
+  \subsection*{Wednesday:}
+
+  \begin{lstlisting}
+    Meeting:
+    - Thesis Chapters 2,3,4,5. Update 1.
+    - Experiments with new dataset (add to resultados)
+  \end{lstlisting}
+
+  \subsection*{Thursday:}
+
+  \subsection*{Friday:}
+
+  \subsection*{Saturday:}
+
+  \subsection*{Sunday:}
+
+  \begin{enumerate}
+    \item Features: Appendix A
+  \end{enumerate}
+
+\subsection*{Appendix A}
+
+\begin{lstlisting}
+  disptec@disptec-jetson:~/TFG$\$$ GST_DEBUG=WARNING release_repo/build/tools/cpp_tools/feature_generator/feature_generator dataset/loss0.01_dataset/1/00/pl.mp4 1 features
+  Initializing gstreamer
+  Building input pipeline from video: dataset/loss0.01_dataset/1/00/pl.mp4
+  Initializing pipeline wrapper for input pipeline
+  Starting pipeline wrapper for input pipeline
+  0:00:00.057519568  1350   0x55ae02e360 WARN                 basesrc gstbasesrc.c:3583:gst_base_src_start_complete:<filesrc0> pad not activated yet
+  Starting processing loop
+  Processing frame: 0
+  Pulling buffer
+  0:00:00.072114420  1350   0x7f7807d770 WARN                 qtdemux qtdemux.c:3031:qtdemux_parse_trex:<qtdemux0> failed to find fragment defaults for stream 1
+  Opening in BLOCKING MODE
+  Opening in BLOCKING MODE 
+  0:00:00.193994038  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:4434:gst_v4l2_object_probe_caps:<nvv4l2decoder0:src> Failed to probe pixel aspect ratio with VIDIOC_CROPCAP: Unknown error -1
+  0:00:00.194068630  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:2375:gst_v4l2_object_add_interlace_mode:0x7f70058ba0 Failed to determine interlace mode
+  0:00:00.194128726  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:2375:gst_v4l2_object_add_interlace_mode:0x7f70058ba0 Failed to determine interlace mode
+  NvMMLiteOpen : Block : BlockType = 260 
+  NVMEDIA: Reading vendor.tegra.display-size : status: 6 
+  NvMMLiteBlockCreate : Block : BlockType = 260 
+  0:00:00.299198963  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:4434:gst_v4l2_object_probe_caps:<nvv4l2decoder0:src> Failed to probe pixel aspect ratio with VIDIOC_CROPCAP: Unknown error -1
+  0:00:00.299293011  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:2375:gst_v4l2_object_add_interlace_mode:0x7f70058ba0 Failed to determine interlace mode
+  0:00:00.299398067  1350   0x7f7c0064f0 WARN                    v4l2 gstv4l2object.c:2375:gst_v4l2_object_add_interlace_mode:0x7f70058ba0 Failed to determine interlace mode
+  0:00:00.300546899  1350   0x7f7c0064f0 WARN            v4l2videodec gstv4l2videodec.c:1673:gst_v4l2_video_dec_decide_allocation:<nvv4l2decoder0> Duration invalid, not setting latency
+  0:00:00.300893075  1350   0x7f7c0064f0 WARN          v4l2bufferpool gstv4l2bufferpool.c:1065:gst_v4l2_buffer_pool_start:<nvv4l2decoder0:pool:src> Uncertain or not enough buffers, enabling copy threshold
+  0:00:00.304852532  1350   0x7f7c006d90 WARN          v4l2bufferpool gstv4l2bufferpool.c:1512:gst_v4l2_buffer_pool_dqbuf:<nvv4l2decoder0:pool:src> Driver should never set v4l2_buffer.field to ANY
+  Generating feature
+  36947120 34767813 19797877 18823760 1205190
+  10842 1441974 8888 1205190 42.351562 3839.056152 34.718750 3502.381836
+  Frame feature extraction duration: 40010
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 1
+  Pulling buffer
+  Generating feature
+  36227516 34393933 20273136 19202381 762828
+  6116 1110078 4756 762828 23.890625 3765.480225 18.578125 2634.650146
+  Frame feature extraction duration: 30183
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 2
+  Pulling buffer
+  Generating feature
+  37264818 35062866 22390703 21356421 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 32130
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 3
+  Pulling buffer
+  Generating feature
+  32942140 31056531 22468954 21202778 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 32385
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 4
+  Pulling buffer
+  Generating feature
+  29332664 27379607 19166030 17751421 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 40245
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 5
+  Pulling buffer
+  Generating feature
+  37246139 35603737 24036285 23135311 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27251
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 6
+  Pulling buffer
+  Generating feature
+  41710075 39357530 28042297 26589192 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27598
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 7
+  Pulling buffer
+  Generating feature
+  34604312 32601719 17616767 16702674 1088500
+  10506 1317826 8596 1088500 41.039062 3463.553223 33.578125 3124.462646
+  Frame feature extraction duration: 27342
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 8
+  Pulling buffer
+  Generating feature
+  32699906 31254235 17161259 16325016 609428
+  4870 860806 3946 609428 19.023438 3000.632324 15.414062 2142.984863
+  Frame feature extraction duration: 26777
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 9
+  Pulling buffer
+  Generating feature
+  33631885 31492415 18905488 17933688 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 36948
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 10
+  Pulling buffer
+  Generating feature
+  30002050 28265786 19528864 18412033 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27305
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 11
+  Pulling buffer
+  Generating feature
+  28718251 26806896 18551617 17178710 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27284
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 12
+  Pulling buffer
+  Generating feature
+  35585313 33944319 22375459 21475893 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27374
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 13
+  Pulling buffer
+  Generating feature
+  40052811 37874989 26385031 25106649 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27295
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 14
+  Pulling buffer
+  Generating feature
+  33012634 30913789 15934701 15020602 1184746
+  11172 1504696 8860 1184746 43.640625 3973.214600 34.609375 3430.105225
+  Frame feature extraction duration: 27298
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 15
+  Pulling buffer
+  Generating feature
+  32083308 30637637 17296503 16460260 609428
+  4870 860806 3946 609428 19.023438 3000.632324 15.414062 2142.984863
+  Frame feature extraction duration: 26902
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 16
+  Pulling buffer
+  Generating feature
+  33116918 30939405 18318829 17308986 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27336
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 17
+  Pulling buffer
+  Generating feature
+  29547404 27931117 19074218 18077364 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27321
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 18
+  Pulling buffer
+  Generating feature
+  27912378 26252461 17745744 16624275 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 44218
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 19
+  Pulling buffer
+  Generating feature
+  35959233 34358690 22749379 21890264 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 26876
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 20
+  Pulling buffer
+  Generating feature
+  40523427 38354849 26855647 25586509 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27268
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 21
+  Pulling buffer
+  Generating feature
+  32879493 30927254 15950574 15069809 1071474
+  10354 1296624 8444 1071474 40.445312 3429.114258 32.984375 3097.476318
+  Frame feature extraction duration: 27261
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 22
+  Pulling buffer
+  Generating feature
+  32246686 30821969 17181625 16397056 640148
+  4870 860806 4042 640148 19.023438 3000.632324 15.789062 2251.283691
+  Frame feature extraction duration: 27195
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 23
+  Pulling buffer
+  Generating feature
+  32548543 30473848 17750454 16843429 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27200
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 24
+  Pulling buffer
+  Generating feature
+  28712298 27132390 18239112 17278637 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27259
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 25
+  Pulling buffer
+  Generating feature
+  27435289 25821767 17268655 16193581 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26812
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 26
+  Pulling buffer
+  Generating feature
+  33471373 31870830 20261519 19402404 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27296
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 27
+  Pulling buffer
+  Generating feature
+  37096459 35033630 23428679 22265290 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27212
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 28
+  Pulling buffer
+  Generating feature
+  31190496 29149891 14314905 13400812 1126512
+  10718 1370610 8762 1126512 41.867188 3601.083984 34.226562 3228.979980
+  Frame feature extraction duration: 27253
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 29
+  Pulling buffer
+  Generating feature
+  30775504 29504284 15751643 15086523 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27248
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 30
+  Pulling buffer
+  Generating feature
+  31528916 29893311 16805689 16337754 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27287
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 31
+  Pulling buffer
+  Generating feature
+  28307695 26697841 17834509 16844088 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27240
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 32
+  Pulling buffer
+  Generating feature
+  27024992 25421489 16858358 15793303 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26787
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 33
+  Pulling buffer
+  Generating feature
+  32704886 31121641 19495032 18653215 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27235
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 34
+  Pulling buffer
+  Generating feature
+  36103654 34250823 22435874 21482483 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27254
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 35
+  Pulling buffer
+  Generating feature
+  31102164 28851452 14226573 13102373 1126512
+  10718 1370610 8762 1126512 41.867188 3601.083984 34.226562 3228.979980
+  Frame feature extraction duration: 27192
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 36
+  Pulling buffer
+  Generating feature
+  30468658 29197438 15459907 14794787 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27488
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 37
+  Pulling buffer
+  Generating feature
+  31047538 29327467 16303789 15751388 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 58967
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 38
+  Pulling buffer
+  Generating feature
+  28495655 26931161 18022469 17077408 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 26841
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 39
+  Pulling buffer
+  Generating feature
+  26649423 25116958 16482789 15488772 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27304
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 40
+  Pulling buffer
+  Generating feature
+  32938906 31164806 19729052 18696380 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27283
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 41
+  Pulling buffer
+  Generating feature
+  36036018 34155029 22368238 21386689 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27308
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 42
+  Pulling buffer
+  Generating feature
+  30555045 28580560 13580914 12708149 1101720
+  10630 1340442 8672 1101720 41.523438 3511.905762 33.875000 3156.078125
+  Frame feature extraction duration: 27273
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 43
+  Pulling buffer
+  Generating feature
+  29595413 28216877 14701224 13919828 597140
+  4870 860806 3850 597140 19.023438 3000.632324 15.039062 2106.404785
+  Frame feature extraction duration: 27309
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 44
+  Pulling buffer
+  Generating feature
+  29488441 27755825 14744692 14179746 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 26835
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 45
+  Pulling buffer
+  Generating feature
+  27188969 25710383 16715783 15856630 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27228
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 46
+  Pulling buffer
+  Generating feature
+  26713339 25151254 16546705 15523068 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27303
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 47
+  Pulling buffer
+  Generating feature
+  32875652 31130856 19665798 18662430 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27328
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 48
+  Pulling buffer
+  Generating feature
+  36727702 34778808 23059922 22010468 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27251
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 49
+  Pulling buffer
+  Generating feature
+  30849394 28643664 13658207 12600287 1147810
+  10920 1420048 8836 1147810 42.656250 3727.506836 34.515625 3292.304443
+  Frame feature extraction duration: 27261
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 50
+  Pulling buffer
+  Generating feature
+  29089893 27668321 14124984 13316680 613268
+  4870 860806 3962 613268 19.023438 3000.632324 15.476562 2156.054199
+  Frame feature extraction duration: 27254
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 51
+  Pulling buffer
+  Generating feature
+  29651800 27672602 14840783 14029255 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 26761
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 52
+  Pulling buffer
+  Generating feature
+  27164699 25684944 16691513 15831191 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27619
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 53
+  Pulling buffer
+  Generating feature
+  26666120 25174029 16499486 15545843 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27251
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 54
+  Pulling buffer
+  Generating feature
+  33636295 31891499 20343751 19340383 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27282
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 55
+  Pulling buffer
+  Generating feature
+  36868567 34919672 22949171 21899716 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27246
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 56
+  Pulling buffer
+  Generating feature
+  31033673 28879999 14106844 13100980 1147810
+  10920 1420048 8836 1147810 42.656250 3727.506836 34.515625 3292.304443
+  Frame feature extraction duration: 27260
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 57
+  Pulling buffer
+  Generating feature
+  29494276 28100841 14555665 13759370 597140
+  4870 860806 3850 597140 19.023438 3000.632324 15.039062 2106.404785
+  Frame feature extraction duration: 26905
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 58
+  Pulling buffer
+  Generating feature
+  30113296 27890704 15288935 14234013 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27252
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 59
+  Pulling buffer
+  Generating feature
+  27497531 26017776 17024345 16164023 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27293
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 60
+  Pulling buffer
+  Generating feature
+  26970236 25254875 16803602 15626689 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27534
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 61
+  Pulling buffer
+  Generating feature
+  33538596 31798861 20246052 19247745 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27358
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 62
+  Pulling buffer
+  Generating feature
+  37086136 35075002 23166740 22055046 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27302
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 63
+  Pulling buffer
+  Generating feature
+  30675009 28554328 13929335 12948768 1140114
+  10748 1385240 8800 1140114 41.984375 3648.406006 34.375000 3271.929688
+  Frame feature extraction duration: 27326
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 64
+  Pulling buffer
+  Generating feature
+  28379865 27021211 13407702 12646188 597140
+  4870 860806 3850 597140 19.023438 3000.632324 15.039062 2106.404785
+  Frame feature extraction duration: 26870
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 65
+  Pulling buffer
+  Generating feature
+  29132590 27263027 14308229 13606336 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27215
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 66
+  Pulling buffer
+  Generating feature
+  27119893 25841955 16646707 15988202 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27190
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 67
+  Pulling buffer
+  Generating feature
+  27138880 25416232 16972246 15788046 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27261
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 68
+  Pulling buffer
+  Generating feature
+  33457198 31702295 20164654 19151179 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27238
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 69
+  Pulling buffer
+  Generating feature
+  36892314 34949087 22972918 21929131 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27255
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 70
+  Pulling buffer
+  Generating feature
+  31375738 29184032 14282422 13250844 1160128
+  10830 1398426 8858 1160128 42.304688 3672.915039 34.601562 3334.481934
+  Frame feature extraction duration: 26853
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 71
+  Pulling buffer
+  Generating feature
+  28475704 27088665 13426797 12667618 627860
+  4870 860806 4010 627860 19.023438 3000.632324 15.664062 2207.215332
+  Frame feature extraction duration: 27249
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 72
+  Pulling buffer
+  Generating feature
+  29023713 27154150 14238342 13536449 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27239
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 73
+  Pulling buffer
+  Generating feature
+  27389719 26111781 16916533 16258028 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27218
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 74
+  Pulling buffer
+  Generating feature
+  27650334 25927686 17483700 16299500 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27348
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 75
+  Pulling buffer
+  Generating feature
+  33508975 31778072 20216431 19226956 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 92429
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 76
+  Pulling buffer
+  Generating feature
+  36792540 34757700 22873144 21737744 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27237
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 77
+  Pulling buffer
+  Generating feature
+  31288640 29279838 14223826 13375152 1160128
+  10830 1398426 8858 1160128 42.304688 3672.915039 34.601562 3334.481934
+  Frame feature extraction duration: 26855
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 78
+  Pulling buffer
+  Generating feature
+  28581634 27209187 13518329 12759150 613268
+  4870 860806 3962 613268 19.023438 3000.632324 15.476562 2156.054199
+  Frame feature extraction duration: 27316
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 79
+  Pulling buffer
+  Generating feature
+  29491635 27683597 14734712 14094344 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27282
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 80
+  Pulling buffer
+  Generating feature
+  27390189 26075047 16917003 16221294 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27296
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 81
+  Pulling buffer
+  Generating feature
+  27712692 26074621 17546058 16446435 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27297
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 82
+  Pulling buffer
+  Generating feature
+  33778032 32181557 20485488 19630441 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27334
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 83
+  Pulling buffer
+  Generating feature
+  37235211 35138243 23315815 22118287 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 26811
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 84
+  Pulling buffer
+  Generating feature
+  31051160 29156936 14084633 13263093 1072684
+  10314 1295458 8466 1072684 40.289062 3437.174316 33.070312 3096.526367
+  Frame feature extraction duration: 27303
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 85
+  Pulling buffer
+  Generating feature
+  28789763 27406641 13554172 12784318 613268
+  4870 860806 3962 613268 19.023438 3000.632324 15.476562 2156.054199
+  Frame feature extraction duration: 27185
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 86
+  Pulling buffer
+  Generating feature
+  29268301 27267849 14478104 13645322 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27292
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 87
+  Pulling buffer
+  Generating feature
+  26624005 25310045 16150819 15456292 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27248
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 88
+  Pulling buffer
+  Generating feature
+  26090837 24479415 15924203 14851229 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27301
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 89
+  Pulling buffer
+  Generating feature
+  31486374 29889899 18193830 17338783 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 26859
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 90
+  Pulling buffer
+  Generating feature
+  35736454 33936090 21817058 20916134 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27280
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 91
+  Pulling buffer
+  Generating feature
+  31018385 29287717 14053260 13397490 1074898
+  10416 1300992 8492 1074898 40.687500 3426.527344 33.171875 3098.447021
+  Frame feature extraction duration: 27290
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 92
+  Pulling buffer
+  Generating feature
+  28801162 27417775 13591913 12817954 609428
+  4870 860806 3946 609428 19.023438 3000.632324 15.414062 2142.984863
+  Frame feature extraction duration: 27260
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 93
+  Pulling buffer
+  Generating feature
+  29525288 27495862 14735091 13873335 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27249
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 94
+  Pulling buffer
+  Generating feature
+  26796269 25482309 16323083 15628556 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27279
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 95
+  Pulling buffer
+  Generating feature
+  26289656 24585167 16123022 14956981 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27284
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 96
+  Pulling buffer
+  Generating feature
+  32035666 30439191 18743122 17888075 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 26867
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 97
+  Pulling buffer
+  Generating feature
+  36201541 34334368 22282145 21314412 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27361
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 98
+  Pulling buffer
+  Generating feature
+  31324125 29572511 14161856 13506086 1095844
+  10590 1331746 8644 1095844 41.367188 3490.888672 33.765625 3140.523193
+  Frame feature extraction duration: 27226
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 99
+  Pulling buffer
+  Generating feature
+  29078112 27698053 13689197 12915238 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27296
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 100
+  Pulling buffer
+  Generating feature
+  29407416 27442654 14600751 13803659 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27302
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 101
+  Pulling buffer
+  Generating feature
+  26509313 25198385 16036127 15344632 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27277
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 102
+  Pulling buffer
+  Generating feature
+  26724837 25010514 16558203 15382328 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26886
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 103
+  Pulling buffer
+  Generating feature
+  32059904 30463429 18767360 17912313 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27277
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 104
+  Pulling buffer
+  Generating feature
+  36084579 34324545 22165183 21304589 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27294
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 105
+  Pulling buffer
+  Generating feature
+  31148254 29394796 13939139 13281525 1095844
+  10590 1331746 8644 1095844 41.367188 3490.888672 33.765625 3140.523193
+  Frame feature extraction duration: 27273
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 106
+  Pulling buffer
+  Generating feature
+  28379538 27109592 13202781 12538935 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27354
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 107
+  Pulling buffer
+  Generating feature
+  29480303 27811376 14724210 14222953 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27274
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 108
+  Pulling buffer
+  Generating feature
+  26824207 25396561 16351021 15542808 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27588
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 109
+  Pulling buffer
+  Generating feature
+  27165301 25450978 16998667 15822792 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26851
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 110
+  Pulling buffer
+  Generating feature
+  32213066 30640271 18920522 18089155 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27404
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 111
+  Pulling buffer
+  Generating feature
+  35789260 33994641 21869864 20974685 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27276
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 112
+  Pulling buffer
+  Generating feature
+  29936009 28167303 12926842 12237744 1079608
+  10476 1306612 8542 1079608 40.921875 3429.353271 33.367188 3103.849609
+  Frame feature extraction duration: 27213
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 113
+  Pulling buffer
+  Generating feature
+  28587501 27285648 13515146 12811201 597908
+  4870 860806 3866 597908 19.023438 3000.632324 15.101562 2107.520996
+  Frame feature extraction duration: 27450
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 114
+  Pulling buffer
+  Generating feature
+  29181059 27481155 14424966 13892732 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27598
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 115
+  Pulling buffer
+  Generating feature
+  26734745 25307099 16261559 15453346 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 26875
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 116
+  Pulling buffer
+  Generating feature
+  26717245 25184529 16550611 15556343 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27299
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 117
+  Pulling buffer
+  Generating feature
+  32036447 30489638 18743903 17938522 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27236
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 118
+  Pulling buffer
+  Generating feature
+  35531223 33836029 21611827 20816073 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27316
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 119
+  Pulling buffer
+  Generating feature
+  29919543 27938178 13019520 12154183 1116028
+  10704 1360500 8730 1116028 41.812500 3566.167969 34.101562 3196.567871
+  Frame feature extraction duration: 27193
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 120
+  Pulling buffer
+  Generating feature
+  28566768 27306268 13545835 12891435 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27314
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 121
+  Pulling buffer
+  Generating feature
+  29065176 27365060 14238583 13706137 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27303
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 122
+  Pulling buffer
+  Generating feature
+  26150834 24794383 15677648 14940630 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 26771
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 123
+  Pulling buffer
+  Generating feature
+  26206385 24685551 16039751 15057365 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27332
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 124
+  Pulling buffer
+  Generating feature
+  31457466 29720852 18164922 17169736 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27306
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 125
+  Pulling buffer
+  Generating feature
+  35030024 33308198 21110628 20288242 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27260
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 126
+  Pulling buffer
+  Generating feature
+  29508424 27381241 12625651 11614496 1116028
+  10704 1360500 8730 1116028 41.812500 3566.167969 34.101562 3196.567871
+  Frame feature extraction duration: 27205
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 127
+  Pulling buffer
+  Generating feature
+  28178110 26890098 13247341 12562613 603284
+  4870 860806 3914 603284 19.023438 3000.632324 15.289062 2122.822754
+  Frame feature extraction duration: 27326
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 128
+  Pulling buffer
+  Generating feature
+  28364340 26519563 13628185 12951078 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 26846
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 129
+  Pulling buffer
+  Generating feature
+  26121414 24771866 15648228 14918113 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27260
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 130
+  Pulling buffer
+  Generating feature
+  25882471 24361637 15715837 14733451 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27308
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 131
+  Pulling buffer
+  Generating feature
+  31213477 29513010 17920933 16961894 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27268
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 132
+  Pulling buffer
+  Generating feature
+  34604446 32882620 20685050 19862664 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27301
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 133
+  Pulling buffer
+  Generating feature
+  29123830 27103014 12229847 11339815 1130784
+  10826 1381298 8784 1130784 42.289062 3607.330566 34.312500 3239.777344
+  Frame feature extraction duration: 27257
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 134
+  Pulling buffer
+  Generating feature
+  28192792 26995744 13237023 12643259 603284
+  4870 860806 3914 603284 19.023438 3000.632324 15.289062 2122.822754
+  Frame feature extraction duration: 26884
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 135
+  Pulling buffer
+  Generating feature
+  28653588 26610096 13917433 13041611 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27280
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 136
+  Pulling buffer
+  Generating feature
+  26313668 24964120 15840482 15110367 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27243
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 137
+  Pulling buffer
+  Generating feature
+  26110750 24602468 15944116 14974282 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27300
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 138
+  Pulling buffer
+  Generating feature
+  30938418 29361349 17645874 16810233 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27288
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 139
+  Pulling buffer
+  Generating feature
+  34506072 32811892 20586676 19791936 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27278
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 140
+  Pulling buffer
+  Generating feature
+  29157391 27324705 12637577 11715603 910712
+  10788 1420568 7158 910712 42.140625 3773.261475 27.960938 2775.654785
+  Frame feature extraction duration: 27308
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 141
+  Pulling buffer
+  Generating feature
+  28916817 27676228 13779804 13136355 597140
+  4870 860806 3850 597140 19.023438 3000.632324 15.039062 2106.404785
+  Frame feature extraction duration: 26855
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 142
+  Pulling buffer
+  Generating feature
+  28900956 26798375 14113847 13178936 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27334
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 143
+  Pulling buffer
+  Generating feature
+  26474286 25068343 16001100 15214590 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27383
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 144
+  Pulling buffer
+  Generating feature
+  26281560 24744827 16114926 15116641 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27302
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 145
+  Pulling buffer
+  Generating feature
+  30942678 29428179 17650134 16877063 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27228
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 146
+  Pulling buffer
+  Generating feature
+  34982992 33324686 21063596 20304730 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27283
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 147
+  Pulling buffer
+  Generating feature
+  29299761 27575687 12712957 11899595 910712
+  10788 1420568 7158 910712 42.140625 3773.261475 27.960938 2775.654785
+  Frame feature extraction duration: 26871
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 148
+  Pulling buffer
+  Generating feature
+  28537571 27234186 13347500 12661735 617620
+  4870 860806 3978 617620 19.023438 3000.632324 15.539062 2171.115723
+  Frame feature extraction duration: 27321
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 149
+  Pulling buffer
+  Generating feature
+  28581522 26571577 13814149 12971874 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27279
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 150
+  Pulling buffer
+  Generating feature
+  26423296 25127168 15950110 15273415 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27684
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 151
+  Pulling buffer
+  Generating feature
+  26773603 25236870 16606969 15608684 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 155760
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 152
+  Pulling buffer
+  Generating feature
+  30090011 28575512 16797467 16024396 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27308
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 153
+  Pulling buffer
+  Generating feature
+  33300112 31545846 19380716 18525890 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27235
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 154
+  Pulling buffer
+  Generating feature
+  29603330 27759707 12898170 11960715 906168
+  10792 1417408 7144 906168 42.156250 3759.600586 27.906250 2760.959961
+  Frame feature extraction duration: 26878
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 155
+  Pulling buffer
+  Generating feature
+  28191460 26994646 13005191 12425997 617620
+  4870 860806 3978 617620 19.023438 3000.632324 15.539062 2171.115723
+  Frame feature extraction duration: 27258
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 156
+  Pulling buffer
+  Generating feature
+  28887168 27081933 14024547 13386982 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27295
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 157
+  Pulling buffer
+  Generating feature
+  26382404 25049072 15909218 15195319 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27268
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 158
+  Pulling buffer
+  Generating feature
+  26182416 24615836 16015782 14987650 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27281
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 159
+  Pulling buffer
+  Generating feature
+  29712479 28031044 16419935 15479928 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27307
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 160
+  Pulling buffer
+  Generating feature
+  33304504 31543838 19385108 18523882 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 26851
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 161
+  Pulling buffer
+  Generating feature
+  28405609 26647987 12320561 11441731 878792
+  10572 1371880 6998 878792 41.296875 3653.474365 27.335938 2685.527832
+  Frame feature extraction duration: 27296
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 162
+  Pulling buffer
+  Generating feature
+  28215254 27002312 13116265 12537071 633748
+  4870 860806 4026 633748 19.023438 3000.632324 15.726562 2228.253418
+  Frame feature extraction duration: 27341
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 163
+  Pulling buffer
+  Generating feature
+  28922345 27117110 14059724 13422159 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27306
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 164
+  Pulling buffer
+  Generating feature
+  26951467 25586210 16478281 15732457 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27187
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 165
+  Pulling buffer
+  Generating feature
+  26153700 24517346 15987066 14889160 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27496
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 166
+  Pulling buffer
+  Generating feature
+  29470071 27853436 16177527 15302320 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27304
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 167
+  Pulling buffer
+  Generating feature
+  32344468 30611673 18425072 17591717 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 26839
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 168
+  Pulling buffer
+  Generating feature
+  27968677 26162716 11982692 11038123 861392
+  10386 1351914 6828 861392 40.570312 3634.963867 26.671875 2653.423584
+  Frame feature extraction duration: 27207
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 169
+  Pulling buffer
+  Generating feature
+  27843702 26697564 12940639 12391385 596884
+  4870 860806 3834 596884 19.023438 3000.632324 14.976562 2107.280762
+  Frame feature extraction duration: 27304
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 170
+  Pulling buffer
+  Generating feature
+  28756254 26920602 14031223 13363241 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27278
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 171
+  Pulling buffer
+  Generating feature
+  26874389 25509132 16401203 15655379 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27345
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 172
+  Pulling buffer
+  Generating feature
+  25935132 24331849 15768498 14703663 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27247
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 173
+  Pulling buffer
+  Generating feature
+  29331721 27715086 16039177 15163970 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 26874
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 174
+  Pulling buffer
+  Generating feature
+  32702857 30875857 18783461 17855901 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27489
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 175
+  Pulling buffer
+  Generating feature
+  27951212 26251970 12000859 11163009 861392
+  10386 1351914 6828 861392 40.570312 3634.963867 26.671875 2653.423584
+  Frame feature extraction duration: 27218
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 176
+  Pulling buffer
+  Generating feature
+  28037276 26891138 13067639 12518385 596884
+  4870 860806 3834 596884 19.023438 3000.632324 14.976562 2107.280762
+  Frame feature extraction duration: 27277
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 177
+  Pulling buffer
+  Generating feature
+  29126028 27330943 14350563 13723148 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27344
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 178
+  Pulling buffer
+  Generating feature
+  26518195 25115176 16045009 15261423 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27338
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 179
+  Pulling buffer
+  Generating feature
+  26190256 24610598 16023622 14982412 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26864
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 180
+  Pulling buffer
+  Generating feature
+  29763133 28248634 16470589 15697518 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27324
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 181
+  Pulling buffer
+  Generating feature
+  32514110 30721925 18594714 17701969 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27243
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 182
+  Pulling buffer
+  Generating feature
+  28342570 26735820 12199408 11510310 917652
+  10718 1411864 7144 917652 41.867188 3762.232422 27.906250 2805.819336
+  Frame feature extraction duration: 27306
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 183
+  Pulling buffer
+  Generating feature
+  28110006 26954652 12938463 12389209 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27255
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 184
+  Pulling buffer
+  Generating feature
+  29252775 27580612 14477310 13972817 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27299
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 185
+  Pulling buffer
+  Generating feature
+  26753086 25379655 16279900 15525902 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 27285
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 186
+  Pulling buffer
+  Generating feature
+  26352784 24773126 16186150 15144940 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 26865
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 187
+  Pulling buffer
+  Generating feature
+  29803053 28288554 16510509 15737438 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27298
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 188
+  Pulling buffer
+  Generating feature
+  32650559 30858374 18731163 17838418 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27308
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 189
+  Pulling buffer
+  Generating feature
+  28204309 26593727 12061147 11368217 917652
+  10718 1411864 7144 917652 41.867188 3762.232422 27.906250 2805.819336
+  Frame feature extraction duration: 27257
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 190
+  Pulling buffer
+  Generating feature
+  28086084 26930730 12914541 12365287 606100
+  4870 860806 3930 606100 19.023438 3000.632324 15.351562 2131.907715
+  Frame feature extraction duration: 27348
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 191
+  Pulling buffer
+  Generating feature
+  29154659 27482496 14379194 13874701 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27252
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 192
+  Pulling buffer
+  Generating feature
+  26570196 25166437 16097010 15312684 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 26866
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 193
+  Pulling buffer
+  Generating feature
+  26330882 24751224 16164248 15123038 538448
+  8482 1179962 4274 538448 33.132812 3511.443359 16.695312 1824.579102
+  Frame feature extraction duration: 27253
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 194
+  Pulling buffer
+  Generating feature
+  29947301 28432802 16654757 15881686 741428
+  15908 2968758 5216 741428 62.140625 7735.253906 20.375000 2481.062500
+  Frame feature extraction duration: 27235
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 195
+  Pulling buffer
+  Generating feature
+  32750271 30958086 18830875 17938130 899440
+  7649 1196377 7160 899440 29.878906 3780.598633 27.968750 2731.186523
+  Frame feature extraction duration: 27292
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 196
+  Pulling buffer
+  Generating feature
+  28066917 26564587 12161585 11446275 787020
+  9840 1298954 6296 787020 38.437500 3596.597656 24.593750 2469.444336
+  Frame feature extraction duration: 27275
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 197
+  Pulling buffer
+  Generating feature
+  28016378 26846688 12883845 12334591 620436
+  4870 860806 3962 620436 19.023438 3000.632324 15.476562 2184.054199
+  Frame feature extraction duration: 27239
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 198
+  Pulling buffer
+  Generating feature
+  29031489 27359326 14369346 13864853 1167670
+  12152 1718098 8492 1167670 47.468750 4458.038086 33.171875 3460.837646
+  Frame feature extraction duration: 27260
+  Unmapping buffer
+  Incrementing processed frame count
+  Processing frame: 199
+  Pulling buffer
+  Generating feature
+  26226964 24823205 15867094 15082768 619433
+  6980 1228204 4415 619433 27.265625 4054.257568 17.246094 2122.232422
+  Frame feature extraction duration: 26868
+  Unmapping buffer
+  Incrementing processed frame count
+\end{lstlisting}
+
+\begin{lstlisting}
+$\$$ mkdir snippets
+$\$$ GST_DEBUG=WARNING release_repo/build/tools/cpp_tools/feature_generator/feature_generator dataset/loss0.01_dataset/1/00/pl.mp4 1 features &> snippets/feature_generation_720_duration
+$\$$ cat snippets/feature_generation_720_duration | grep -E "duration: [0-9]+" | sed -r 's/.*duration: ([0-9]+)/\1/g' > feature_durations.txt
+$\$$ python3
+Python 3.6.9 (default, Mar 10 2023, 16:46:00) 
+[GCC 8.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> with open('feature_durations.txt','r') as f: data = f.read()
+... 
+>>> data[:10]
+'40162\n2937'
+>>> lines = data.split('\n')
+>>> lines[:10]
+['40162', '29370', '32387', '31767', '40070', '27319', '27306', '27462', '27061', '36128']
+>>> lines = [int(line) for line in lines]
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 1, in <listcomp>
+ValueError: invalid literal for int() with base 10: ''
+>>> lines = [int(line) for line in lines if line.isnumeric()]
+>>> lines[:10]
+[40162, 29370, 32387, 31767, 40070, 27319, 27306, 27462, 27061, 36128]
+>>> lines[0]
+40162
+>>> lines[0]+1
+40163
+>>> sum(lines)/len(lines)
+28709.565
+>>> 
+KeyboardInterr
+\end{lstlisting}
+
+Results in MAXN 15W Mode:
+\begin{lstlisting}
+  $\$$ python3 release_repo/tools/python_tools/parse_feature_extraction_duration_log.py snippets/feature_durations.txt 
+  21866.455  
+\end{lstlisting}
+
+Filtering duration:
+\begin{lstlisting}
+  disptec@disptec-jetson:~/TFG$\$$ ./release_repo/build/tools/cpp_tools/analyzer/analyzer models/amdahl/05_28_2023_07\:33\:52.forest 4 dataset/loss0.01_dataset/1/00/features.bytes dataset/loss0.01_dataset/1/00/block.bytes 
+  Loading feature file: dataset/loss0.01_dataset/1/00/features.bytes
+  Loading label file: dataset/loss0.01_dataset/1/00/block.bytes
+  Converting feature file from row major to column major
+  Building label memory
+  Dataset loading duration: 858480
+  Initializing Rangerx
+  Loading from memory: 0x7f6d093010 0x7f6ce03010
+  Loading forest from file models/amdahl/05_28_2023_07:33:52.forest.
+  Predicting ..
+  Filtering duration: 1362
+  Confusion matrix:
+                0   255
+  predicted 0   479394 0
+  predicted 255 191406 0
+  
+  Precision: 0.000000  
+\end{lstlisting}
+
+\begin{lstlisting}
+  fguindon@amdahl:~/TFG$\$$ ./train_complete_dataset.sh
+Using output prefix: models//05_28_2023_16:42:16
+Writting model specification data
+Loading feature file: dataset/loss0.01_dataset/2//00/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//00/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//01/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//01/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//02/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//02/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//03/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//03/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//04/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//04/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//05/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//05/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//06/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//06/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//07/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//07/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//08/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//08/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//09/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//09/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//10/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//10/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//11/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//11/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//12/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//12/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//13/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//13/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//14/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//14/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//15/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//15/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//16/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//16/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//17/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//17/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//18/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//18/block.bytes
+Building label memory
+Loading feature file: dataset/loss0.01_dataset/2//19/features.bytes
+Loading label file: dataset/loss0.01_dataset/2//19/block.bytes
+Building label memory
+Dataset loading duration: 7830251
+Measuring raw dataset balance
+Negatives: 13315266, Positives: 100734, Total: 670800, Balance: 0.99 : 0.01
+Randomizing negative and positive ids separately
+Adjusting dataset balance to 0.50% pos
+Balanced neg cnt: 100734, pos cnt: 100734
+Dataset balancing duration: 1430582
+Converting feature memory from row major to column major
+Initializing Rangerx
+Loading from memory: 0x7f12506c1010 0x7f1256dbe010
+Rangerx init duration: 4112998
+Running Rangerx
+Growing trees ..
+Computing prediction error ..
+Saving model to file
+Saved forest to file models//05_28_2023_16:42:16.forest.
+Rangerx training duration: 665791
+Writting output
+
+Tree type:                         Classification
+Dependent variable name:           y
+Number of trees:                   2
+Sample size:                       201468
+Number of independent variables:   132
+Mtry:                              10
+Target node size:                  1
+Variable importance mode:          0
+Memory mode:                       0
+Seed:                              0
+Number of threads:                 32
+
+Overall OOB prediction error:      0.00394561
+
+Saved confusion matrix to file models//05_28_2023_16:42:16.confusion.
+fguindon@amdahl:~/TFG$\$$ cat models/05_28_2023_16\:42\:16.confusion 
+Overall OOB prediction error (Fraction missclassified): 0.00394561
+
+Class specific prediction errors:
+                0     255
+predicted 0     60312 203   
+predicted 255     274   60105
+fguindon@amdahl:~/TFG$\$$ ll dataset/loss0.01_dataset/2/19/features.bytes 
+-rw-rw-r-- 1 fguindon fguindon 354182400 may 28 16:22 dataset/loss0.01_dataset/2/19/features.bytes
+fguindon@amdahl:~/TFG$\$$ ll dataset/loss0.01_dataset/2/19/block..bytes 
+ls: cannot access 'dataset/loss0.01_dataset/2/19/block..bytes': No such file or directory
+fguindon@amdahl:~/TFG$\$$ ll dataset/loss0.01_dataset/2/19/block.bytes 
+-rw-rw-r-- 1 fguindon fguindon 720000 may 28 15:58 dataset/loss0.01_dataset/2/19/block.bytes
+fguindon@amdahl:~/TFG$\$$ cat models/05_28_2023_16\:42\:16.forest_spec 
+MODEL SPECIFICATION: 05_28_2023_16:42:16.forest
+Number of trees: 2
+Maximum tree depth: 8
+Splitting rule: EXTRATREES
+Random threshold splits: 50
+Random features per tree: 10
+Dataset used:
+  Name: 20 frame sets of webcam capture
+  Data:  dataset/loss0.01_dataset/2//00/features.bytes  dataset/loss0.01_dataset/2//00/block.bytes  dataset/loss0.01_dataset/2//01/features.bytes  dataset/loss0.01_dataset/2//01/block.bytes  dataset/loss0.01_dataset/2//02/features.bytes  dataset/loss0.01_dataset/2//02/block.bytes  dataset/loss0.01_dataset/2//03/features.bytes  dataset/loss0.01_dataset/2//03/block.bytes  dataset/loss0.01_dataset/2//04/features.bytes  dataset/loss0.01_dataset/2//04/block.bytes  dataset/loss0.01_dataset/2//05/features.bytes  dataset/loss0.01_dataset/2//05/block.bytes  dataset/loss0.01_dataset/2//06/features.bytes  dataset/loss0.01_dataset/2//06/block.bytes  dataset/loss0.01_dataset/2//07/features.bytes  dataset/loss0.01_dataset/2//07/block.bytes  dataset/loss0.01_dataset/2//08/features.bytes  dataset/loss0.01_dataset/2//08/block.bytes  dataset/loss0.01_dataset/2//09/features.bytes  dataset/loss0.01_dataset/2//09/block.bytes  dataset/loss0.01_dataset/2//10/features.bytes  dataset/loss0.01_dataset/2//10/block.bytes  dataset/loss0.01_dataset/2//11/features.bytes  dataset/loss0.01_dataset/2//11/block.bytes  dataset/loss0.01_dataset/2//12/features.bytes  dataset/loss0.01_dataset/2//12/block.bytes  dataset/loss0.01_dataset/2//13/features.bytes  dataset/loss0.01_dataset/2//13/block.bytes  dataset/loss0.01_dataset/2//14/features.bytes  dataset/loss0.01_dataset/2//14/block.bytes  dataset/loss0.01_dataset/2//15/features.bytes  dataset/loss0.01_dataset/2//15/block.bytes  dataset/loss0.01_dataset/2//16/features.bytes  dataset/loss0.01_dataset/2//16/block.bytes  dataset/loss0.01_dataset/2//17/features.bytes  dataset/loss0.01_dataset/2//17/block.bytes  dataset/loss0.01_dataset/2//18/features.bytes  dataset/loss0.01_dataset/2//18/block.bytes  dataset/loss0.01_dataset/2//19/features.bytes  dataset/loss0.01_dataset/2//19/block.bytes 
+\end{lstlisting}
+
+\begin{lstlisting}
+disptec@disptec-jetson:~/TFG/snippets$\$$ cat mask_generator_durations_parsed.log | awk '{s+=$\$$1} END {print s}'
+59225
+disptec@disptec-jetson:~/TFG/snippets$\$$ cat mask_generator_durations_parsed.log | wc -l
+63
+disptec@disptec-jetson:~/TFG/snippets$\$$ python3 -c "59225/63"
+disptec@disptec-jetson:~/TFG/snippets$\$$ python3 -c "print(59225/63)"
+940.0793650793651
+disptec@disptec-jetson:~/TFG/snippets$\$$
+\end{lstlisting}
+
+\end{document}
