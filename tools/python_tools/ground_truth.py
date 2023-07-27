@@ -199,13 +199,16 @@ def main(parser):
     ref_video = cv.VideoCapture(ref_video)
     pl_video = cv.VideoCapture(pl_video)
 
-    if ref_video.isOpened() and pl_video.isOpened():
-        width = ref_video.get(cv.CAP_PROP_FRAME_WIDTH)
-        height = ref_video.get(cv.CAP_PROP_FRAME_HEIGHT)
-        assert(width == pl_video.get(cv.CAP_PROP_FRAME_WIDTH))
-        assert(height == pl_video.get(cv.CAP_PROP_FRAME_HEIGHT))
-        width = int(width)
-        height = int(height)
+    if not ref_video.isOpened() or not pl_video.isOpened():
+        print("Error, could not open videos")
+        exit(1)
+
+    width = ref_video.get(cv.CAP_PROP_FRAME_WIDTH)
+    height = ref_video.get(cv.CAP_PROP_FRAME_HEIGHT)
+    assert(width == pl_video.get(cv.CAP_PROP_FRAME_WIDTH))
+    assert(height == pl_video.get(cv.CAP_PROP_FRAME_HEIGHT))
+    width = int(width)
+    height = int(height)
 
     fourcc = cv.VideoWriter_fourcc(*'xvid')
     ref_writer = cv.VideoWriter(f"{output_dir}/ref.mp4", fourcc, 30.0, (width, height))

@@ -1,5 +1,14 @@
 ## Design
 
+
+### Artifact Detector Library
+
+* Predictor
+
+```
+```
+
+```puml
 @startuml
 
 struct Buffer {
@@ -47,3 +56,4 @@ participant RandomDecisionForest as rdf
 feat -> rdf : 
 
 @enduml
+```

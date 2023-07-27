@@ -749,6 +749,22 @@ void Forest::print_single_tree_maxdepth(size_t tree_id, size_t maxdepth) {
   trees[tree_id]->print_single_tree_maxdepth(0, maxdepth);
 }
 
+void Forest::get_predictions(float* pred_mem, size_t size) {
+  if (!pred_mem) {
+    printf("Prediction memory pointer is null\n");
+    return;
+  }
+
+  if (size != predictions[0][0].size()) {
+    printf("Prediction memory size mismatch\n");
+    return;
+  }
+
+  for (size_t i = 0; i < size; ++i) {
+    pred_mem[i] = predictions[0][0][i];
+  }
+}
+
 void Forest::predict() {
   // Predict trees in multiple threads and join the threads with the main thread
 #ifdef OLD_WIN_R_BUILD
